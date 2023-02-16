@@ -53,6 +53,7 @@ export const YoroiProvider = ({children}) => {
                 console.warn("[dApp][tryConnectSilent] no silent re-connection is available");
                 try {
                     console.log(`[dApp][tryConnectSilent] trying {false, true}`);
+                    setConnectionState(IN_PROGRESS);
                     connectResult = await connect(false, true);
                     if (connectResult != null){
                         console.log('[dApp][tryConnectSilent] RE-CONNECTED!');
@@ -68,38 +69,48 @@ export const YoroiProvider = ({children}) => {
                 throw new Error(error);
             }
         }
-    }
+    };
 
     const connect = async (requestId, silent) => {
+        setConnectionState(IN_PROGRESS);
         console.log(`[dApp][connect] is called`);
+
         if (!window.cardano) {
-            console.warn("There are no cardano wallets are installed");
+            console.error("There are no cardano wallets are installed");
+            setConnectionState(NOT_CONNECTED);
             return;
         }
+
         if (!window.cardano.yoroi) {
-            alert("Yoroi wallet not found! Please install it");
+            console.error("Yoroi wallet not found! Please install it");
+            setConnectionState(NOT_CONNECTED);
             return;
         }
+
         console.log(`[dApp][connect] connecting a wallet`);
         console.log(`[dApp][connect] {requestIdentification: ${requestId}, onlySilent: ${silent}}`);
-        const connectedApi  = await window
-            .cardano
-            .yoroi
-            .enable(
-                {
-                    requestIdentification: requestId,
-                    onlySilent: silent
-                }
-            );
-        console.log(`[dApp][connect] wallet API object is received`);
-        setApi(connectedApi);
-        if ( requestId && connectedApi.experimental && connectedApi.experimental.auth) {
-            const auth = connectedApi.experimental.auth();
-            setAuthEnabled(auth && auth.isEnabled());
+
+        try {
+            const connectedApi  = await window.cardano.yoroi
+                .enable(
+                    {
+                        requestIdentification: requestId,
+                        onlySilent: silent
+                    }
+                );
+            console.log(`[dApp][connect] wallet API object is received`);
+            setApi(connectedApi);
+            if ( requestId && connectedApi.experimental && connectedApi.experimental.auth) {
+                const auth = connectedApi.experimental.auth();
+                setAuthEnabled(auth && auth.isEnabled());
+            }
             setConnectionState(CONNECTED);
-        }
-        return connectedApi;
-    }
+            return connectedApi;
+        } catch (error) {
+            setConnectionState(NOT_CONNECTED);
+            throw new Error(error);
+        };
+    };
 
     const values = {
         api,
@@ -108,17 +119,17 @@ export const YoroiProvider = ({children}) => {
         connectionState,
     };
     
-    return <YoroiContext.Provider value={values}>{children}</YoroiContext.Provider>
-}
+    return <YoroiContext.Provider value={values}>{children}</YoroiContext.Provider>;
+};
 
 const useYoroi = () => {
-    const context = React.useContext(YoroiContext)
+    const context = React.useContext(YoroiContext);
 
     if (context === undefined) {
-        throw new Error("Install Yoroi")
+        throw new Error("Install Yoroi");
     }
     
     return context;
-}
+};
 
 export default useYoroi;
