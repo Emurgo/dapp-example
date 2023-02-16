@@ -1,7 +1,7 @@
 import Cip30Tab from "./subtabs/cip30Tab";
-import ContractTab from "./subtabs/contractTab";
+// import ContractTab from "./subtabs/contractTab";
 import NFTTab from "./subtabs/NFTTab";
-import SubmitTxsTab from "./subtabs/submitTxsTab";
+// import SubmitTxsTab from "./subtabs/submitTxsTab";
 import {
     Routes,
     Route,
@@ -54,7 +54,7 @@ const MainTab = () => {
             </div>
             <Routes>
                 <Route path="/CIP-30" element={<Cip30Tab />} />
-                <Route path="/Contracts" element={<ContractTab />} />
+                {/* <Route path="/Contracts" element={<ContractTab />} /> */}
                 <Route path="/NFTs" element={<NFTTab />} />
                 {/* <Route path="/Submit-Txs" element={<SubmitTxsTab />} /> */}
             </Routes>
