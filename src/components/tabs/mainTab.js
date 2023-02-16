@@ -36,19 +36,19 @@ const MainTab = () => {
                                 <button className={"inline-block p-4 rounded-t-lg " + (pathname === "/CIP-30" ? ACTIVE_COLOURS : INACTIVE_COLOURS)}>CIP-30</button>
                             </Link>
                         </li>
-                        <li className="mr-2">
+                        {/* <li className="mr-2">
                             <button className={"inline-block p-4 rounded-t-lg cursor-not-allowed " + (pathname === "/Contracts" ? ACTIVE_COLOURS : INACTIVE_COLOURS)}>Contracts</button>
-                        </li>
+                        </li> */}
                         <li className="mr-2">
                             <Link to="NFTs">
                                 <button className={"inline-block p-4 rounded-t-lg " + (pathname === "/NFTs" ? ACTIVE_COLOURS : INACTIVE_COLOURS)}>NFTs</button>
                             </Link>
                         </li>
-                        <li className="mr-2">
+                        {/* <li className="mr-2">
                             <Link to="Submit-Txs">
                                 <button className={"inline-block p-4 rounded-t-lg " + (pathname === "/Submit-Txs" ? ACTIVE_COLOURS : INACTIVE_COLOURS)}>Submit-Txs</button>
                             </Link>
-                        </li>
+                        </li> */}
                     </ul>
                 }
             </div>
@@ -56,7 +56,7 @@ const MainTab = () => {
                 <Route path="/CIP-30" element={<Cip30Tab />} />
                 <Route path="/Contracts" element={<ContractTab />} />
                 <Route path="/NFTs" element={<NFTTab />} />
-                <Route path="/Submit-Txs" element={<SubmitTxsTab />} />
+                {/* <Route path="/Submit-Txs" element={<SubmitTxsTab />} /> */}
             </Routes>
         </>
     );
