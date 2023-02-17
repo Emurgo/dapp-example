@@ -1,7 +1,6 @@
 import { useState } from "react";
 import useYoroi from "../../../hooks/yoroiProvider";
 import useWasm from "../../../hooks/useWasm";
-import { Buffer } from "buffer";
 import { hexToBytes, bytesToHex } from "../../../utils/utils";
 import {
   getAddressFromBytes,

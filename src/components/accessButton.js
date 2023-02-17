@@ -18,6 +18,10 @@ const AccessButton = () => {
     return walletId;
   };
 
+  const getWalletIcon = () => {
+    return window.cardano.yoroi.icon;
+  };
+
   const handleOnChange = () => {
     setIsAuthChecked(!isAuthChecked);
   };
@@ -27,10 +31,19 @@ const AccessButton = () => {
       <div className="grid justify-items-center py-3">
         {api
           ?
-          <div className="py-5 text-xl font-bold tracking-tight text-white">
-            Connected To Yoroi
-            <div className="py-1 text-xl font-bold tracking-tight text-white text-center">
-              {getWalletPlate(api, isAuthChecked, authEnabled)}
+          <div className="grid grid-cols-4">
+            <div className="grid justify-items-end py-5">
+              <img src={getWalletIcon()} />
+            </div>
+            <div className="col-span-3 text-xl font-bold tracking-tight text-white text-center">
+              <div className="py-5">
+                <div>
+                  Connected To Yoroi
+                </div>
+                <div className="py-1">
+                  {getWalletPlate(api, isAuthChecked, authEnabled)}
+                </div>
+              </div>
             </div>
           </div>
           : connectionState === IN_PROGRESS
