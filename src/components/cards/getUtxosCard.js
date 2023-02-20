@@ -30,7 +30,8 @@ const GetUtxosCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
       })
       .catch((e) => {
         onWaiting(false);
-        onResponse(e.info);
+        onRawResponse('');
+        onResponse(e);
         console.log(e);
       })
   }

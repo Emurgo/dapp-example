@@ -21,7 +21,8 @@ const GetRewardAddressesCard = ({ api, wasm, onRawResponse, onResponse, onWaitin
       })
       .catch((e) => {
         onWaiting(false);
-        onResponse(e.info);
+        onRawResponse('');
+        onResponse(e);
         console.log(e);
       })
   }

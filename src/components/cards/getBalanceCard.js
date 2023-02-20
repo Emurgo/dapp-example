@@ -18,8 +18,9 @@ const GetBalanceCard = ({ api, wasm, onRawResponse, onResponse, onWaiting}) => {
       })
       .catch((e) => {
         onWaiting(false);
-        onResponse(e.info)
-        console.log(e)
+        onRawResponse('');
+        onResponse(e);
+        console.log(e);
       })
   }
 
