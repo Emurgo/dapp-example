@@ -1,32 +1,34 @@
-import React, {useState} from "react";
+import React from "react";
 import {hexToBytes} from "../../utils/utils";
 import ApiCard from "./apiCard";
 
 
-const GetRewardAddressesCard = ({ api, wasm }) => {
-  const [rewardAddressesText, setRewardAddressesText] = useState("")
+const GetRewardAddressesCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
 
   const getRewardAddressesClick = () => {
+    onWaiting(true);
     api?.getRewardAddresses()
       .then((hexAddresses) => {
+        onWaiting(false);
+        onRawResponse(hexAddresses);
         const addresses = []
         for (let i = 0; i < hexAddresses.length; i++) {
           const wasmAddress = wasm.Address.from_bytes(hexToBytes(hexAddresses[i]))
           addresses.push(wasmAddress.to_bech32())
         }
-        setRewardAddressesText(addresses)
+        onResponse(addresses);
       })
       .catch((e) => {
-        setRewardAddressesText(e.info)
-        console.log(e)
+        onWaiting(false);
+        onRawResponse('');
+        onResponse(e);
+        console.log(e);
       })
   }
 
 
   const apiProps = {
     apiName: "getRewardAddresses",
-    apiDescription: "Returns your reward addresses, these are where your staking rewards go",
-    text: rewardAddressesText,
     clickFunction: getRewardAddressesClick
   }
 

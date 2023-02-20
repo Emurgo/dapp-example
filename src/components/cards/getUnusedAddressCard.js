@@ -1,30 +1,32 @@
-import React, {useState} from "react";
+import React from "react";
 import {hexToBytes} from "../../utils/utils";
 import ApiCard from "./apiCard";
 
-const GetUnusedAddressesCard = ({ api, wasm }) => {
-  const [unusedAddressesText, setUnusedAddressesText] = useState("")
+const GetUnusedAddressesCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
 
   const getUnusedAddressesClick = () => {
+    onWaiting(true);
     api?.getUnusedAddresses()
       .then((hexAddresses) => {
+        onWaiting(false);
+        onRawResponse(hexAddresses);
         const addresses = []
         for (let i = 0; i < hexAddresses.length; i++) {
           const wasmAddress = wasm.Address.from_bytes(hexToBytes(hexAddresses[i]))
           addresses.push(wasmAddress.to_bech32())
         }
-        setUnusedAddressesText(addresses)
+        onResponse(addresses);
       })
       .catch((e) => {
-        setUnusedAddressesText(e.info)
-        console.log(e)
+        onWaiting(false);
+        onRawResponse('');
+        onResponse(e);
+        console.log(e);
       })
   }
 
   const apiProps = {
     apiName: "getUnusedAddresses",
-    apiDescription: "Returns the unused addresses of your Yoroi wallet",
-    text: unusedAddressesText,
     clickFunction: getUnusedAddressesClick
   }
 
