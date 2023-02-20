@@ -1,18 +1,22 @@
 import React, {useState} from "react";
 import ApiCard from "./apiCard";
 
-const SubmitTransactionCard = ({ api }) => {
+const SubmitTransactionCard = ({ api, onRawResponse, onResponse, onWaiting }) => {
   const [submitTransactionText, setSubmitTransactionText] = useState("")
   const [submitTransactionInput, setSubmitTransactionInput] = useState("")
 
   const submitTransactionClick = () => {
+    onWaiting(true);
     api?.submitTx(submitTransactionInput)
       .then((txId) => {
-        setSubmitTransactionText(txId)
+        onWaiting(false);
+        onRawResponse(txId);
+        onResponse(txId);
       })
       .catch((e) => {
-        setSubmitTransactionText(e.info)
-        console.log(e)
+        onWaiting(false);
+        onResponse(e.info);
+        console.log(e);
       })
   }
 

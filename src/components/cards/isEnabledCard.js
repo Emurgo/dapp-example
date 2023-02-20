@@ -1,17 +1,21 @@
 import React, {useState} from "react";
 import ApiCard from "./apiCard";
 
-const IsEnabledCard = () => {
+const IsEnabledCard = ({ onRawResponse, onResponse, onWaiting }) => {
   const [isEnabledText, setIsEnabledText] = useState("")
 
   const isDisabledClick = () => {
+    onWaiting(true);
     window.cardano.yoroi?.isEnabled()
       .then((enabled) => {
-        setIsEnabledText(enabled)
+        onWaiting(false);
+        onRawResponse(enabled);
+        onResponse(enabled);
       })
       .catch((e) => {
-        setIsEnabledText(e.info)
-        console.log(e)
+        onWaiting(false);
+        onResponse(e.info);
+        console.error(e);
       })
   }
 

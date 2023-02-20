@@ -3,23 +3,27 @@ import ApiCard from "./apiCard";
 import InputModal from "./inputModal";
 import {getAddressFromBytes} from "../../utils/wasmTools";
 
-const GetUsedAddresses = ({ api, wasm }) => {
+const GetUsedAddresses = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
   const [usedAddressesText, setUsedAddressesText] = useState("")
   const [usedAddressInput, setUsedAddressInput] = useState({ page: 0, limit: 5 })
 
   const getUsedAddressesClick = () => {
+    onWaiting(true);
     api?.getUsedAddresses(usedAddressInput)
       .then((hexAddresses) => {
+        onWaiting(false);
+        onRawResponse(hexAddresses);
         const addresses = []
         for (let i = 0; i < hexAddresses.length; i++) {
           const wasmAddress = getAddressFromBytes(wasm, hexAddresses[i]);
           addresses.push(wasmAddress.to_bech32());
         }
-        setUsedAddressesText(addresses)
+        onResponse(addresses);
       })
       .catch((e) => {
-        setUsedAddressesText(e.info)
-        console.log(e)
+        onWaiting(false);
+        onResponse(e.info);
+        console.log(e);
       })
   }
 

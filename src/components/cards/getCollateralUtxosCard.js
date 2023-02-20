@@ -3,13 +3,16 @@ import {bytesToHex, hexToBytes, wasmMultiassetToJSONs} from "../../utils/utils";
 import ApiCard from "./apiCard";
 import InputModal from "./inputModal";
 
-const GetCollateralUtxosCard = ({ api, wasm }) => {
+const GetCollateralUtxosCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
   const [getCollateralUtxosText, setGetCollateralUtxosText] = useState("")
   const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState(2000000)
 
   const getCollateralUtxosClick = () => {
+    onWaiting(true);
     api?.getCollateral(getCollateralUtxosInput)
       .then((hexUtxos) => {
+        onWaiting(false);
+        onRawResponse(hexUtxos);
         let utxos = []
         for (let i = 0; i < hexUtxos.length; i++) {
           const utxo = {}
@@ -21,13 +24,14 @@ const GetCollateralUtxosCard = ({ api, wasm }) => {
           utxo.receiver = output.address().to_bech32()
           utxo.amount = output.amount().coin().to_str()
           utxo.asset = wasmMultiassetToJSONs(output.amount().multiasset())
-          utxos.push(JSON.stringify(utxo))
+          utxos.push(utxo)
         }
-        setGetCollateralUtxosText(utxos)
+        onResponse(utxos);
       })
       .catch((e) => {
-        setGetCollateralUtxosText(e.info)
-        console.log(e)
+        onWaiting(false);
+        onResponse(e.info);
+        console.log(e);
       })
 
   }

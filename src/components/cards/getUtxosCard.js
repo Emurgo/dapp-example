@@ -3,13 +3,16 @@ import {bytesToHex, hexToBytes, wasmMultiassetToJSONs} from "../../utils/utils";
 import ApiCard from "./apiCard";
 import InputModal from "./inputModal";
 
-const GetUtxosCard = ({ api, wasm }) => {
+const GetUtxosCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
   const [getUtxosText, setGetUtxosText] = useState("")
   const [getUtxosInput, setGetUtxosInput] = useState({ amount: "", page: 0, limit: 10 })
 
   const getUtxosClick = () => {
+    onWaiting(true);
     api?.getUtxos(getUtxosInput.amount, { page: getUtxosInput.page, limit: getUtxosInput.limit })
       .then((hexUtxos) => {
+        onWaiting(false);
+        onRawResponse(hexUtxos);
         let utxos = []
         for (let i = 0; i < hexUtxos.length; i++) {
           const utxo = {}
@@ -21,13 +24,14 @@ const GetUtxosCard = ({ api, wasm }) => {
           utxo.receiver = output.address().to_bech32()
           utxo.amount = output.amount().coin().to_str()
           utxo.asset = wasmMultiassetToJSONs(output.amount().multiasset())
-          utxos.push(JSON.stringify(utxo))
+          utxos.push(utxo)
         }
-        setGetUtxosText(utxos)
+        onResponse(utxos);
       })
       .catch((e) => {
-        setGetUtxosText(e.info)
-        console.log(e)
+        onWaiting(false);
+        onResponse(e.info);
+        console.log(e);
       })
   }
 

@@ -13,7 +13,7 @@ import {
   getWasmUtxos
 } from "../../utils/wasmTools";
 
-const SignTransactionCard = ({ api, wasm }) => {
+const SignTransactionCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
   const [signTransactionText, setSignTransactionText] = useState("")
   const [buildTransactionInput, setBuildTransactionInput] = useState({ amount: "2000000", address: "" })
   const [signTransactionInput, setSignTransactionInput] = useState("")
@@ -41,19 +41,23 @@ const SignTransactionCard = ({ api, wasm }) => {
   }
 
   const signTransactionClick = async () => {
+    onWaiting(true);
     let txHex = signTransactionInput;
     if (!txHex) {
-      txHex = await buildTransaction()
+      txHex = await buildTransaction();
     }
     api?.signTx(txHex)
       .then((witnessHex) => {
+        onWaiting(false);
+        onRawResponse(witnessHex);
         const wasmUnsignedTransaction = getTransactionFromBytes(wasm, txHex);
         const wasmWitnessSet = getTransactionWitnessSetFromBytes(wasm, witnessHex);
         const wasmSignedTransaction = getSignedTransaction(wasm, wasmUnsignedTransaction, wasmWitnessSet);
-        setSignTransactionText(bytesToHex(wasmSignedTransaction.to_bytes()));
+        onResponse(bytesToHex(wasmSignedTransaction.to_bytes()));
       })
       .catch((e) => {
-        setSignTransactionText(e.info);
+        onWaiting(false);
+        onResponse(e.info);
         console.log(e);
       })
   }

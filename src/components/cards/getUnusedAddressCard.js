@@ -2,21 +2,25 @@ import React, {useState} from "react";
 import {hexToBytes} from "../../utils/utils";
 import ApiCard from "./apiCard";
 
-const GetUnusedAddressesCard = ({ api, wasm }) => {
+const GetUnusedAddressesCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
   const [unusedAddressesText, setUnusedAddressesText] = useState("")
 
   const getUnusedAddressesClick = () => {
+    onWaiting(true);
     api?.getUnusedAddresses()
       .then((hexAddresses) => {
+        onWaiting(false);
+        onRawResponse(hexAddresses);
         const addresses = []
         for (let i = 0; i < hexAddresses.length; i++) {
           const wasmAddress = wasm.Address.from_bytes(hexToBytes(hexAddresses[i]))
           addresses.push(wasmAddress.to_bech32())
         }
-        setUnusedAddressesText(addresses)
+        onResponse(addresses);
       })
       .catch((e) => {
-        setUnusedAddressesText(e.info)
+        onWaiting(false);
+        onResponse(e.info)
         console.log(e)
       })
   }
