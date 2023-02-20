@@ -9,6 +9,7 @@ const GetBalanceCard = ({ api, wasm, onRawResponse, onResponse, onWaiting}) => {
     onWaiting(true);
     api?.getBalance()
       .then((hexBalance) => {
+        onWaiting(false);
         onRawResponse(hexBalance);
         const wasmValue = wasm.Value.from_bytes(hexToBytes(hexBalance));
         const adaValue = wasmValue.coin().to_str();
@@ -16,6 +17,7 @@ const GetBalanceCard = ({ api, wasm, onRawResponse, onResponse, onWaiting}) => {
         onResponse({lovelaces: adaValue, assets: assetValue});
       })
       .catch((e) => {
+        onWaiting(false);
         onResponse(e.info)
         console.log(e)
       })
