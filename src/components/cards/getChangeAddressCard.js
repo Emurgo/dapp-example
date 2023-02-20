@@ -1,9 +1,8 @@
-import React, {useState} from "react";
+import React from "react";
 import {hexToBytes} from "../../utils/utils";
 import ApiCard from "./apiCard";
 
 const GetChangeAddressCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
-  const [getChangeAddressText, setGetChangeAddressText] = useState("")
 
   const getChangeAddressClick = () => {
     onWaiting(true);
@@ -24,8 +23,6 @@ const GetChangeAddressCard = ({ api, wasm, onRawResponse, onResponse, onWaiting 
 
   const apiProps = {
     apiName: "getChangeAddress",
-    apiDescription: "Returns your change address, Yoroi generates a new one every transaction",
-    text: getChangeAddressText,
     clickFunction: getChangeAddressClick
   }
   return (

@@ -1,9 +1,8 @@
-import React, {useState} from "react";
+import React from "react";
 import {hexToBytes} from "../../utils/utils";
 import ApiCard from "./apiCard";
 
 const GetUnusedAddressesCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
-  const [unusedAddressesText, setUnusedAddressesText] = useState("")
 
   const getUnusedAddressesClick = () => {
     onWaiting(true);
@@ -28,8 +27,6 @@ const GetUnusedAddressesCard = ({ api, wasm, onRawResponse, onResponse, onWaitin
 
   const apiProps = {
     apiName: "getUnusedAddresses",
-    apiDescription: "Returns the unused addresses of your Yoroi wallet",
-    text: unusedAddressesText,
     clickFunction: getUnusedAddressesClick
   }
 

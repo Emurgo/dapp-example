@@ -1,9 +1,8 @@
-import React, {useState} from "react";
+import React from "react";
 import {hexToBytes, wasmMultiassetToJSONs} from "../../utils/utils";
 import ApiCard from "./apiCard";
 
 const GetBalanceCard = ({ api, wasm, onRawResponse, onResponse, onWaiting}) => {
-  const [getBalanceText, setGetBalanceText] = useState("")
 
   const getBalanceClick = () => {
     onWaiting(true);
@@ -26,8 +25,6 @@ const GetBalanceCard = ({ api, wasm, onRawResponse, onResponse, onWaiting}) => {
 
   const apiProps = {
     apiName: "getBalance",
-    apiDescription: "Returns the balance of your account in lovelaces and tokens",
-    text: getBalanceText,
     clickFunction: getBalanceClick
   }
 

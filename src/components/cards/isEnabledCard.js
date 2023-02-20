@@ -1,8 +1,7 @@
-import React, {useState} from "react";
+import React from "react";
 import ApiCard from "./apiCard";
 
 const IsEnabledCard = ({ onRawResponse, onResponse, onWaiting }) => {
-  const [isEnabledText, setIsEnabledText] = useState("")
 
   const isDisabledClick = () => {
     onWaiting(true);
@@ -22,8 +21,6 @@ const IsEnabledCard = ({ onRawResponse, onResponse, onWaiting }) => {
 
   const apiProps = {
     apiName: "isEnabled",
-    apiDescription: "Returns true or false depending on whether Yoroi is enabled",
-    text: isEnabledText,
     clickFunction: isDisabledClick
   }
 

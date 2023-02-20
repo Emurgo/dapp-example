@@ -1,11 +1,9 @@
 import React, {useState} from "react";
 import {bytesToHex, hexToBytes, wasmMultiassetToJSONs} from "../../utils/utils";
-import ApiCard from "./apiCard";
-import InputModal from "./inputModal";
+import ApiCardWithModal from "./apiCardWithModal";
 
 const GetCollateralUtxosCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
-  const [getCollateralUtxosText, setGetCollateralUtxosText] = useState("")
-  const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState(2000000)
+  const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState(2000000);
 
   const getCollateralUtxosClick = () => {
     onWaiting(true);
@@ -38,23 +36,30 @@ const GetCollateralUtxosCard = ({ api, wasm, onRawResponse, onResponse, onWaitin
   }
 
   const apiProps = {
-    apiName: "getCollateral",
-    apiDescription: "Returns UTXOs usable for collateral (required by plutus transactions)",
-    text: getCollateralUtxosText,
+    buttonLabel: "getCollateral",
     clickFunction: getCollateralUtxosClick,
-    inputs: "amount: number"
   }
 
   return (
-    <ApiCard {...apiProps}>
-      <InputModal buttonLabel="Set Inputs">
-        <div className="px-4 pb-3">
-          <label htmlFor="amount" className="block mb-2 text-sm font-medium text-gray-300">Amount</label>
-          <input type="number" min="0" id="amount" className="appearance-none border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder="2000000"
-                 value={getCollateralUtxosInput} onChange={(event) => setGetCollateralUtxosInput(Number(event.target.value))} />
-        </div>
-      </InputModal>
-    </ApiCard>
+    <ApiCardWithModal {...apiProps}>
+      <div className="px-4 pb-3">
+        <label
+          htmlFor="amount"
+          className="block mb-2 text-sm font-medium text-gray-300"
+        >
+          Amount
+        </label>
+        <input
+          type="number"
+          min="0"
+          id="amount"
+          className="appearance-none border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+          placeholder="2000000"
+          value={getCollateralUtxosInput}
+          onChange={(event) => setGetCollateralUtxosInput(Number(event.target.value))}
+        />
+      </div>
+    </ApiCardWithModal>
   );
 };
 

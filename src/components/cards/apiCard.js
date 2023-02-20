@@ -1,7 +1,7 @@
 import React from "react";
 
 const ApiCard = (props) => {
-  const { apiName, apiDescription, text, clickFunction, inputs, children } = props
+  const { apiName, clickFunction } = props
 
   return (
     <div className="grid grid-cols-1 rounded-lg border bg-gray-800 border-gray-700">

@@ -1,10 +1,9 @@
-import React, {useState} from "react";
+import React from "react";
 import {hexToBytes} from "../../utils/utils";
 import ApiCard from "./apiCard";
 
 
 const GetRewardAddressesCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
-  const [rewardAddressesText, setRewardAddressesText] = useState("")
 
   const getRewardAddressesClick = () => {
     onWaiting(true);
@@ -30,8 +29,6 @@ const GetRewardAddressesCard = ({ api, wasm, onRawResponse, onResponse, onWaitin
 
   const apiProps = {
     apiName: "getRewardAddresses",
-    apiDescription: "Returns your reward addresses, these are where your staking rewards go",
-    text: rewardAddressesText,
     clickFunction: getRewardAddressesClick
   }
 

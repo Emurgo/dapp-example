@@ -1,11 +1,9 @@
 import React, {useState} from "react";
 import {bytesToHex, hexToBytes, wasmMultiassetToJSONs} from "../../utils/utils";
-import ApiCard from "./apiCard";
-import InputModal from "./inputModal";
+import ApiCardWithModal from "./apiCardWithModal";
 
 const GetUtxosCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
-  const [getUtxosText, setGetUtxosText] = useState("")
-  const [getUtxosInput, setGetUtxosInput] = useState({ amount: "", page: 0, limit: 10 })
+  const [getUtxosInput, setGetUtxosInput] = useState({ amount: "", page: 0, limit: 10 });
 
   const getUtxosClick = () => {
     onWaiting(true);
@@ -37,35 +35,30 @@ const GetUtxosCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
   }
 
   const apiProps = {
-    apiName: "getUtxos",
-    apiDescription: "Returns the available UTXOs within your wallet. If \"amount\" is undefined, returns all UTXOs, else perform UTXO selection for amount",
-    text: getUtxosText,
+    buttonLabel: "getUtxos",
     clickFunction: getUtxosClick,
-    inputs: "amount: string, {page: number, limit: number}"
   }
 
   return (
-    <ApiCard {...apiProps}>
-      <InputModal buttonLabel="Set Inputs">
-        <div className="px-4 pb-3">
-          <label htmlFor="amount" className="block mb-2 text-sm font-medium text-gray-300">Amount</label>
-          <input type="number" min="0" id="amount" className="appearance-none border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder=""
-                 value={getUtxosInput.amount} onChange={(event) => setGetUtxosInput({ ...getUtxosInput, amount: event.target.value })} />
+    <ApiCardWithModal {...apiProps}>
+      <div className="px-4 pb-3">
+        <label htmlFor="amount" className="block mb-2 text-sm font-medium text-gray-300">Amount</label>
+        <input type="number" min="0" id="amount" className="appearance-none border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder=""
+                value={getUtxosInput.amount} onChange={(event) => setGetUtxosInput({ ...getUtxosInput, amount: event.target.value })} />
+      </div>
+      <div className="grid gap-6 mb-6 md:grid-cols-2 px-4">
+        <div>
+          <label htmlFor="page" className="block mb-2 text-sm font-medium text-gray-300">Page</label>
+          <input type="number" min="0" id="page" className="appearance-none border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder=""
+                  value={getUtxosInput.page} onChange={(event) => setGetUtxosInput({ ...getUtxosInput, page: Number(event.target.value) })} />
         </div>
-        <div className="grid gap-6 mb-6 md:grid-cols-2 px-4">
-          <div>
-            <label htmlFor="page" className="block mb-2 text-sm font-medium text-gray-300">Page</label>
-            <input type="number" min="0" id="page" className="appearance-none border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder=""
-                   value={getUtxosInput.page} onChange={(event) => setGetUtxosInput({ ...getUtxosInput, page: Number(event.target.value) })} />
-          </div>
-          <div>
-            <label htmlFor="limit" className="block mb-2 text-sm font-medium text-gray-300">Limit</label>
-            <input type="number" min="0" id="limit" className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder=""
-                   value={getUtxosInput.limit} onChange={(event) => setGetUtxosInput({ ...getUtxosInput, limit: Number(event.target.value) })} />
-          </div>
+        <div>
+          <label htmlFor="limit" className="block mb-2 text-sm font-medium text-gray-300">Limit</label>
+          <input type="number" min="0" id="limit" className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder=""
+                  value={getUtxosInput.limit} onChange={(event) => setGetUtxosInput({ ...getUtxosInput, limit: Number(event.target.value) })} />
         </div>
-      </InputModal>
-    </ApiCard>
+      </div>
+    </ApiCardWithModal>
   );
 };
 
