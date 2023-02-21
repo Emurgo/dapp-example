@@ -28,7 +28,7 @@ const Cip30Tab = () => {
     const copyToClipboard = () => {
         navigator.clipboard.writeText(currentText).then(
             function() {
-                console.log('Async: Copying to clipboard was successful!');
+                console.log('Async: Copying the processed response to clipboard was successful!');
                 setMessageDisplayed(true);
                 hideMessage();
             },
@@ -39,14 +39,14 @@ const Cip30Tab = () => {
     };
 
     const copyRawToClipboard = () => {
-        navigator.clipboard.writeText(currentText).then(
+        navigator.clipboard.writeText(rawCurrentText).then(
             function() {
-                console.log('Async: Copying to clipboard was successful!');
+                console.log('Async: Copying raw response to clipboard was successful!');
                 setMessageDisplayedRaw(true);
                 hideMessageRaw();
             },
             function(err) {
-                console.error('Async: Could not copy text: ', err);
+                console.error('Async: Could not copy raw response: ', err);
             }
         );
     };
