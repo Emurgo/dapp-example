@@ -8,6 +8,7 @@ import GetRewardAddressesCard from "../../cards/getRewardAddressesCard";
 import GetUnusedAddressesCard from "../../cards/getUnusedAddressCard";
 import GetUsedAddresses from "../../cards/getUsedAddressCard";
 import GetUtxosCard from "../../cards/getUtxosCard";
+import SignDataCard from "../../cards/signDataCard";
 import SignTransactionCard from "../../cards/signTransactionCard";
 import SubmitTransactionCard from "../../cards/submitTransactionCard";
 import IsEnabledCard from "../../cards/isEnabledCard";
@@ -131,6 +132,14 @@ const Cip30Tab = () => {
                         <GetCollateralUtxosCard
                             api={api}
                             wasm={wasm}
+                            onRawResponse={setRawCurrentText}
+                            onResponse={setResponse}
+                            onWaiting={setWaiterState}
+                        />
+                    </div>
+                    <div>
+                        <SignDataCard
+                            api={api}
                             onRawResponse={setRawCurrentText}
                             onResponse={setResponse}
                             onWaiting={setWaiterState}
