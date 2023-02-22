@@ -9,15 +9,11 @@ const SignDataCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
         let address;
         try {
             const usedAddresses = await api?.getUsedAddresses({page: 0, limit: 5});
-            console.log(`Used addresses: ${usedAddresses}`);
             if (usedAddresses && usedAddresses.length > 0) {
-                console.log(`Selected used address: ${usedAddresses[0]}`);
                 address = usedAddresses[0];
             } else {
                 const unusedAddresses = await api?.getUnusedAddresses();
-                console.log(`Unused addresses: ${unusedAddresses}`);
                 if ((unusedAddresses && unusedAddresses.length > 0)) {
-                    console.log(`Selected unused address: ${unusedAddresses[0]}`);
                     address = unusedAddresses[0];
                 }
             }
@@ -28,17 +24,19 @@ const SignDataCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
         return address;
     };
 
-    const signDataClick = async () => {
-        let payloadHex;
-        onWaiting(true);
-
-        if (message.startsWith("0x")) {
-            payloadHex = Buffer.from(message.replace("^0x", ""), "hex").toString("hex");
-        } else {
-            payloadHex = Buffer.from(message, "utf8").toString("hex");
+    const getPayloadHex = (payload) => {
+        if (payload.startsWith("0x")) {
+            return Buffer.from(payload.replace("^0x", ""), "hex").toString("hex");
         }
 
+        return Buffer.from(payload, "utf8").toString("hex");
+    };
+
+    const signDataClick = async () => {
+        onWaiting(true);
+
         const address = await getAddress();
+        const payloadHex = getPayloadHex(message);
 
         api?.signData(address, payloadHex)
             .then((sig) => {
