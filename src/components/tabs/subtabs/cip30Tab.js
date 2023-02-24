@@ -9,6 +9,7 @@ import GetUnusedAddressesCard from "../../cards/getUnusedAddressCard";
 import GetUsedAddresses from "../../cards/getUsedAddressCard";
 import GetUtxosCard from "../../cards/getUtxosCard";
 import SignDataCard from "../../cards/signDataCard";
+import BuildTransactionCard from "../../cards/buildTransactionCard";
 import SignTransactionCard from "../../cards/signTransactionCard";
 import SubmitTransactionCard from "../../cards/submitTransactionCard";
 import IsEnabledCard from "../../cards/isEnabledCard";
@@ -140,6 +141,15 @@ const Cip30Tab = () => {
                     <div>
                         <SignDataCard
                             api={api}
+                            onRawResponse={setRawCurrentText}
+                            onResponse={setResponse}
+                            onWaiting={setWaiterState}
+                        />
+                    </div>
+                    <div>
+                        <BuildTransactionCard
+                            api={api}
+                            wasm={wasm}
                             onRawResponse={setRawCurrentText}
                             onResponse={setResponse}
                             onWaiting={setWaiterState}

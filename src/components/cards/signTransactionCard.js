@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import {bytesToHex} from "../../utils/utils";
+import React, { useState } from "react";
+import { bytesToHex } from "../../utils/utils";
 import {
   getAddressFromBytes,
   getLargestFirstMultiAsset,
@@ -13,10 +13,10 @@ import {
 import ApiCardWithModal from "./apiCardWithModal";
 
 const SignTransactionCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
-  const [buildTransactionInput, setBuildTransactionInput] = useState({ amount: "2000000", address: "" });
+  const defaultValue = { amount: "2000000", address: "" };
   const [signTransactionInput, setSignTransactionInput] = useState("");
 
-  const buildTransaction = async () => {
+  const buildTransaction = async (buildTransactionInput) => {
     const txBuilder = getTxBuilder(wasm);
 
     const changeAddress = await api?.getChangeAddress();
@@ -42,7 +42,7 @@ const SignTransactionCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }
     onWaiting(true);
     let txHex = signTransactionInput;
     if (!txHex) {
-      txHex = await buildTransaction();
+      txHex = await buildTransaction(defaultValue);
     }
     api?.signTx(txHex)
       .then((witnessHex) => {

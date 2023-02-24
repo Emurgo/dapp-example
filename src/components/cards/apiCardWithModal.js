@@ -2,17 +2,22 @@ import React, {useState} from "react";
 
 const ApiCardWithModal = (props) => {
     const [showModal, setShowModal] = useState(false);
-    const { buttonLabel, clickFunction, children } = props;
+    const { buttonLabel, clickFunction, halfOpacity, children } = props;
 
     const clickAndClose = () => {
         clickFunction();
         setShowModal(false);
     };
 
+
     return (
-        <div className="grid grid-cols-1 rounded-lg border bg-gray-800 border-gray-600">
+        <div className="grid grid-cols-1 rounded-lg border border-gray-600">
             <button
-                className="w-full h-20 bg-orange-700 hover:bg-orange-800 rounded-lg text-white"
+                className={
+                    "w-full h-20 rounded-lg text-white " + 
+                    ((halfOpacity !== true) ? "bg-orange-700 " : "bg-orange-700/50 ") +
+                    ((halfOpacity !== true) ? "hover:bg-orange-800" : "hover:bg-orange-800/50")
+                }
                 onClick={() => setShowModal(!showModal)}
             >
                 {buttonLabel}
