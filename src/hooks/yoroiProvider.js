@@ -9,6 +9,12 @@ export const YoroiProvider = ({children}) => {
     const [authEnabled, setAuthEnabled] = useState(false);
     const [connectionState, setConnectionState] = useState(NOT_CONNECTED);
 
+    const setConnectionStateFalse = () => {
+        setConnectionState(NOT_CONNECTED);
+        setAuthEnabled(false);
+        setApi(null);
+    };
+
     useEffect(() => {
         if (!window.cardano) {
             console.warn("There are no cardano wallets are installed");
@@ -105,6 +111,7 @@ export const YoroiProvider = ({children}) => {
                 setAuthEnabled(auth && auth.isEnabled());
             }
             setConnectionState(CONNECTED);
+            connectedApi.experimental.onDisconnect(setConnectionStateFalse);
             return connectedApi;
         } catch (error) {
             setConnectionState(NOT_CONNECTED);
