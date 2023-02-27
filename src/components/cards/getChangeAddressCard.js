@@ -11,7 +11,7 @@ const GetChangeAddressCard = ({ api, wasm, onRawResponse, onResponse, onWaiting 
         onWaiting(false);
         onRawResponse(hexAddress);
         const wasmAddress = wasm.Address.from_bytes(hexToBytes(hexAddress));
-        onResponse(wasmAddress.to_bech32());
+        onResponse(wasmAddress.to_bech32(), false);
       })
       .catch((e) => {
         onWaiting(false);

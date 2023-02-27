@@ -10,7 +10,7 @@ const SubmitTransactionCard = ({ api, onRawResponse, onResponse, onWaiting }) =>
       .then((txId) => {
         onWaiting(false);
         onRawResponse(txId);
-        onResponse(txId);
+        onResponse(txId, false);
       })
       .catch((e) => {
         onWaiting(false);

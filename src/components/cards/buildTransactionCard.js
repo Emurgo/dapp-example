@@ -35,7 +35,7 @@ const BuildTransactionCard = ({ api, wasm, onRawResponse, onResponse, onWaiting 
 
             onWaiting(false);
             onRawResponse(bytesToHex(wasmUnsignedTransaction.to_bytes()));
-            onResponse('');
+            onResponse('', false);
         } catch (error) {
             onWaiting(false);
             onRawResponse('');

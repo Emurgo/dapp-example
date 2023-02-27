@@ -51,7 +51,7 @@ const SignTransactionCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }
         const wasmUnsignedTransaction = getTransactionFromBytes(wasm, txHex);
         const wasmWitnessSet = getTransactionWitnessSetFromBytes(wasm, witnessHex);
         const wasmSignedTransaction = getSignedTransaction(wasm, wasmUnsignedTransaction, wasmWitnessSet);
-        onResponse(bytesToHex(wasmSignedTransaction.to_bytes()));
+        onResponse(bytesToHex(wasmSignedTransaction.to_bytes()), false);
       })
       .catch((e) => {
         onWaiting(false);

@@ -23,8 +23,11 @@ const Cip30Tab = () => {
     const [isMessageDisplayed, setMessageDisplayed] = useState(false);
     const [isMessageDisplayedRaw, setMessageDisplayedRaw] = useState(false);
 
-    const setResponse = (response) => {
-        setCurrentText(JSON.stringify(response, undefined, 2));
+    const setResponse = (response, stringifyIt = true) => {
+        setCurrentText(stringifyIt
+            ? JSON.stringify(response, undefined, 2)
+            : response
+            );
     };
   
     const copyToClipboard = () => {
@@ -227,7 +230,7 @@ const Cip30Tab = () => {
                                 <div className="grid grid-cols-3">
                                     <div className="grid justify-items-start content-end">
                                         <span className="text-l font-bold text-white">
-                                            Stringified response:
+                                            Processed response:
                                         </span>
                                     </div>
                                     <div className="grid justify-items-center content-end">
