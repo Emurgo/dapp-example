@@ -61,7 +61,6 @@ const ExperimentalPart = ({ api, wasm, onRawResponse, onResponse, onWaiting }) =
                     <div>
                         <ListNFTsCard
                             api={api}
-                            wasm={wasm}
                             onRawResponse={onRawResponse}
                             onResponse={onResponse}
                             onWaiting={onWaiting}
