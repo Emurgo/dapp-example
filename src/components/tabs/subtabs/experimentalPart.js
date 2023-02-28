@@ -48,7 +48,7 @@ const ExperimentalPart = ({ api, wasm, onRawResponse, onResponse, onWaiting }) =
                 </div>
             </div>
             <div {...getCollapseProps()}>
-                <div className="grid justify-items-stretch grid-cols-2 lg:grid-cols-3 gap-2">
+                <div className="grid justify-items-stretch grid-cols-1 lg:grid-cols-3 gap-2 pt-3">
                     <div>
                         <AuthCard
                             api={api}
