@@ -1,6 +1,7 @@
 import React from "react";
 import useCollapse from "react-collapsed";
 import AuthCard from "../../cards/authCard";
+import ListNFTsCard from "../../cards/listNFTsCard";
 
 const ExperimentalPart = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
     const { getCollapseProps, getToggleProps, isExpanded } = useCollapse();
@@ -57,22 +58,21 @@ const ExperimentalPart = ({ api, wasm, onRawResponse, onResponse, onWaiting }) =
                             onWaiting={onWaiting}
                         />
                     </div>
-                    {/* <div>
-                        <CreateTxCard
+                    <div>
+                        <ListNFTsCard
                             api={api}
-                            wasm={wasm}
-                            onRawResponse={setRawCurrentText}
-                            onResponse={setResponse}
-                            onWaiting={setWaiterState}
+                            onRawResponse={onRawResponse}
+                            onResponse={onResponse}
+                            onWaiting={onWaiting}
                         />
-                    </div> */}
+                    </div>
                     {/* <div>
                         <ListNFTsCard
                             api={api}
                             wasm={wasm}
-                            onRawResponse={setRawCurrentText}
-                            onResponse={setResponse}
-                            onWaiting={setWaiterState}
+                            onRawResponse={onRawResponse}
+                            onResponse={onResponse}
+                            onWaiting={onWaiting}
                         />
                     </div> */}
                 </div>
