@@ -114,6 +114,7 @@ export const YoroiProvider = ({children}) => {
             connectedApi.experimental.onDisconnect(setConnectionStateFalse);
             return connectedApi;
         } catch (error) {
+            console.warn(`[dApp][connect] The error received while connecting the wallet`);
             setConnectionState(NOT_CONNECTED);
             throw new Error(error);
         };
