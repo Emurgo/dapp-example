@@ -16,26 +16,38 @@ import {
 } from "../../../utils/wasmTools";
 
 const NFTTab = () => {
+    const imageTypes = [
+      {label: "JPEG", value: "image/jpeg"},
+      {label: "PNG", value: "image/png"},
+      {label: "SVG", value: "image/svg+xml"},
+      {label: "WebP", value: "image/webp"},
+      {label: "GIF", value: "image/gif"},
+    ];
     const { api } = useYoroi();
     const wasm = useWasm();
     const [currentNFTName, setCurrentNFTName] = useState('');
     const [currentImageUrl, setCurrentImageUrl] = useState('');
     const [currentDescription, setCurrentDescription] = useState('');
+    const [currentImageType, setImageType] = useState("image/jpeg");
     const emptyTokenInfo = {
       NFTName: "",
       metadata: {
         name: "<string>",
         image: "<uri | array>",
-        mediaType: "image/jpeg",
+        mediaType: currentImageType,
         tokenType: "nft",
         description: "<string | array>",
         totalSupply: 1,
         files: [{
           name: "<string>",
-          mediaType: "image/jpeg",
+          mediaType: currentImageType,
           src: "<uri | array>",
         }],
       },
+    };
+
+    const handleImagTypeChange = (event) => {
+      setImageType(event.target.value);
     };
 
     const sliceBy64Char = (inputString) => {
@@ -176,6 +188,24 @@ const NFTTab = () => {
                                 className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                                 value={currentImageUrl} onChange={(event) => { setCurrentImageUrl(event.target.value) }}
                               />
+                           </div>
+                           <div className="mb-6 pr-4">
+                              <label htmlFor="image-type" className="block mb-2 text-sm font-medium text-gray-300 text-white focus:ring-blue-500 focus:border-blue-500">
+                                Image Type
+                              </label>
+                              <select
+                                className="border text-sm rounded-md p-2.5 bg-gray-700 border-gray-600 text-white"
+                                onChange={handleImagTypeChange} name="image-types" id="image-type">
+                                {imageTypes.map((imageType, index) => (
+                                  <option
+                                    className="border rounded-md text-white"
+                                    key={index}
+                                    value={imageType.value}
+                                  >
+                                    {imageType.label}
+                                  </option>
+                                ))}
+                              </select>
                            </div>
                            <div className="mb-6 pr-4">
                               <label htmlFor="Description" className="block mb-2 text-sm font-medium text-gray-300">
