@@ -1,37 +1,34 @@
-import React from "react";
-import ApiCard from "./apiCard";
+import React from 'react'
+import ApiCard from './apiCard'
 
-const AuthCard = ({ api, onRawResponse, onResponse, onWaiting }) => {
-
+const AuthCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const isAuthorizedClick = async () => {
-    onWaiting(true);
+    onWaiting(true)
     if (api.experimental && api.experimental.auth) {
       try {
-        const authObject = await api.experimental.auth();
-        onWaiting(false);
-        onRawResponse('');
-        onResponse(authObject);
+        const authObject = await api.experimental.auth()
+        onWaiting(false)
+        onRawResponse('')
+        onResponse(authObject)
       } catch (error) {
-        onWaiting(false);
-        onRawResponse('');
-        onResponse(error);
-        console.error(error);
+        onWaiting(false)
+        onRawResponse('')
+        onResponse(error)
+        console.error(error)
       }
     } else {
-      onWaiting(false);
-      onRawResponse('');
-      onResponse("experimental object or auth object is not found", false);
+      onWaiting(false)
+      onRawResponse('')
+      onResponse('experimental object or auth object is not found', false)
     }
   }
 
   const apiProps = {
-    apiName: "auth",
-    clickFunction: isAuthorizedClick
+    apiName: 'auth',
+    clickFunction: isAuthorizedClick,
   }
 
-  return (
-    <ApiCard {...apiProps} />
-  );
+  return <ApiCard {...apiProps} />
 }
 
-export default AuthCard;
+export default AuthCard

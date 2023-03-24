@@ -1,7 +1,7 @@
-import './App.css';
-import React from 'react';
-import AccessButton from './components/accessButton';
-import MainTab from './components/tabs/mainTab';
+import './App.css'
+import React from 'react'
+import AccessButton from './components/accessButton'
+import MainTab from './components/tabs/mainTab'
 
 const App = () => {
   return (
@@ -9,7 +9,7 @@ const App = () => {
       <AccessButton />
       <MainTab />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

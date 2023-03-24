@@ -1,37 +1,36 @@
-import React, {useState} from "react";
-import ApiCardWithModal from "./apiCardWithModal";
+import React, {useState} from 'react'
+import ApiCardWithModal from './apiCardWithModal'
 
-const SubmitTransactionCard = ({ api, onRawResponse, onResponse, onWaiting }) => {
-  const [submitTransactionInput, setSubmitTransactionInput] = useState("");
+const SubmitTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
+  const [submitTransactionInput, setSubmitTransactionInput] = useState('')
 
   const submitTransactionClick = () => {
-    onWaiting(true);
-    api?.submitTx(submitTransactionInput)
+    onWaiting(true)
+    api
+      ?.submitTx(submitTransactionInput)
       .then((txId) => {
-        onWaiting(false);
-        onRawResponse(txId);
-        onResponse(txId, false);
+        onWaiting(false)
+        onRawResponse(txId)
+        onResponse(txId, false)
       })
       .catch((e) => {
-        onWaiting(false);
-        onRawResponse('');
-        onResponse(e);
-        console.log(e);
+        onWaiting(false)
+        onRawResponse('')
+        onResponse(e)
+        console.log(e)
       })
   }
 
   const apiProps = {
-    buttonLabel: "submitTx",
+    buttonLabel: 'submitTx',
     clickFunction: submitTransactionClick,
   }
 
   return (
     <ApiCardWithModal {...apiProps}>
       <div className="px-4 pb-3">
-        <label
-          htmlFor="txHex"
-          className="block mb-2 text-sm font-medium text-gray-300">
-            Signed Tx Hex
+        <label htmlFor="txHex" className="block mb-2 text-sm font-medium text-gray-300">
+          Signed Tx Hex
         </label>
         <input
           type="text"
@@ -43,7 +42,7 @@ const SubmitTransactionCard = ({ api, onRawResponse, onResponse, onWaiting }) =>
         />
       </div>
     </ApiCardWithModal>
-  );
-};
+  )
+}
 
-export default SubmitTransactionCard;
+export default SubmitTransactionCard

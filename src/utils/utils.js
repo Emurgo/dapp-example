@@ -1,11 +1,11 @@
-import { Buffer } from "buffer";
+import {Buffer} from 'buffer'
 
 export function bytesToHex(bytes) {
-  return Buffer.from(bytes).toString('hex');
+  return Buffer.from(bytes).toString('hex')
 }
 
 export function hexToBytes(hex) {
-  return Buffer.from(hex, 'hex');
+  return Buffer.from(hex, 'hex')
 }
 
 export function wasmMultiassetToJSONs(wasmMultiasset) {

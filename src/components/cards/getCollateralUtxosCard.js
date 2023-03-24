@@ -1,16 +1,17 @@
-import React, {useState} from "react";
-import {bytesToHex, hexToBytes, wasmMultiassetToJSONs} from "../../utils/utils";
-import ApiCardWithModal from "./apiCardWithModal";
+import React, {useState} from 'react'
+import {bytesToHex, hexToBytes, wasmMultiassetToJSONs} from '../../utils/utils'
+import ApiCardWithModal from './apiCardWithModal'
 
-const GetCollateralUtxosCard = ({ api, wasm, onRawResponse, onResponse, onWaiting }) => {
-  const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState(2000000);
+const GetCollateralUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
+  const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState(2000000)
 
   const getCollateralUtxosClick = () => {
-    onWaiting(true);
-    api?.getCollateral(getCollateralUtxosInput)
+    onWaiting(true)
+    api
+      ?.getCollateral(getCollateralUtxosInput)
       .then((hexUtxos) => {
-        onWaiting(false);
-        onRawResponse(hexUtxos);
+        onWaiting(false)
+        onRawResponse(hexUtxos)
         let utxos = []
         for (let i = 0; i < hexUtxos.length; i++) {
           const utxo = {}
@@ -24,29 +25,25 @@ const GetCollateralUtxosCard = ({ api, wasm, onRawResponse, onResponse, onWaitin
           utxo.asset = wasmMultiassetToJSONs(output.amount().multiasset())
           utxos.push(utxo)
         }
-        onResponse(utxos);
+        onResponse(utxos)
       })
       .catch((e) => {
-        onWaiting(false);
-        onRawResponse('');
-        onResponse(e);
-        console.log(e);
+        onWaiting(false)
+        onRawResponse('')
+        onResponse(e)
+        console.log(e)
       })
-
   }
 
   const apiProps = {
-    buttonLabel: "getCollateral",
+    buttonLabel: 'getCollateral',
     clickFunction: getCollateralUtxosClick,
   }
 
   return (
     <ApiCardWithModal {...apiProps}>
       <div className="px-4 pb-3">
-        <label
-          htmlFor="amount"
-          className="block mb-2 text-sm font-medium text-gray-300"
-        >
+        <label htmlFor="amount" className="block mb-2 text-sm font-medium text-gray-300">
           Amount
         </label>
         <input
@@ -60,7 +57,7 @@ const GetCollateralUtxosCard = ({ api, wasm, onRawResponse, onResponse, onWaitin
         />
       </div>
     </ApiCardWithModal>
-  );
-};
+  )
+}
 
-export default GetCollateralUtxosCard;
+export default GetCollateralUtxosCard

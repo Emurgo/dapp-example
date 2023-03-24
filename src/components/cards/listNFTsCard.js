@@ -1,31 +1,30 @@
-import React from "react";
-import ApiCard from "./apiCard";
+import React from 'react'
+import ApiCard from './apiCard'
 
-const ListNFTsCard = ({ api, onRawResponse, onResponse, onWaiting }) => {
+const ListNFTsCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const listNFTsClick = () => {
-    onWaiting(true);
-    api?.experimental.listNFTs()
+    onWaiting(true)
+    api?.experimental
+      .listNFTs()
       .then((response) => {
-        onWaiting(false);
-        onRawResponse('');
-        onResponse(response);
+        onWaiting(false)
+        onRawResponse('')
+        onResponse(response)
       })
       .catch((e) => {
-        onWaiting(false);
-        onRawResponse('');
-        onResponse(e);
-        console.log(e);
-      });
-  };
-
-  const apiProps = {
-    apiName: "listNFTs",
-    clickFunction: listNFTsClick
+        onWaiting(false)
+        onRawResponse('')
+        onResponse(e)
+        console.log(e)
+      })
   }
 
-  return (
-    <ApiCard {...apiProps} />
-  );
-};
+  const apiProps = {
+    apiName: 'listNFTs',
+    clickFunction: listNFTsClick,
+  }
 
-export default ListNFTsCard;
+  return <ApiCard {...apiProps} />
+}
+
+export default ListNFTsCard
