@@ -4,6 +4,7 @@ import {textPartFromWalletChecksumImagePart} from '@emurgo/cip4-js'
 import {IN_PROGRESS} from '../utils/connectionStates'
 
 const AccessButton = () => {
+  // add selectedWallet here
   const {api, connect, authEnabled, connectionState} = useYoroi()
   const [isAuthChecked, setIsAuthChecked] = useState(false)
 
@@ -19,6 +20,7 @@ const AccessButton = () => {
   }
 
   const getWalletIcon = () => {
+    // add selected wallet window.cardano[selectedWallet].icon
     return window.cardano.yoroi.icon
   }
 
