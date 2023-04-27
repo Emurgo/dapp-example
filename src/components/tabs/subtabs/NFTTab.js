@@ -138,19 +138,20 @@ const NFTTab = () => {
     txBuilder.add_change_if_needed(wasmChangeAddress)
 
     const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes())
-    api?.signTx(unsignedTransactionHex).then((witnessSetHex) => {
-      const wasmWitnessSet = getTransactionWitnessSetFromBytes(wasm, witnessSetHex)
-      const wasmTx = getTransactionFromBytes(wasm, unsignedTransactionHex)
-      const wasmSignedTransaction = getSignedTransaction(wasm, wasmTx, wasmWitnessSet)
-      const transactionHex = bytesToHex(wasmSignedTransaction.to_bytes())
-      console.log(transactionHex)
+    api?.signTx({ tx: unsignedTransactionHex, returnTx: true}).then((transactionHex) => {
+    // api?.signTx(unsignedTransactionHex).then((witnessSetHex) => {
+      // const wasmWitnessSet = getTransactionWitnessSetFromBytes(wasm, witnessSetHex)
+      // const wasmTx = getTransactionFromBytes(wasm, unsignedTransactionHex)
+      // const wasmSignedTransaction = getSignedTransaction(wasm, wasmTx, wasmWitnessSet)
+      // const transactionHex = bytesToHex(wasmSignedTransaction.to_bytes())
+      console.log(`TransactionHex: ${transactionHex}`)
       api
         .submitTx(transactionHex)
         .then((txId) => {
           console.log(`Transaction successfully submitted: ${txId}`)
         })
         .catch((err) => {
-          console.log(err)
+          console.error(err)
         })
     })
   }

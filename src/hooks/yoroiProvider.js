@@ -20,12 +20,14 @@ export const YoroiProvider = ({children}) => {
       console.warn('There are no cardano wallets are installed')
       return
     }
+    // Check available wallets
     if (!window.cardano.yoroi) {
       alert('Yoroi wallet not found! Please install it')
       return
     }
     setConnectionState(IN_PROGRESS)
 
+    // use selectedWallet instead of the direct wallet name window.cardano[selectedWallet]
     window.cardano.yoroi
       .isEnabled()
       .then((response) => {
@@ -88,6 +90,7 @@ export const YoroiProvider = ({children}) => {
       return
     }
 
+    // add method selectWallet
     if (!window.cardano.yoroi) {
       console.error('Yoroi wallet not found! Please install it')
       setConnectionState(NOT_CONNECTED)
@@ -98,6 +101,8 @@ export const YoroiProvider = ({children}) => {
     console.log(`[dApp][connect] {requestIdentification: ${requestId}, onlySilent: ${silent}}`)
 
     try {
+      // use selectedWallet instead of direct name
+      // window.cardano[selectedWallet].enable
       const connectedApi = await window.cardano.yoroi.enable({
         requestIdentification: requestId,
         onlySilent: silent,
@@ -109,6 +114,7 @@ export const YoroiProvider = ({children}) => {
         setAuthEnabled(auth && auth.isEnabled())
       }
       setConnectionState(CONNECTED)
+      // add condtion use it only in case of yoroi wallet is used
       connectedApi.experimental.onDisconnect(setConnectionStateFalse)
       return connectedApi
     } catch (error) {
