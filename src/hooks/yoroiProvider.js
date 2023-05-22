@@ -120,7 +120,7 @@ export const YoroiProvider = ({children}) => {
     } catch (error) {
       console.warn(`[dApp][connect] The error received while connecting the wallet`)
       setConnectionState(NOT_CONNECTED)
-      throw new Error(error)
+      throw new Error(JSON.stringify(error))
     }
   }
 
