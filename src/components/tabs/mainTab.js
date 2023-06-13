@@ -1,7 +1,5 @@
 import Cip30Tab from './subtabs/cip30Tab'
-// import ContractTab from "./subtabs/contractTab";
 import NFTTab from './subtabs/NFTTab'
-// import SubmitTxsTab from "./subtabs/submitTxsTab";
 import {Routes, Route, Link, useLocation, Navigate} from 'react-router-dom'
 import useYoroi from '../../hooks/yoroiProvider'
 import {CONNECTED} from '../../utils/connectionStates'

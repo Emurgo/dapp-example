@@ -1,4 +1,3 @@
-import './App.css'
 import React from 'react'
 import AccessButton from './components/accessButton'
 import MainTab from './components/tabs/mainTab'
