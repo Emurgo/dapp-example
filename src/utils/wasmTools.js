@@ -56,4 +56,4 @@ export const getNativeScript = (wasm, pubKeyHash) =>
 export const getTransactionOutputBuilder = (wasm, wasmChangeAddress) =>
   wasm.TransactionOutputBuilder.new().with_address(wasmChangeAddress).next()
 
-export const getAssetName = (wasm, mintingTxInfo) => wasm.AssetName.new(Buffer.from(mintingTxInfo.NFTName, 'utf8'))
+export const getAssetName = (wasm, assetNameString) => wasm.AssetName.new(Buffer.from(assetNameString, 'utf8'))

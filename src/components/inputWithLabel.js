@@ -2,7 +2,6 @@ import React from 'react'
 
 const InputWithLabel = (props) => {
   const {inputName, inputValue, onChangeFunction} = props
-  console.log(`input value: ${JSON.stringify(inputValue)}`)
 
   const nftInputID = inputValue.split(' ').join('')
 

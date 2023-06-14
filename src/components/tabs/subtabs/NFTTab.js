@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import {Buffer} from 'buffer'
 import useYoroi from '../../../hooks/yoroiProvider'
 import useWasm from '../../../hooks/useWasm'
 import {hexToBytes, bytesToHex} from '../../../utils/utils'
@@ -7,14 +8,13 @@ import {
   getAssetName,
   getNativeScript,
   getPubKeyHash,
-  getSignedTransaction,
-  getTransactionFromBytes,
   getTransactionOutputBuilder,
-  getTransactionWitnessSetFromBytes,
   getTxBuilder,
   toInt,
 } from '../../../utils/wasmTools'
 import {CONNECTED} from '../../../utils/connectionStates'
+import SelectWithLabel from '../../selectWithLabel'
+import InputWithLabel from '../../inputWithLabel'
 
 const NFTTab = () => {
   const imageTypes = [
@@ -30,6 +30,14 @@ const NFTTab = () => {
   const [currentImageUrl, setCurrentImageUrl] = useState('')
   const [currentDescription, setCurrentDescription] = useState('')
   const [currentImageType, setImageType] = useState('image/jpeg')
+  const [isV2nft, setV2nft] = useState(false)
+  const [currentErrorState, setCurrentErrorState] = useState(false)
+
+  const handleError = () => {
+    setCurrentErrorState(true)
+    setTimeout(() => setCurrentErrorState(false), 5000)
+  }
+
   const emptyTokenInfo = {
     NFTName: '',
     metadata: {
@@ -49,12 +57,20 @@ const NFTTab = () => {
     },
   }
 
-  const handleImagTypeChange = (event) => {
+  const handleNftVersionOnChange = () => {
+    setV2nft(!isV2nft)
+    console.log(`[dApp][NFT_Tab] V2 is set: ${!isV2nft}`)
+    setCurrentMintingInfo(emptyTokenInfo)
+    setMintingTxInfo([])
+    console.log('[dApp][NFT_Tab] cleared the metadata and the prepared minting batch info')
+  }
+
+  const handleImageTypeChange = (event) => {
     setImageType(event.target.value)
   }
 
   const sliceBy64Char = (inputString) => {
-    console.log(`inputString: ${JSON.stringify(inputString)}`)
+    console.log(`[dApp][NFT_Tab] inputString: ${JSON.stringify(inputString)}`)
     if (inputString.length <= 64) {
       return inputString
     }
@@ -82,7 +98,7 @@ const NFTTab = () => {
     const imageUrl = sliceBy64Char(currentImageUrl)
     const description = sliceBy64Char(currentDescription)
     const newInfo = emptyTokenInfo
-    newInfo.NFTName = name
+    newInfo.NFTName = isV2nft ? Buffer.from(name, 'utf8').toString('hex') : name
     newInfo.metadata.name = name
     newInfo.metadata.files[0].name = name
     newInfo.metadata.image = imageUrl
@@ -102,7 +118,7 @@ const NFTTab = () => {
     const txBuilder = getTxBuilder(wasm)
 
     const changeAddress = await api?.getChangeAddress()
-    console.log(`changeAddress -> ${changeAddress}`)
+    console.log(`[dApp][NFT_Tab][mint] changeAddress -> ${changeAddress}`)
     const wasmChangeAddress = getAddressFromBytes(wasm, changeAddress)
     const usedAddresses = await api?.getUsedAddresses()
     const usedAddress = getAddressFromBytes(wasm, usedAddresses[0])
@@ -114,12 +130,12 @@ const NFTTab = () => {
 
     for (const assetInfo of mintingTxInfo) {
       metadata[scriptHashHex][assetInfo.NFTName] = assetInfo.metadata
-      metadata['version'] = '1.0'
-      console.log(metadata)
+      metadata['version'] = isV2nft ? '2.0' : '1.0'
+      console.log(`[dApp][NFT_Tab][mint] metadata -> ${JSON.stringify(metadata)}`)
       txBuilder.add_json_metadatum(wasm.BigNum.from_str('721'), JSON.stringify(metadata))
       txBuilder.add_mint_asset_and_output_min_required_coin(
         wasmNativeScript,
-        getAssetName(wasm, assetInfo),
+        getAssetName(wasm, assetInfo.metadata.name),
         toInt(wasm, 1),
         getTransactionOutputBuilder(wasm, wasmChangeAddress),
       )
@@ -138,19 +154,15 @@ const NFTTab = () => {
     txBuilder.add_change_if_needed(wasmChangeAddress)
 
     const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes())
-    api?.signTx({ tx: unsignedTransactionHex, returnTx: true}).then((transactionHex) => {
-    // api?.signTx(unsignedTransactionHex).then((witnessSetHex) => {
-      // const wasmWitnessSet = getTransactionWitnessSetFromBytes(wasm, witnessSetHex)
-      // const wasmTx = getTransactionFromBytes(wasm, unsignedTransactionHex)
-      // const wasmSignedTransaction = getSignedTransaction(wasm, wasmTx, wasmWitnessSet)
-      // const transactionHex = bytesToHex(wasmSignedTransaction.to_bytes())
-      console.log(`TransactionHex: ${transactionHex}`)
+    api?.signTx({tx: unsignedTransactionHex, returnTx: true}).then((transactionHex) => {
+      console.log(`[dApp][NFT_Tab][mint] TransactionHex: ${transactionHex}`)
       api
         .submitTx(transactionHex)
         .then((txId) => {
-          console.log(`Transaction successfully submitted: ${txId}`)
+          console.log(`[dApp][NFT_Tab][mint] Transaction successfully submitted: ${txId}`)
         })
         .catch((err) => {
+          handleError()
           console.error(err)
         })
     })
@@ -158,166 +170,155 @@ const NFTTab = () => {
 
   return (
     <div>
-    {connectionState === CONNECTED ? (
-      <>
-        <div className="grid justify-items-center py-5 px-5">
-          <div className="block p-6 min-w-full rounded-lg border shadow-md bg-gray-800 border-gray-700">
-            <div className="text-white">
-              Note: Currently the functionality of this is extremely limited, it is really only here to mint really basic
-              NFTs for testing. The minting policy is hardcoded to basically just use the pubkeyhash of your first used
-              address, so all the NFTs you mint here will have the same policy id. They're not even really NFTs, cus you
-              can mint multiple of them. This is a work in progress and will have more functionalities in the future.
+      {connectionState === CONNECTED ? (
+        <>
+          <div className="grid justify-items-center py-5 px-5">
+            <div className="block p-6 min-w-full rounded-lg border shadow-md bg-gray-800 border-gray-700">
+              <div className="text-white text-center">
+                <p />
+                Note: Currently the functionality of this is extremely limited, it is really only here to mint really
+                basic NFTs for testing.
+                <p />
+                The minting policy is hardcoded to basically just use the pubkeyhash of your first used address, so all
+                the NFTs you mint here will have the same policy id.
+                <p />
+                They're not even really NFTs, cuz you can mint multiple of them. This is a work in progress and will
+                have more functionalities in the future.
+              </div>
+              {currentErrorState ? (
+                <div className="text-red-500 text-2xl font-bold text-center">
+                  <p /> !!! The error appeared. Please check logs !!!
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
           </div>
-        </div>
-        <div className="grid justify-items-center py-5 px-5">
-          <div className="block p-6 min-w-full rounded-lg border shadow-md bg-gray-800 border-gray-700">
-            <div className="flex">
-              <div className="flex-1">
-                {/* Inputs */}
-                <div className="mb-6 pr-4">
-                  <label htmlFor="NFTName" className="block mb-2 text-sm font-medium text-gray-300">
-                    NFT Name
-                  </label>
-                  <input
-                    type="text"
-                    id="NFTName"
-                    className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
-                    value={currentNFTName}
-                    onChange={(event) => {
+          <div className="grid justify-items-center py-5 px-5">
+            <div className="block p-6 min-w-full rounded-lg border shadow-md bg-gray-800 border-gray-700">
+              <div className="flex pb-5">
+                <div className="flex-1">
+                  {/* Inputs */}
+                  <InputWithLabel
+                    inputName="NFT Name"
+                    inputValue={currentNFTName}
+                    onChangeFunction={(event) => {
                       setCurrentNFTName(event.target.value)
                     }}
                   />
-                </div>
-                <div className="mb-6 pr-4">
-                  <label htmlFor="ImageURL" className="block mb-2 text-sm font-medium text-gray-300">
-                    Image URL
-                  </label>
-                  <input
-                    type="text"
-                    id="ImageURL"
-                    className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
-                    value={currentImageUrl}
-                    onChange={(event) => {
+                  <InputWithLabel
+                    inputName="Image URL"
+                    inputValue={currentImageUrl}
+                    onChangeFunction={(event) => {
                       setCurrentImageUrl(event.target.value)
                     }}
                   />
-                </div>
-                <div className="mb-6 pr-4">
-                  <label
-                    htmlFor="image-type"
-                    className="block mb-2 text-sm font-medium text-gray-300 text-white focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    Image Type
-                  </label>
-                  <select
-                    className="border text-sm rounded-md p-2.5 bg-gray-700 border-gray-600 text-white"
-                    onChange={handleImagTypeChange}
-                    name="image-types"
-                    id="image-type"
-                  >
-                    {imageTypes.map((imageType, index) => (
-                      <option className="border rounded-md text-white" key={index} value={imageType.value}>
-                        {imageType.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-6 pr-4">
-                  <label htmlFor="Description" className="block mb-2 text-sm font-medium text-gray-300">
-                    Description
-                  </label>
-                  <input
-                    type="text"
-                    id="Description"
-                    className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
-                    value={currentDescription}
-                    onChange={(event) => {
+                  <SelectWithLabel
+                    selectName="Image Type"
+                    selectArray={imageTypes}
+                    onChangeFunction={handleImageTypeChange}
+                  />
+                  <InputWithLabel
+                    inputName="Description"
+                    inputValue={currentDescription}
+                    onChangeFunction={(event) => {
                       setCurrentDescription(event.target.value)
                     }}
                   />
+                  <div className="text-l tracking-tight text-gray-300">
+                    <div>
+                      <input
+                        type="checkbox"
+                        id="isV2nft"
+                        name="v2Checkbox"
+                        checked={isV2nft}
+                        onChange={handleNftVersionOnChange}
+                      />
+                      <label htmlFor="isV2nft" className="font-bold">
+                        <span /> V2
+                      </label>
+                      <p /> If this checkbox isn't selected the NFT V1 will be minted
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="mb-6 h-full">
+                    <label className="block mb-2 text-sm font-medium text-gray-300">Metadata JSON</label>
+                    <textarea
+                      className="flex-1 w-full h-full rounded bg-gray-900 text-white px-2 readonly"
+                      readOnly
+                      value={JSON.stringify(currentMintingInfo, null, 4)}
+                    ></textarea>
+                  </div>
                 </div>
               </div>
-              <div className="flex-1">
-                <div className="mb-6">
-                  <label className="block mb-2 text-sm font-medium text-gray-300">Metadata JSON</label>
-                  <textarea
-                    className="flex-row w-full rounded bg-gray-900 text-white px-2 readonly"
-                    rows="10"
-                    readOnly
-                    value={JSON.stringify(currentMintingInfo, null, 4)}
-                  ></textarea>
+              {/* Buttons */}
+              <div className="flex pt-7">
+                <div className="flex-1">
+                  <div>
+                    <button
+                      type="button"
+                      className="text-white font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center bg-blue-600 hover:bg-blue-700 focus:ring-blue-800"
+                      onClick={generateMetadata}
+                    >
+                      Generate
+                    </button>
+                    <button
+                      type="button"
+                      className="text-white font-medium rounded-lg text-sm sm:w-auto mx-5 px-5 py-2.5 text-center bg-red-600 hover:bg-red-700 focus:ring-red-800"
+                      onClick={clearInfo}
+                    >
+                      Clear Info
+                    </button>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div>
+                    <button
+                      type="button"
+                      className="text-white font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center bg-blue-600 hover:bg-blue-700 focus:ring-blue-800"
+                      onClick={pushMintInfo}
+                    >
+                      Add Mint Instructions
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-            {/* Buttons */}
-            <div className="flex">
-              <div className="flex-1">
-                <div>
-                  <button
-                    type="button"
-                    className="text-white font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center bg-blue-600 hover:bg-blue-700 focus:ring-blue-800"
-                    onClick={generateMetadata}
-                  >
-                    Generate
-                  </button>
-                  <button
-                    type="button"
-                    className="text-white font-medium rounded-lg text-sm sm:w-auto mx-5 px-5 py-2.5 text-center bg-red-600 hover:bg-red-700 focus:ring-red-800"
-                    onClick={clearInfo}
-                  >
-                    Clear Info
-                  </button>
-                </div>
+          </div>
+          <div className="grid justify-items-center py-5 px-5">
+            <div className="block p-6 min-w-full rounded-lg border shadow-md bg-gray-800 border-gray-700">
+              <div className="mb-6">
+                <label className="block mb-2 text-sm font-medium text-gray-300">Current Minting Batch</label>
+                <textarea
+                  className="flex-row w-full rounded bg-gray-900 text-white px-2 readonly"
+                  rows="10"
+                  readOnly
+                  value={JSON.stringify(mintingTxInfo, null, 4)}
+                ></textarea>
               </div>
-              <div className="flex-1">
-                <div>
-                  <button
-                    type="button"
-                    className="text-white font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center bg-blue-600 hover:bg-blue-700 focus:ring-blue-800"
-                    onClick={pushMintInfo}
-                  >
-                    Add Mint Instructions
-                  </button>
-                </div>
+              <div>
+                <button
+                  type="button"
+                  className="text-white font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center bg-blue-600 hover:bg-blue-700 focus:ring-blue-800"
+                  onClick={mint}
+                >
+                  Mint
+                </button>
+                <button
+                  type="button"
+                  className="text-white font-medium rounded-lg text-sm sm:w-auto mx-5 px-5 py-2.5 text-center bg-red-600 hover:bg-red-700 focus:ring-red-800"
+                  onClick={() => setMintingTxInfo([])}
+                >
+                  Clear Minting Batch
+                </button>
               </div>
             </div>
           </div>
-        </div>
-        <div className="grid justify-items-center py-5 px-5">
-          <div className="block p-6 min-w-full rounded-lg border shadow-md bg-gray-800 border-gray-700">
-            <div className="mb-6">
-              <label className="block mb-2 text-sm font-medium text-gray-300">Current Minting Batch</label>
-              <textarea
-                className="flex-row w-full rounded bg-gray-900 text-white px-2 readonly"
-                rows="10"
-                readOnly
-                value={JSON.stringify(mintingTxInfo, null, 4)}
-              ></textarea>
-            </div>
-            <div>
-              <button
-                type="button"
-                className="text-white font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center bg-blue-600 hover:bg-blue-700 focus:ring-blue-800"
-                onClick={mint}
-              >
-                Mint
-              </button>
-              <button
-                type="button"
-                className="text-white font-medium rounded-lg text-sm sm:w-auto mx-5 px-5 py-2.5 text-center bg-red-600 hover:bg-red-700 focus:ring-red-800"
-                onClick={() => setMintingTxInfo([])}
-              >
-                Clear Minting Batch
-              </button>
-            </div>
-          </div>
-        </div>
-      </>
-    ) : (
-      <div></div>
-    )
-    }
+        </>
+      ) : (
+        <div></div>
+      )}
     </div>
   )
 }
