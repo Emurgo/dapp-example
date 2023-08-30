@@ -1,9 +1,10 @@
 import React, {useState} from 'react'
 import Popup from 'reactjs-popup'
 import useYoroi from '../hooks/yoroiProvider'
+import {NO_CARDANO} from '../utils/connectionStates'
 
 const WalletsModal = () => {
-  const {connect, availableWallets, setSelectedWallet} = useYoroi()
+  const {connect, availableWallets, setSelectedWallet, connectionState} = useYoroi()
   const [selectedUserWallet, setSelectedUserWallet] = useState('')
   const [isAuthChecked, setIsAuthChecked] = useState(false)
   console.log(`[dApp][WalletsModal] is called`)
@@ -24,15 +25,14 @@ const WalletsModal = () => {
   const modal = true
   const nested = false
 
+  const buttonProps = {
+    className:
+      'rounded-md border-black-300 bg-blue-500 hover:bg-blue-300 active:bg-blue-700 py-5 px-5 disabled:opacity-50',
+    disabled: connectionState === NO_CARDANO ?? 'disabled',
+  }
+
   return (
-    <Popup
-      trigger={
-        <button className="rounded-md border-black-300 bg-blue-500 hover:bg-blue-300 active:bg-blue-700 py-5 px-5">
-          Connect Wallet
-        </button>
-      }
-      {...{modal, nested, overlayStyle}}
-    >
+    <Popup trigger={<button {...buttonProps}>Connect Wallet</button>} {...{modal, nested, overlayStyle}}>
       {(close) => (
         <div className="bg-gray-900 border rounded-md border-gray-700 shadow-lg w-full outline-none focus:outline-none">
           {/* close button and modal window title */}

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {NOT_CONNECTED, IN_PROGRESS, CONNECTED} from '../utils/connectionStates'
+import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_CARDANO} from '../utils/connectionStates'
 
 const YoroiContext = React.createContext(null)
 const reservedKeys = [
@@ -39,6 +39,7 @@ export const YoroiProvider = ({children}) => {
   useEffect(() => {
     if (!window.cardano) {
       console.warn('[dApp] There are no cardano wallets are installed')
+      setConnectionState(NO_CARDANO)
       return
     }
 
