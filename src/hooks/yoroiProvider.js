@@ -129,17 +129,17 @@ export const YoroiProvider = ({children}) => {
       setApi(connectedApi)
       if (requestId && connectedApi.experimental && connectedApi.experimental.auth) {
         const auth = connectedApi.experimental.auth()
-        setAuthEnabled(auth && auth.isEnabled())
+        setAuthEnabled(auth?.isEnabled())
       }
       setConnectionState(CONNECTED)
-      if (connectedApi.experimental && connectedApi.experimental.onDisconnect) {
+      if (connectedApi.experimental?.onDisconnect) {
         connectedApi.experimental.onDisconnect(setConnectionStateFalse)
       }
       return connectedApi
     } catch (error) {
       console.error(`[dApp][connect] The error received while connecting the wallet`)
       setConnectionState(NOT_CONNECTED)
-      console.error(`[dApp][connect] ${JSON.stringify(error)}`)
+      console.error(`[dApp][connect] ${error}`)
     }
   }
 
