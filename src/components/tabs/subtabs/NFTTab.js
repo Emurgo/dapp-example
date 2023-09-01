@@ -141,31 +141,41 @@ const NFTTab = () => {
       )
     }
 
+    console.log(`[dApp][NFT_Tab][mint] getting UTxOs`)
     const hexInputUtxos = await api?.getUtxos()
 
+    console.log(`[dApp][NFT_Tab][mint] preparing wasmUTxOs`)
     const wasmUtxos = wasm.TransactionUnspentOutputs.new()
     for (const hexInputUtxo of hexInputUtxos) {
       const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexInputUtxo))
       wasmUtxos.add(wasmUtxo)
     }
 
+    console.log(`[dApp][NFT_Tab][mint] adding inputs`)
     txBuilder.add_inputs_from(wasmUtxos, wasm.CoinSelectionStrategyCIP2.LargestFirstMultiAsset)
     txBuilder.add_required_signer(pubkeyHash)
     txBuilder.add_change_if_needed(wasmChangeAddress)
 
     const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes())
-    api?.signTx({tx: unsignedTransactionHex, returnTx: true}).then((transactionHex) => {
-      console.log(`[dApp][NFT_Tab][mint] TransactionHex: ${transactionHex}`)
-      api
-        .submitTx(transactionHex)
-        .then((txId) => {
-          console.log(`[dApp][NFT_Tab][mint] Transaction successfully submitted: ${txId}`)
-        })
-        .catch((err) => {
-          handleError()
-          console.error(err)
-        })
-    })
+    console.log(`[dApp][NFT_Tab][mint] signing the tx`)
+    api
+      ?.signTx({tx: unsignedTransactionHex, returnTx: true})
+      .then((transactionHex) => {
+        console.log(`[dApp][NFT_Tab][mint] TransactionHex: ${transactionHex}`)
+        api
+          .submitTx(transactionHex)
+          .then((txId) => {
+            console.log(`[dApp][NFT_Tab][mint] Transaction successfully submitted: ${txId}`)
+          })
+          .catch((err) => {
+            handleError()
+            console.error(err)
+          })
+      })
+      .catch((err) => {
+        handleError()
+        console.error(err)
+      })
   }
 
   return (

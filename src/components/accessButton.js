@@ -1,17 +1,18 @@
-import React, {useState} from 'react'
+import React from 'react'
 import useYoroi from '../hooks/yoroiProvider'
 import {textPartFromWalletChecksumImagePart} from '@emurgo/cip4-js'
 import {IN_PROGRESS} from '../utils/connectionStates'
+import WalletsModal from './walletsModal'
 
 const AccessButton = () => {
   // add selectedWallet here
-  const {api, connect, authEnabled, connectionState} = useYoroi()
-  const [isAuthChecked, setIsAuthChecked] = useState(false)
+  const {api, authEnabled, connectionState, availableWallets, selectedWallet} = useYoroi()
+  console.log(`[dApp][AccessButton] available wallets: ${availableWallets.length}`)
 
-  const getWalletPlate = (apiObject, isAuthRequired, isAuthEnabled) => {
+  const getWalletPlate = (apiObject, isAuthEnabled) => {
     let walletId = 'anonymous wallet'
-    console.log(`[dApp][getWalletPlate] isAuthRequired - ${isAuthRequired}, isAuthEnabled - ${isAuthEnabled}`)
-    if (isAuthRequired || isAuthEnabled) {
+    console.log(`[dApp][getWalletPlate] isAuthEnabled - ${isAuthEnabled}`)
+    if (isAuthEnabled) {
       const auth = apiObject.experimental.auth && apiObject.experimental.auth()
       walletId = auth.getWalletId()
       return textPartFromWalletChecksumImagePart(walletId)
@@ -20,12 +21,14 @@ const AccessButton = () => {
   }
 
   const getWalletIcon = () => {
-    // add selected wallet window.cardano[selectedWallet].icon
-    return window.cardano.yoroi.icon
+    return window.cardano[selectedWallet].icon
   }
 
-  const handleOnChange = () => {
-    setIsAuthChecked(!isAuthChecked)
+  const getWalletName = () => {
+    const walletName = window.cardano[selectedWallet].name
+    const capitilizedFirstLetter = walletName[0].toUpperCase() + walletName.substring(1)
+
+    return capitilizedFirstLetter
   }
 
   return (
@@ -34,12 +37,12 @@ const AccessButton = () => {
         {api ? (
           <div className="grid grid-cols-4">
             <div className="grid justify-items-end py-5">
-              <img src={getWalletIcon()} />
+              <img src={getWalletIcon()} alt="wallet icon" />
             </div>
-            <div className="col-span-3 text-xl font-bold tracking-tight text-white text-center">
+            <div className="col-span-3 text-xl font-bold tracking-tight text-white text-center ml-1">
               <div className="py-5">
-                <div>Connected To Yoroi</div>
-                <div className="py-1">{getWalletPlate(api, isAuthChecked, authEnabled)}</div>
+                <div>Connected To {getWalletName()}</div>
+                <div className="py-1">{getWalletPlate(api, authEnabled)}</div>
               </div>
             </div>
           </div>
@@ -49,26 +52,7 @@ const AccessButton = () => {
           </div>
         ) : (
           <div>
-            <button
-              className="rounded-md border-black-300 bg-blue-500 hover:bg-blue-300 active:bg-blue-700 py-5 px-5"
-              onClick={() => connect(isAuthChecked, false)}
-            >
-              Request Access To Yoroi
-            </button>
-            <div className="grid justify-items-center py-5 text-l font-bold tracking-tight text-white">
-              <div>
-                <input
-                  type="checkbox"
-                  id="authRequired"
-                  name="authRequiredCheckbox"
-                  checked={isAuthChecked}
-                  onChange={handleOnChange}
-                />
-                <label htmlFor="authRequired">
-                  <span /> Request authentication
-                </label>
-              </div>
-            </div>
+            <WalletsModal />
           </div>
         )}
       </div>
