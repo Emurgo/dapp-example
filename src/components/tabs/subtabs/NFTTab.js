@@ -136,10 +136,8 @@ const NFTTab = () => {
   }
 
   const pushMintInfo = () => {
-    let tempMintInfo = {NFTName: '', metadata: ''}
-    tempMintInfo.NFTName = currentMintingInfo.NFTName
-    tempMintInfo.metadata = currentMintingInfo.metadata
-    setMintingTxInfo((mintingTxInfo) => [...mintingTxInfo, tempMintInfo])
+    const newInfo = JSON.parse(JSON.stringify(currentMintingInfo))
+    setMintingTxInfo((mintingTxInfo) => [...mintingTxInfo, newInfo])
   }
 
   const generateSeveralMetadata = () => {
