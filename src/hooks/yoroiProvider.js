@@ -88,25 +88,20 @@ export const YoroiProvider = ({children}) => {
       }
     } catch (error) {
       console.warn(`[dApp][tryConnectSilent]: failed {true, true}`)
-      if (String(error).includes('onlySilent:fail')) {
-        console.warn('[dApp][tryConnectSilent] no silent re-connection with auth is available')
-        try {
-          console.log(`[dApp][tryConnectSilent] trying {false, true}`)
-          setConnectionState(IN_PROGRESS)
-          connectResult = await connect(walletName, false, true, false)
-          if (connectResult != null) {
-            console.log('[dApp][tryConnectSilent] RE-CONNECTED!')
-            setSelectedWallet(walletName)
-            setConnectionState(CONNECTED)
-            return
-          }
-        } catch (error) {
-          setConnectionState(NOT_CONNECTED)
-          throw new Error(error)
+      console.warn('[dApp][tryConnectSilent] no silent re-connection with auth is available')
+      try {
+        console.log(`[dApp][tryConnectSilent] trying {false, true}`)
+        setConnectionState(IN_PROGRESS)
+        connectResult = await connect(walletName, false, true, false)
+        if (connectResult != null) {
+          console.log('[dApp][tryConnectSilent] RE-CONNECTED!')
+          setSelectedWallet(walletName)
+          setConnectionState(CONNECTED)
+          return
         }
-      } else {
+      } catch (error) {
         setConnectionState(NOT_CONNECTED)
-        throw new Error(error)
+        console.error(error)
       }
     }
   }
