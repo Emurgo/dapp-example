@@ -23,7 +23,6 @@ const OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState
       <div>
         <GetNetworkIdCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}
@@ -32,7 +31,6 @@ const OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState
       <div>
         <GetExtensionsCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}
