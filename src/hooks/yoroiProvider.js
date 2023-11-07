@@ -46,7 +46,13 @@ export const YoroiProvider = ({children}) => {
     // We need to filter like this because of the Nami wallet.
     // It injects everything into the cardano object not only the object "nami".
     const userWallets = Object.keys(window.cardano).filter((cardanoKey) => !reservedKeys.includes(cardanoKey))
-    const allInfoWallets = userWallets.map((walletName) => window.cardano[walletName])
+    const allInfoWallets = userWallets.map((walletName) => {
+      return {
+        walletObjKey: walletName,
+        walletObjInfo: window.cardano[walletName],
+      }
+    })
+    console.log('allInfoWallets: ', allInfoWallets)
     setAvailableWallets(allInfoWallets)
 
     if (userWallets.length === 1) {
