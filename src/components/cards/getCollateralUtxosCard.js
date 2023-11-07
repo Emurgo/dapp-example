@@ -3,7 +3,7 @@ import {bytesToHex, hexToBytes, wasmMultiassetToJSONs} from '../../utils/utils'
 import ApiCardWithModal from './apiCardWithModal'
 
 const GetCollateralUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
-  const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState(2000000)
+  const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState("2000000")
 
   const getCollateralUtxosClick = () => {
     onWaiting(true)
@@ -53,7 +53,7 @@ const GetCollateralUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting
           className="appearance-none border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
           placeholder="2000000"
           value={getCollateralUtxosInput}
-          onChange={(event) => setGetCollateralUtxosInput(Number(event.target.value))}
+          onChange={(event) => setGetCollateralUtxosInput(event.target.value)}
         />
       </div>
     </ApiCardWithModal>

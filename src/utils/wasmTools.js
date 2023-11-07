@@ -24,8 +24,8 @@ export const getTxBuilder = (wasm) => {
 
 export const getWasmUtxos = (wasm, hexUtxos) => {
   const wasmUtxos = wasm.TransactionUnspentOutputs.new()
-  for (let i = 0; i < hexUtxos.length; i++) {
-    const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexUtxos[i]))
+  for (const hexUtxo of hexUtxos) {
+    const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexUtxo))
     wasmUtxos.add(wasmUtxo)
   }
 
