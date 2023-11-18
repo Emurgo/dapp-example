@@ -18,11 +18,22 @@ import InputWithLabel from '../../inputWithLabel'
 
 const NFTTab = () => {
   const imageTypes = [
-    {label: 'JPEG', value: 'image/jpeg'},
-    {label: 'PNG', value: 'image/png'},
-    {label: 'SVG', value: 'image/svg+xml'},
-    {label: 'WebP', value: 'image/webp'},
-    {label: 'GIF', value: 'image/gif'},
+    {label: 'Image_JPEG', value: 'image/jpeg'},
+    {label: 'Image_PNG', value: 'image/png'},
+    {label: 'Image_SVG', value: 'image/svg+xml'},
+    {label: 'Image_WebP', value: 'image/webp'},
+    {label: 'Image_GIF', value: 'image/gif'},
+    {label: 'Image_ICO', value: 'image/x-icon'},
+    {label: 'Image_TIFF', value: 'image/tiff'},
+    {label: 'Audio_MP3', value: 'audio/mpeg3'},
+    {label: 'Audio_OGG', value: 'audio/ogg'},
+    {label: 'Audio_WAV', value: 'audio/wav'},
+    {label: 'Video_AVI', value: 'video/msvideo'},
+    {label: 'Video_MOV', value: 'video/quicktime'},
+    {label: 'Video_MP4', value: 'video/mp4'},
+    {label: 'Video_OGG', value: 'video/ogg'},
+    {label: 'Video_WebM', value: 'video/webm'},
+    {label: 'Video_WMV', value: 'video/x-ms-wmv'},
   ]
   const {api, connectionState} = useYoroi()
   const wasm = useWasm()
@@ -30,14 +41,6 @@ const NFTTab = () => {
   const [currentImageUrl, setCurrentImageUrl] = useState('')
   const [currentDescription, setCurrentDescription] = useState('')
   const [currentImageType, setImageType] = useState('image/jpeg')
-  const [isV2nft, setV2nft] = useState(false)
-  const [currentErrorState, setCurrentErrorState] = useState(false)
-
-  const handleError = () => {
-    setCurrentErrorState(true)
-    setTimeout(() => setCurrentErrorState(false), 5000)
-  }
-
   const emptyTokenInfo = {
     NFTName: '',
     metadata: {
@@ -56,13 +59,32 @@ const NFTTab = () => {
       ],
     },
   }
+  const [currentMintingInfo, setCurrentMintingInfo] = useState(emptyTokenInfo)
+  const [mintingTxInfo, setMintingTxInfo] = useState([])
+  const [isV2nft, setV2nft] = useState(false)
+  const [isMoreThenOneNFT, setIsMoreThenOneNFT] = useState(false)
+  const [currentErrorState, setCurrentErrorState] = useState(false)
+  const [currentNFTsAmount, setNFTsAmount] = useState(1)
+
+  const handleError = () => {
+    setCurrentErrorState(true)
+    setTimeout(() => setCurrentErrorState(false), 5000)
+  }
+
+  const handleNFTsAmount = () => {
+    setIsMoreThenOneNFT(!isMoreThenOneNFT)
+    console.debug(`[dApp][NFT_Tab] mint MoreThenOneNFT is set: ${!isV2nft}`)
+    if (isMoreThenOneNFT === false) {
+      setNFTsAmount(1)
+    }
+  }
 
   const handleNftVersionOnChange = () => {
     setV2nft(!isV2nft)
-    console.log(`[dApp][NFT_Tab] V2 is set: ${!isV2nft}`)
+    console.debug(`[dApp][NFT_Tab] V2 is set: ${!isV2nft}`)
     setCurrentMintingInfo(emptyTokenInfo)
     setMintingTxInfo([])
-    console.log('[dApp][NFT_Tab] cleared the metadata and the prepared minting batch info')
+    console.debug('[dApp][NFT_Tab] cleared the metadata and the prepared minting batch info')
   }
 
   const handleImageTypeChange = (event) => {
@@ -70,7 +92,7 @@ const NFTTab = () => {
   }
 
   const sliceBy64Char = (inputString) => {
-    console.log(`[dApp][NFT_Tab] inputString: ${JSON.stringify(inputString)}`)
+    console.debug(`[dApp][NFT_Tab] inputString: ${JSON.stringify(inputString)}`)
     if (inputString.length <= 64) {
       return inputString
     }
@@ -89,14 +111,13 @@ const NFTTab = () => {
     setCurrentDescription('')
   }
 
-  const [currentMintingInfo, setCurrentMintingInfo] = useState(emptyTokenInfo)
-
-  const [mintingTxInfo, setMintingTxInfo] = useState([])
-
-  const generateMetadata = () => {
-    const name = currentNFTName.replace(/ /g, '_')
-    const imageUrl = sliceBy64Char(currentImageUrl)
-    const description = sliceBy64Char(currentDescription)
+  const _genMeta = (nftName, nftImageUrl, nftDescription) => {
+    console.debug(
+      `[dApp][NFT_Tab][_genMeta]\nnftName: ${nftName}\nnftImageUrl: ${nftImageUrl}\nnftDescription: ${nftDescription}`,
+    )
+    const name = nftName.replace(/ /g, '_')
+    const imageUrl = sliceBy64Char(nftImageUrl)
+    const description = sliceBy64Char(nftDescription)
     const newInfo = emptyTokenInfo
     newInfo.NFTName = isV2nft ? Buffer.from(name, 'utf8').toString('hex') : name
     newInfo.metadata.name = name
@@ -104,21 +125,39 @@ const NFTTab = () => {
     newInfo.metadata.image = imageUrl
     newInfo.metadata.files[0].src = imageUrl
     newInfo.metadata.description = description
+    console.debug(`[dApp][NFT_Tab][_genMeta] newInfo: ${JSON.stringify(newInfo, null, 2)}`)
+
+    return newInfo
+  }
+
+  const generateMetadata = () => {
+    const newInfo = _genMeta(currentNFTName, currentImageUrl, currentDescription)
     setCurrentMintingInfo({...currentMintingInfo, ...newInfo})
   }
 
   const pushMintInfo = () => {
-    let tempMintInfo = {NFTName: '', metadata: ''}
-    tempMintInfo.NFTName = currentMintingInfo.NFTName
-    tempMintInfo.metadata = currentMintingInfo.metadata
-    setMintingTxInfo((mintingTxInfo) => [...mintingTxInfo, tempMintInfo])
+    const newInfo = JSON.parse(JSON.stringify(currentMintingInfo))
+    setMintingTxInfo((mintingTxInfo) => [...mintingTxInfo, newInfo])
+  }
+
+  const generateSeveralMetadata = () => {
+    console.debug(`[dApp][NFT_Tab][generateSeveralMetadata] ${currentNFTsAmount} NFTs metadata will be generated`)
+    const allMetadataInfo = []
+    for (let index = 1; index <= currentNFTsAmount; index++) {
+      const newName = currentNFTName + `_${index}`
+      const newDescription = currentDescription + `_${newName}`
+      // deep copy of an object
+      const newInfo = JSON.parse(JSON.stringify(_genMeta(newName, currentImageUrl, newDescription)))
+      allMetadataInfo.push(newInfo)
+    }
+    setMintingTxInfo(allMetadataInfo)
   }
 
   const mint = async () => {
     const txBuilder = getTxBuilder(wasm)
 
     const changeAddress = await api?.getChangeAddress()
-    console.log(`[dApp][NFT_Tab][mint] changeAddress -> ${changeAddress}`)
+    console.debug(`[dApp][NFT_Tab][mint] changeAddress -> ${changeAddress}`)
     const wasmChangeAddress = getAddressFromBytes(wasm, changeAddress)
     const usedAddresses = await api?.getUsedAddresses()
     const usedAddress = getAddressFromBytes(wasm, usedAddresses[0])
@@ -131,7 +170,7 @@ const NFTTab = () => {
     for (const assetInfo of mintingTxInfo) {
       metadata[scriptHashHex][assetInfo.NFTName] = assetInfo.metadata
       metadata['version'] = isV2nft ? '2.0' : '1.0'
-      console.log(`[dApp][NFT_Tab][mint] metadata -> ${JSON.stringify(metadata)}`)
+      console.debug(`[dApp][NFT_Tab][mint] metadata -> ${JSON.stringify(metadata)}`)
       txBuilder.add_json_metadatum(wasm.BigNum.from_str('721'), JSON.stringify(metadata))
       txBuilder.add_mint_asset_and_output_min_required_coin(
         wasmNativeScript,
@@ -141,27 +180,27 @@ const NFTTab = () => {
       )
     }
 
-    console.log(`[dApp][NFT_Tab][mint] getting UTxOs`)
+    console.debug(`[dApp][NFT_Tab][mint] getting UTxOs`)
     const hexInputUtxos = await api?.getUtxos()
 
-    console.log(`[dApp][NFT_Tab][mint] preparing wasmUTxOs`)
+    console.debug(`[dApp][NFT_Tab][mint] preparing wasmUTxOs`)
     const wasmUtxos = wasm.TransactionUnspentOutputs.new()
     for (const hexInputUtxo of hexInputUtxos) {
       const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexInputUtxo))
       wasmUtxos.add(wasmUtxo)
     }
 
-    console.log(`[dApp][NFT_Tab][mint] adding inputs`)
+    console.debug(`[dApp][NFT_Tab][mint] adding inputs`)
     txBuilder.add_inputs_from(wasmUtxos, wasm.CoinSelectionStrategyCIP2.LargestFirstMultiAsset)
     txBuilder.add_required_signer(pubkeyHash)
     txBuilder.add_change_if_needed(wasmChangeAddress)
 
     const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes())
-    console.log(`[dApp][NFT_Tab][mint] signing the tx`)
+    console.debug(`[dApp][NFT_Tab][mint] signing the tx`)
     api
       ?.signTx({tx: unsignedTransactionHex, returnTx: true})
       .then((transactionHex) => {
-        console.log(`[dApp][NFT_Tab][mint] TransactionHex: ${transactionHex}`)
+        console.debug(`[dApp][NFT_Tab][mint] TransactionHex: ${transactionHex}`)
         api
           .submitTx(transactionHex)
           .then((txId) => {
@@ -239,6 +278,35 @@ const NFTTab = () => {
                     <div>
                       <input
                         type="checkbox"
+                        id="isMoreThenOneNFT"
+                        name="mintSeveralNFTCheckbox"
+                        checked={isMoreThenOneNFT}
+                        onChange={handleNFTsAmount}
+                      />
+                      <label htmlFor="isMoreThenOneNFT" className="font-bold">
+                        <span /> Mint several NFTs with automatic incrementing
+                      </label>
+                      {isMoreThenOneNFT ? (
+                        <input
+                          type="number"
+                          min={1}
+                          max={15}
+                          id="amount"
+                          className="text-sm border rounded-lg block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                          placeholder={1}
+                          value={currentNFTsAmount}
+                          onChange={(event) => setNFTsAmount(Number(event.target.value))}
+                        />
+                      ) : (
+                        <></>
+                      )}
+                    </div>
+                  </div>
+                  <div></div>
+                  <div className="text-l tracking-tight text-gray-300">
+                    <div>
+                      <input
+                        type="checkbox"
                         id="isV2nft"
                         name="v2Checkbox"
                         checked={isV2nft}
@@ -266,13 +334,23 @@ const NFTTab = () => {
               <div className="flex pt-7">
                 <div className="flex-1">
                   <div>
-                    <button
-                      type="button"
-                      className="text-white font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center bg-blue-600 hover:bg-blue-700 focus:ring-blue-800"
-                      onClick={generateMetadata}
-                    >
-                      Generate
-                    </button>
+                    {isMoreThenOneNFT ? (
+                      <button
+                        type="button"
+                        className="text-white font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center bg-blue-600 hover:bg-blue-700 focus:ring-blue-800"
+                        onClick={generateSeveralMetadata}
+                      >
+                        Generate
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="text-white font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center bg-blue-600 hover:bg-blue-700 focus:ring-blue-800"
+                        onClick={generateMetadata}
+                      >
+                        Generate
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="text-white font-medium rounded-lg text-sm sm:w-auto mx-5 px-5 py-2.5 text-center bg-red-600 hover:bg-red-700 focus:ring-red-800"
