@@ -37,7 +37,7 @@ const AccessButton = () => {
         {api ? (
           <div className="grid grid-cols-4">
             <div className="grid justify-items-end py-5">
-              <img src={getWalletIcon()} alt="wallet icon" />
+              <img src={getWalletIcon()} alt="wallet icon" width="72"/>
             </div>
             <div className="col-span-3 text-xl font-bold tracking-tight text-white text-center ml-1">
               <div className="py-5">

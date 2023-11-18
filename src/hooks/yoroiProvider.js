@@ -46,7 +46,13 @@ export const YoroiProvider = ({children}) => {
     // We need to filter like this because of the Nami wallet.
     // It injects everything into the cardano object not only the object "nami".
     const userWallets = Object.keys(window.cardano).filter((cardanoKey) => !reservedKeys.includes(cardanoKey))
-    const allInfoWallets = userWallets.map((walletName) => window.cardano[walletName])
+    const allInfoWallets = userWallets.map((walletName) => {
+      return {
+        walletObjKey: walletName,
+        walletObjInfo: window.cardano[walletName],
+      }
+    })
+    console.log('allInfoWallets: ', allInfoWallets)
     setAvailableWallets(allInfoWallets)
 
     if (userWallets.length === 1) {
@@ -70,12 +76,16 @@ export const YoroiProvider = ({children}) => {
     }
   }, [])
 
+  /**
+   * @param {string} walletName - A wallet name as it is presented in the Cardano object
+   * @returns {Promise<void>}
+   */
   const tryConnectSilent = async (walletName) => {
     let connectResult = null
     console.log(`[dApp][tryConnectSilent] is called`)
     try {
       console.log(`[dApp][tryConnectSilent] trying {true, true}`)
-      connectResult = await connect(walletName, true, true)
+      connectResult = await connect(walletName, true, true, true)
       if (connectResult != null) {
         console.log('[dApp][tryConnectSilent] RE-CONNECTED!')
         setSelectedWallet(walletName)
@@ -84,30 +94,32 @@ export const YoroiProvider = ({children}) => {
       }
     } catch (error) {
       console.warn(`[dApp][tryConnectSilent]: failed {true, true}`)
-      if (String(error).includes('onlySilent:fail')) {
-        console.warn('[dApp][tryConnectSilent] no silent re-connection is available')
-        try {
-          console.log(`[dApp][tryConnectSilent] trying {false, true}`)
-          setConnectionState(IN_PROGRESS)
-          connectResult = await connect(walletName, false, true)
-          if (connectResult != null) {
-            console.log('[dApp][tryConnectSilent] RE-CONNECTED!')
-            setSelectedWallet(walletName)
-            setConnectionState(CONNECTED)
-            return
-          }
-        } catch (error) {
-          setConnectionState(NOT_CONNECTED)
-          throw new Error(error)
+      console.warn('[dApp][tryConnectSilent] no silent re-connection with auth is available')
+      try {
+        console.log(`[dApp][tryConnectSilent] trying {false, true}`)
+        setConnectionState(IN_PROGRESS)
+        connectResult = await connect(walletName, false, true, false)
+        if (connectResult != null) {
+          console.log('[dApp][tryConnectSilent] RE-CONNECTED!')
+          setSelectedWallet(walletName)
+          setConnectionState(CONNECTED)
+          return
         }
-      } else {
+      } catch (error) {
         setConnectionState(NOT_CONNECTED)
-        throw new Error(error)
+        console.error(error)
       }
     }
   }
 
-  const connect = async (walletName, requestId, silent) => {
+  /**
+   * @param {string} walletName - A wallet name as it is presented in the Cardano object
+   * @param {bool} requestId - Request connection with or without required authentication
+   * @param {bool} silent - Request connection with or without showing the connection pop-up
+   * @param {bool} throwError - Throw an error which possibly can be while connecting to the wallet
+   * @returns {Promise<any>}
+   */
+  const connect = async (walletName, requestId, silent, throwError = false) => {
     setConnectionState(IN_PROGRESS)
     console.log(`[dApp][connect] is called`)
 
@@ -139,7 +151,11 @@ export const YoroiProvider = ({children}) => {
     } catch (error) {
       console.error(`[dApp][connect] The error received while connecting the wallet`)
       setConnectionState(NOT_CONNECTED)
-      console.error(`[dApp][connect] ${error}`)
+      if (throwError) {
+        throw new Error(JSON.stringify(error))
+      } else {
+        console.error(`[dApp][connect] ${error}`)
+      }
     }
   }
 

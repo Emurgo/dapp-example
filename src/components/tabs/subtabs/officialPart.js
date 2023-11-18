@@ -11,12 +11,30 @@ import BuildTransactionCard from '../../cards/buildTransactionCard'
 import SignTransactionCard from '../../cards/signTransactionCard'
 import SubmitTransactionCard from '../../cards/submitTransactionCard'
 import IsEnabledCard from '../../cards/isEnabledCard'
+import GetNetworkIdCard from '../../cards/getNetworkIdCard'
+import GetExtensionsCard from '../../cards/getExtensionsCard'
 
 const OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState}) => {
   return (
     <div className="grid justify-items-stretch grid-cols-1 lg:grid-cols-2 gap-2">
       <div>
         <IsEnabledCard onRawResponse={setRawCurrentText} onResponse={setResponse} onWaiting={setWaiterState} />
+      </div>
+      <div>
+        <GetNetworkIdCard
+          api={api}
+          onRawResponse={setRawCurrentText}
+          onResponse={setResponse}
+          onWaiting={setWaiterState}
+        />
+      </div>
+      <div>
+        <GetExtensionsCard
+          api={api}
+          onRawResponse={setRawCurrentText}
+          onResponse={setResponse}
+          onWaiting={setWaiterState}
+        />
       </div>
       <div>
         <GetBalanceCard

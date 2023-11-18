@@ -11,7 +11,7 @@ const Cip30Tab = () => {
   const wasm = useWasm()
   const [currentText, setCurrentText] = useState('')
   const [rawCurrentText, setRawCurrentText] = useState('')
-  const [currentWaiterState, setWaiterState] = useState(false)
+  const [waiterState, setWaiterState] = useState(false)
 
   const setResponse = (response, stringifyIt = true) => {
     setCurrentText(stringifyIt ? JSON.stringify(response, undefined, 2) : response)
@@ -32,7 +32,7 @@ const Cip30Tab = () => {
             <ResponsesPart
               rawCurrentText={rawCurrentText}
               currentText={currentText}
-              currentWaiterState={currentWaiterState}
+              currentWaiterState={waiterState}
             />
           </div>
           <div>

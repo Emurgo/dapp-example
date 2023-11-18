@@ -55,18 +55,18 @@ const WalletsModal = () => {
           <div className="text-white my-2 px-2">Please, select one of presented wallets to continue</div>
           <div className="grid justify-items-center grid-cols-3 gap-2 my-2 px-1">
             {availableWallets.map((walletInfo) => (
-              <div className="text-white" key={walletInfo.name.toLowerCase()}>
+              <div className="text-white" key={walletInfo.walletObjKey.toLowerCase()}>
                 <label>
-                  {walletInfo.name.toUpperCase()}
+                  {walletInfo.walletObjKey.toLowerCase()}
                   <input
                     className="ml-1"
                     type="radio"
                     name="avalable_wallets"
-                    value={walletInfo.name.toLowerCase()}
-                    onChange={() => setSelectedUserWallet(walletInfo.name.toLowerCase())}
+                    value={walletInfo.walletObjKey.toLowerCase()}
+                    onChange={() => setSelectedUserWallet(walletInfo.walletObjKey.toLowerCase())}
                   />
                   <div>
-                    <img src={walletInfo.icon} alt={walletInfo.name.toLowerCase()} width="72" />
+                    <img src={walletInfo.walletObjInfo.icon} alt={walletInfo.walletObjKey.toLowerCase()} width="72" />
                   </div>
                 </label>
               </div>

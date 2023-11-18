@@ -3,6 +3,7 @@ import NFTTab from './subtabs/NFTTab'
 import {Routes, Route, Link, useLocation, Navigate} from 'react-router-dom'
 import useYoroi from '../../hooks/yoroiProvider'
 import {CONNECTED, NO_CARDANO} from '../../utils/connectionStates'
+import Cip95Tab from './subtabs/cip95Tab'
 
 const MainTab = () => {
   const {pathname} = useLocation()
@@ -38,6 +39,17 @@ const MainTab = () => {
                 </button>
               </Link>
             </li>
+            <li className="mr-2">
+              <Link to="CIP-95">
+                <button
+                  className={
+                    'inline-block p-4 rounded-t-lg ' + (pathname === '/CIP-95' ? ACTIVE_COLOURS : INACTIVE_COLOURS)
+                  }
+                >
+                  CIP-95
+                </button>
+              </Link>
+            </li>
             {/* <li className="mr-2">
                             <button className={"inline-block p-4 rounded-t-lg cursor-not-allowed " + (pathname === "/Contracts" ? ACTIVE_COLOURS : INACTIVE_COLOURS)}>Contracts</button>
                         </li> */}
@@ -62,9 +74,9 @@ const MainTab = () => {
       </div>
       <Routes>
         <Route path="/CIP-30" element={connectionState === CONNECTED ? <Cip30Tab /> : <Navigate replace to={'/'} />} />
+        <Route path="/CIP-95" element={connectionState === CONNECTED ? <Cip95Tab /> : <Navigate replace to={'/'} />} />
         {/* <Route path="/Contracts" element={<ContractTab />} /> */}
         <Route path="/NFTs" element={connectionState === CONNECTED ? <NFTTab /> : <Navigate replace to={'/'} />} />
-        {/* <Route path="/Submit-Txs" element={<SubmitTxsTab />} /> */}
       </Routes>
     </>
   )
