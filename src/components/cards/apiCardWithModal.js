@@ -54,7 +54,7 @@ export const ApiCardWithModal = (props) => {
                   handleActionAndClose(close)
                 }}
               >
-                Confirm
+                Send
               </button>
             </div>
           </div>
