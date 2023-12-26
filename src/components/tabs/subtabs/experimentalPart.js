@@ -1,5 +1,5 @@
 import React from 'react'
-import useCollapse from 'react-collapsed'
+import {useCollapse} from 'react-collapsed'
 import AuthCard from '../../cards/authCard'
 import ListNFTsCard from '../../cards/listNFTsCard'
 
