@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import {bytesToHex, hexToBytes, wasmMultiassetToJSONs} from '../../utils/utils'
 import ApiCardWithModal from './apiCardWithModal'
+import {ModalWindowContent, CommonStyles} from '../ui-constants'
 
 const GetUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
   const [getUtxosInput, setGetUtxosInput] = useState({amount: '', page: 0, limit: 10})
@@ -13,9 +14,9 @@ const GetUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
         onWaiting(false)
         onRawResponse(hexUtxos)
         let utxos = []
-        for (let i = 0; i < hexUtxos.length; i++) {
+        for (const element of hexUtxos) {
           const utxo = {}
-          const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexUtxos[i]))
+          const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(element))
           const output = wasmUtxo.output()
           const input = wasmUtxo.input()
           utxo.tx_hash = bytesToHex(input.transaction_id().to_bytes())
@@ -42,15 +43,15 @@ const GetUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
 
   return (
     <ApiCardWithModal {...apiProps}>
-      <div className="px-4 pb-3">
-        <label htmlFor="amount" className="block mb-2 text-sm font-medium text-gray-300">
-          Amount
+      <div className={ModalWindowContent.contentPadding}>
+        <label htmlFor="amount" className={ModalWindowContent.contentLabelStyle}>
+          Amount (lovelaces)
         </label>
         <input
           type="number"
           min="0"
           id="amount"
-          className="appearance-none border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+          className={CommonStyles.inputStyles}
           placeholder=""
           value={getUtxosInput.amount}
           onChange={(event) => setGetUtxosInput({...getUtxosInput, amount: event.target.value})}
@@ -58,28 +59,28 @@ const GetUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
       </div>
       <div className="grid gap-6 mb-6 md:grid-cols-2 px-4">
         <div>
-          <label htmlFor="page" className="block mb-2 text-sm font-medium text-gray-300">
+          <label htmlFor="page" className={ModalWindowContent.contentLabelStyle}>
             Page
           </label>
           <input
             type="number"
             min="0"
             id="page"
-            className="appearance-none border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+            className={CommonStyles.inputStyles}
             placeholder=""
             value={getUtxosInput.page}
             onChange={(event) => setGetUtxosInput({...getUtxosInput, page: Number(event.target.value)})}
           />
         </div>
         <div>
-          <label htmlFor="limit" className="block mb-2 text-sm font-medium text-gray-300">
+          <label htmlFor="limit" className={ModalWindowContent.contentLabelStyle}>
             Limit
           </label>
           <input
             type="number"
             min="0"
             id="limit"
-            className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+            className={CommonStyles.inputStyles}
             placeholder=""
             value={getUtxosInput.limit}
             onChange={(event) => setGetUtxosInput({...getUtxosInput, limit: Number(event.target.value)})}

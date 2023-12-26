@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react'
 import useYoroi from '../../../hooks/yoroiProvider'
 import useWasm from '../../../hooks/useWasm'
 import {bytesToHex, hexToBytes} from '../../../utils/utils'
+import {CommonStyles} from '../../ui-constants'
 
 const ContractTab = () => {
   const [contractInfo, setContractInfo] = useState({contractAddress: '', contractHex: ''})
@@ -34,8 +35,7 @@ const ContractSave = ({contractInfo, setContractInfo}) => {
   }
 
   return (
-    <>
-      <div className="grid justify-items-center py-5 px-5">
+    <div className="grid justify-items-center py-5 px-5">
         <div className="block p-6 min-w-full rounded-lg border shadow-md bg-gray-800 border-gray-700">
           <div className="mb-6">
             <label htmlFor="address" className="block mb-2 text-sm font-medium text-gray-300">
@@ -44,7 +44,7 @@ const ContractSave = ({contractInfo, setContractInfo}) => {
             <input
               type="text"
               id="address"
-              className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+              className={CommonStyles.inputStyles}
               value={contractInfo.contractAddress}
               onChange={(event) => {
                 setContractInfo({...contractInfo, contractAddress: event.target.value})
@@ -58,7 +58,7 @@ const ContractSave = ({contractInfo, setContractInfo}) => {
             <input
               type="text"
               id="hex"
-              className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+              className={CommonStyles.inputStyles}
               value={contractInfo.contractHex}
               onChange={(event) => {
                 setContractInfo({...contractInfo, contractHex: event.target.value})
@@ -88,7 +88,6 @@ const ContractSave = ({contractInfo, setContractInfo}) => {
           </div>
         </div>
       </div>
-    </>
   )
 }
 
@@ -136,8 +135,8 @@ const SendToContract = ({contractInfo}) => {
     const wasmValue = wasm.Value.new(wasm.BigNum.from_str(sendTxInfo.value.ada))
     const wasmMultiasset = wasm.MultiAsset.new()
     const wasmAssets = wasm.Assets.new()
-    for (let i = 0; i < sendTxInfo.value.assets.length; i++) {
-      const assetInfo = sendTxInfo.value.assets[i]
+    for (const element of sendTxInfo.value.assets) {
+      const assetInfo = element
       wasmAssets.insert(wasm.AssetName.new(hexToBytes(assetInfo.name)), wasm.BigNum.from_str(assetInfo.amount))
       wasmMultiasset.insert(wasm.ScriptHash.from_bytes(hexToBytes(assetInfo.policyId)), wasmAssets)
     }
@@ -170,8 +169,8 @@ const SendToContract = ({contractInfo}) => {
 
     // create a new TransactionUnspentOutputs object and insert all UTXOs into it
     const wasmUtxos = wasm.TransactionUnspentOutputs.new()
-    for (let i = 0; i < hexInputUtxos.length; i++) {
-      const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexInputUtxos[i]))
+    for (const element of hexInputUtxos) {
+      const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(element))
       wasmUtxos.add(wasmUtxo)
     }
 
@@ -205,8 +204,7 @@ const SendToContract = ({contractInfo}) => {
   }
 
   return (
-    <>
-      <div className="block p-6 min-w-full rounded-lg border shadow-md bg-gray-800 border-gray-700">
+    <div className="block p-6 min-w-full rounded-lg border shadow-md bg-gray-800 border-gray-700">
         <div className="mb-6">
           <label htmlFor="ada" className="block mb-2 text-sm font-medium text-gray-300">
             Lovelaces Value
@@ -214,7 +212,7 @@ const SendToContract = ({contractInfo}) => {
           <input
             type="text"
             id="ada"
-            className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+            className={CommonStyles.inputStyles}
             value={sendTxInfo.value.ada}
             onChange={(event) => {
               setSendTxInfo({...sendTxInfo, value: {...sendTxInfo.value, ada: event.target.value}})
@@ -222,9 +220,10 @@ const SendToContract = ({contractInfo}) => {
           />
         </div>
         <div className="mb-6">
-          <label className="block mb-2 text-sm font-medium text-gray-300">Datum JSON</label>
+          <label htmlFor="sendTxInfoDatum" className="block mb-2 text-sm font-medium text-gray-300">Datum JSON</label>
           <textarea
             className="flex-row w-full rounded bg-gray-900 text-white px-2"
+            id="sendTxInfoDatum"
             value={sendTxInfo.datum}
             onChange={(event) => {
               setSendTxInfo({...sendTxInfo, datum: event.target.value})
@@ -329,7 +328,7 @@ const SendToContract = ({contractInfo}) => {
                         <input
                           type="text"
                           id="name"
-                          className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                          className={CommonStyles.inputStyles}
                           value={currentAssetInfo.name}
                           onChange={(event) => setCurrentAssetInfo({...currentAssetInfo, name: event.target.value})}
                         />
@@ -344,7 +343,7 @@ const SendToContract = ({contractInfo}) => {
                           type="number"
                           min="0"
                           id="amount"
-                          className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                          className={CommonStyles.inputStyles}
                           value={currentAssetInfo.amount}
                           onChange={(event) => setCurrentAssetInfo({...currentAssetInfo, amount: event.target.value})}
                         />
@@ -383,7 +382,6 @@ const SendToContract = ({contractInfo}) => {
           </button>
         </div>
       </div>
-    </>
   )
 }
 
@@ -467,8 +465,8 @@ const RedeemFromContract = ({contractInfo}) => {
     wasmTxInputsBuilder.add_plutus_script_input(plutusScriptWitness, wasmTxInput, wasmValue)
     // Maybe add some more value to pay fees and extra outputs
     const hexInputUtxos = await api.getUtxos('5000000')
-    for (let i = 0; i < hexInputUtxos.length; i++) {
-      const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexInputUtxos[i]))
+    for (const element of hexInputUtxos) {
+      const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(element))
       wasmTxInputsBuilder.add_input(wasmUtxo.output().address(), wasmUtxo.input(), wasmUtxo.output().amount())
     }
     // Then we can set the tx inputs to the tx inputs builder
@@ -477,8 +475,8 @@ const RedeemFromContract = ({contractInfo}) => {
     // For plutus transactions, we need some collateral also
     const hexCollateralUtxos = await api?.getCollateral(3000000)
     const collateralTxInputsBuilder = wasm.TxInputsBuilder.new()
-    for (let i = 0; i < hexCollateralUtxos.length; i++) {
-      const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexCollateralUtxos[i]))
+    for (const element of hexCollateralUtxos) {
+      const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(element))
       collateralTxInputsBuilder.add_input(wasmUtxo.output().address(), wasmUtxo.input(), wasmUtxo.output().amount())
     }
     txBuilder.set_collateral(collateralTxInputsBuilder)
@@ -572,7 +570,7 @@ const RedeemFromContract = ({contractInfo}) => {
           <input
             type="text"
             id="outputId"
-            className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+            className={CommonStyles.inputStyles}
             value={scriptInputInfo.outputId}
             onChange={(event) => setScriptInputInfo({...scriptInputInfo, outputId: event.target.value})}
           />
@@ -616,10 +614,11 @@ const RedeemFromContract = ({contractInfo}) => {
         </button>
       </div>
       <div className="mb-6 px-5">
-        <label className="block mb-2 text-sm font-medium text-gray-300">Input List</label>
+        <label htmlFor="scriptInputList" className="block mb-2 text-sm font-medium text-gray-300">Input List</label>
         <textarea
           className="flex-row w-full rounded bg-gray-900 text-white px-2"
           value={scriptInputList}
+          id="scriptInputList"
           onChange={(event) => {
             setScriptInputList({...scriptInputList, datum: event.target.value})
           }}

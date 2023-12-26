@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import {getAddressFromBytes} from '../../utils/wasmTools'
 import ApiCardWithModal from './apiCardWithModal'
+import {ModalWindowContent, CommonStyles} from '../ui-constants'
 
 const GetUsedAddresses = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
   const [usedAddressInput, setUsedAddressInput] = useState({page: 0, limit: 5})
@@ -13,8 +14,8 @@ const GetUsedAddresses = ({api, wasm, onRawResponse, onResponse, onWaiting}) => 
         onWaiting(false)
         onRawResponse(hexAddresses)
         const addresses = []
-        for (let i = 0; i < hexAddresses.length; i++) {
-          const wasmAddress = getAddressFromBytes(wasm, hexAddresses[i])
+        for (const element of hexAddresses) {
+          const wasmAddress = getAddressFromBytes(wasm, element)
           addresses.push(wasmAddress.to_bech32())
         }
         onResponse(addresses)
@@ -34,30 +35,30 @@ const GetUsedAddresses = ({api, wasm, onRawResponse, onResponse, onWaiting}) => 
 
   return (
     <ApiCardWithModal {...apiProps}>
-      <div className="grid gap-6 mb-6 md:grid-cols-2 px-4">
+      <div className="grid gap-6 mb-6 md:grid-cols-2 px-2">
         <div>
-          <label htmlFor="page" className="block mb-2 text-sm font-medium text-gray-300">
+          <label htmlFor="page" className={ModalWindowContent.contentLabelStyle}>
             Page
           </label>
           <input
             type="number"
             min="0"
             id="page"
-            className="appearance-none border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+            className={CommonStyles.inputStyles}
             placeholder="0"
             value={usedAddressInput.page}
             onChange={(event) => setUsedAddressInput({...usedAddressInput, page: Number(event.target.value)})}
           />
         </div>
         <div>
-          <label htmlFor="limit" className="block mb-2 text-sm font-medium text-gray-300">
+          <label htmlFor="limit" className={ModalWindowContent.contentLabelStyle}>
             Limit
           </label>
           <input
             type="number"
             min="0"
             id="limit"
-            className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+            className={CommonStyles.inputStyles}
             placeholder="5"
             value={usedAddressInput.limit}
             onChange={(event) => setUsedAddressInput({...usedAddressInput, limit: Number(event.target.value)})}

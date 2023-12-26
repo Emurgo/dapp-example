@@ -1,9 +1,10 @@
 import React, {useState} from 'react'
 import {bytesToHex, hexToBytes, wasmMultiassetToJSONs} from '../../utils/utils'
 import ApiCardWithModal from './apiCardWithModal'
+import {CommonStyles, ModalWindowContent} from '../ui-constants'
 
 const GetCollateralUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
-  const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState("2000000")
+  const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState('2000000')
 
   const getCollateralUtxosClick = () => {
     onWaiting(true)
@@ -13,9 +14,9 @@ const GetCollateralUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting
         onWaiting(false)
         onRawResponse(hexUtxos)
         let utxos = []
-        for (let i = 0; i < hexUtxos.length; i++) {
+        for (const element of hexUtxos) {
           const utxo = {}
-          const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexUtxos[i]))
+          const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(element))
           const output = wasmUtxo.output()
           const input = wasmUtxo.input()
           utxo.tx_hash = bytesToHex(input.transaction_id().to_bytes())
@@ -42,15 +43,15 @@ const GetCollateralUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting
 
   return (
     <ApiCardWithModal {...apiProps}>
-      <div className="px-4 pb-3">
-        <label htmlFor="amount" className="block mb-2 text-sm font-medium text-gray-300">
+      <div className={ModalWindowContent.contentPadding}>
+        <label htmlFor="amount" className={ModalWindowContent.contentLabelStyle}>
           Amount
         </label>
         <input
           type="number"
           min="0"
           id="amount"
-          className="appearance-none border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+          className={CommonStyles.inputStyles}
           placeholder="2000000"
           value={getCollateralUtxosInput}
           onChange={(event) => setGetCollateralUtxosInput(event.target.value)}

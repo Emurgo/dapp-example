@@ -11,8 +11,8 @@ const GetRewardAddressesCard = ({api, wasm, onRawResponse, onResponse, onWaiting
         onWaiting(false)
         onRawResponse(hexAddresses)
         const addresses = []
-        for (let i = 0; i < hexAddresses.length; i++) {
-          const wasmAddress = wasm.Address.from_bytes(hexToBytes(hexAddresses[i]))
+        for (const element of hexAddresses) {
+          const wasmAddress = wasm.Address.from_bytes(hexToBytes(element))
           addresses.push(wasmAddress.to_bech32())
         }
         onResponse(addresses)

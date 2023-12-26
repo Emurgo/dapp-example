@@ -17,10 +17,9 @@ export const ApiCardWithModal = (props) => {
   const nested = false
 
   const buttonProps = {
-    className: 'w-full h-16 rounded-lg text-white active:bg-orange-500 ' +
-      (halfOpacity !== true
-        ? 'bg-orange-700 hover:bg-orange-800'
-        : 'bg-orange-700/50 hover:bg-orange-800/50'),
+    className:
+      'w-full h-16 rounded-lg border-1 border-gray-600 text-white active:bg-orange-500 ' +
+      (halfOpacity !== true ? 'bg-orange-700 hover:bg-orange-800' : 'bg-orange-700/50 hover:bg-orange-800/50'),
   }
 
   return (
@@ -44,9 +43,7 @@ export const ApiCardWithModal = (props) => {
             </div>
           </div>
           {/* content section */}
-          <div className='py-5'>
-            {children}
-          </div>
+          <div className="py-5">{children}</div>
           {/* end of content section*/}
           {/* confirmation button */}
           <div className="flex">
@@ -65,7 +62,6 @@ export const ApiCardWithModal = (props) => {
       )}
     </Popup>
   )
-
 }
 
 export default ApiCardWithModal

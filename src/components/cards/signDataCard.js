@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
 import {Buffer} from 'buffer'
+import {CommonStyles, ModalWindowContent} from '../ui-constants'
 
 const SignDataCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
   const [message, setMessage] = useState('')
@@ -60,14 +61,14 @@ const SignDataCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
 
   return (
     <ApiCardWithModal {...apiProps}>
-      <div className="px-4 pb-3">
-        <label htmlFor="signMessage" className="block mb-2 text-sm font-medium text-gray-300">
+      <div className={ModalWindowContent.contentPadding}>
+        <label htmlFor="signMessage" className={ModalWindowContent.contentLabelStyle}>
           Sign Data
         </label>
         <input
           type="text"
           id="signMessage"
-          className="appearance-none border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+          className={CommonStyles.inputStyles}
           placeholder=""
           value={message}
           onChange={(event) => setMessage(event.target.value)}

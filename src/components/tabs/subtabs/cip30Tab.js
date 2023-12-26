@@ -29,11 +29,7 @@ const Cip30Tab = () => {
               setResponse={setResponse}
               setWaiterState={setWaiterState}
             />
-            <ResponsesPart
-              rawCurrentText={rawCurrentText}
-              currentText={currentText}
-              currentWaiterState={waiterState}
-            />
+            <ResponsesPart rawCurrentText={rawCurrentText} currentText={currentText} currentWaiterState={waiterState} />
           </div>
           <div>
             <ExperimentalPart
