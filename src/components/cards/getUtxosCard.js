@@ -57,7 +57,7 @@ const GetUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
           onChange={(event) => setGetUtxosInput({...getUtxosInput, amount: event.target.value})}
         />
       </div>
-      <div className="grid gap-6 mb-6 md:grid-cols-2 px-4">
+      <div className="grid gap-4 mb-3 md:grid-cols-2 px-2">
         <div>
           <label htmlFor="page" className={ModalWindowContent.contentLabelStyle}>
             Page

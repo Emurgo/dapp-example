@@ -3,7 +3,7 @@ import ApiCardWithModal from './apiCardWithModal'
 import {Buffer} from 'buffer'
 import {CommonStyles, ModalWindowContent} from '../ui-constants'
 
-const SignDataCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
+const SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [message, setMessage] = useState('')
 
   const getAddress = async () => {
