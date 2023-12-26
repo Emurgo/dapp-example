@@ -18,7 +18,7 @@ export const ApiCardWithModal = (props) => {
 
   const buttonProps = {
     className:
-      'w-full h-16 rounded-lg border-1 border-gray-600 text-white active:bg-orange-500 ' +
+      'w-full h-16 rounded-lg border-1 border-gray-600 text-white text-lg active:bg-orange-500 ' +
       (halfOpacity !== true ? 'bg-orange-700 hover:bg-orange-800' : 'bg-orange-700/50 hover:bg-orange-800/50'),
   }
 
