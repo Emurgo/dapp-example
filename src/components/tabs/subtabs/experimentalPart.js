@@ -3,7 +3,7 @@ import {useCollapse} from 'react-collapsed'
 import AuthCard from '../../cards/authCard'
 import ListNFTsCard from '../../cards/listNFTsCard'
 
-const ExperimentalPart = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
+const ExperimentalPart = ({api, onRawResponse, onResponse, onWaiting}) => {
   const {getCollapseProps, getToggleProps, isExpanded} = useCollapse()
 
   return (

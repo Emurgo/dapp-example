@@ -34,7 +34,6 @@ const Cip30Tab = () => {
           <div>
             <ExperimentalPart
               api={api}
-              wasm={wasm}
               onRawResponse={setRawCurrentText}
               onResponse={setResponse}
               onWaiting={setWaiterState}
