@@ -12,7 +12,7 @@ const Cip95GetPubDRepKeyCard = ({api, wasm, onRawResponse, onResponse, onWaiting
         const dRepIDHex = dRepID.to_hex()
         const dRepIDBech32 = dRepID.to_bech32('drep')
         onResponse({
-            dRepIDHash: dRepIDHex,
+            dRepIDHex: dRepIDHex,
             dRepIDBech32: dRepIDBech32,
         })
       })

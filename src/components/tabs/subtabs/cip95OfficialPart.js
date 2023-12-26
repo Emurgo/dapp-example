@@ -5,7 +5,7 @@ import Cip95GetUnregisteredPubStakeKeysCard from '../../cards/cip95getUnregister
 
 const Cip95OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState}) => {
   return (
-    <div className="grid justify-items-stretch grid-cols-1 lg:grid-cols-2 gap-2">
+    <div className="grid justify-items-stretch grid-cols-3 gap-2">
       <div>
         <Cip95GetPubDRepKeyCard
           api={api}
