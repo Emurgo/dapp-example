@@ -1,104 +1,71 @@
-import React, {useState} from 'react'
+import React from 'react'
+import Popup from 'reactjs-popup'
 
-const ApiCardWithModal = (props) => {
-  const [showModal, setShowModal] = useState(false)
+export const ApiCardWithModal = (props) => {
   const {buttonLabel, clickFunction, halfOpacity, children} = props
 
-  const clickAndClose = () => {
+  const handleActionAndClose = (closeFunc) => {
+    console.log(`[dApp][ApiCardWithModalV2] is called`)
+    // action here
     clickFunction()
-    setShowModal(false)
+    closeFunc()
+    console.log(`[dApp][ApiCardWithModalV2] is closed`)
+  }
+
+  const overlayStyle = {background: 'rgba(0,0,0,0.75)'}
+  const modal = true
+  const nested = false
+
+  const buttonProps = {
+    className: 'w-full h-16 rounded-lg text-white active:bg-orange-500 ' +
+      (halfOpacity !== true
+        ? 'bg-orange-700 hover:bg-orange-800'
+        : 'bg-orange-700/50 hover:bg-orange-800/50'),
   }
 
   return (
-    <div className="grid grid-cols-1 rounded-lg border-2 border-gray-600">
-      <button
-        className={
-          'w-full h-16 rounded-lg text-white ' +
-          (halfOpacity !== true
-            ? 'bg-orange-700 hover:bg-orange-800 active:bg-orange-500'
-            : 'bg-orange-700/50 hover:bg-orange-800/50 active:bg-orange-500/50')
-        }
-        onClick={() => setShowModal(!showModal)}
-      >
-        {buttonLabel}
-      </button>
-      {showModal && (
-        <div
-          className="
-                overflow-y-auto
-                overflow-x-hidden
-                fixed
-                top-0
-                right-0
-                left-0
-                z-50
-                w-full
-                md:inset-0
-                h-modal
-                md:h-full"
-        >
-          <div
-            className="
-                    justify-center
-                    items-center
-                    flex
-                    overflow-x-hidden
-                    overflow-y-auto
-                    fixed
-                    inset-0
-                    z-50
-                    outline-none
-                    focus:outline-none"
-          >
-            <div className="relative w-auto my-6 mx-auto max-w-3xl">
-              {/*content*/}
-              <div className="bg-gray-900 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
-                {/*header*/}
-                <div className="bg-gray-900 flex items-start justify-between p-5 rounded-t">
-                  <h3 className="text-3xl font-semibold">{buttonLabel} inputs</h3>
-                  <button
-                    className="p-1 ml-auto bg-transparent border-0 text-white float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
-                    onClick={() => setShowModal(false)}
-                  >
-                    x
-                  </button>
-                </div>
-                {/*body*/}
-                <div className="bg-gray-900 relative p-6 flex-auto">{children}</div>
-                {/*footer*/}
-                <div className="bg-gray-900 grid justify-items-stretch p-6 rounded-b">
-                  <button
-                    className="
-                                        bg-emerald-500
-                                        text-white
-                                        active:bg-emerald-600
-                                        font-bold
-                                        text-sm
-                                        px-6
-                                        py-3
-                                        rounded
-                                        shadow
-                                        hover:shadow-lg
-                                        outline-none
-                                        focus:outline-none
-                                        mr-1
-                                        mb-1
-                                        ease-linear
-                                        transition-all
-                                        duration-150"
-                    type="button"
-                    onClick={clickAndClose}
-                  >
-                    {buttonLabel}
-                  </button>
-                </div>
+    <Popup trigger={<button {...buttonProps}>{buttonLabel}</button>} {...{modal, nested, overlayStyle}}>
+      {(close) => (
+        <div className="bg-gray-900 border rounded-md border-gray-700 shadow-lg w-96 outline-none focus:outline-none">
+          {/* close button and modal window title */}
+          <div className="flex bg-blue-900">
+            <div className="flex flex-auto justify-left">
+              <div className="pl-1 bg-transparent text-white float-left text-2xl m-2 font-semibold outline-none focus:outline-none">
+                {buttonLabel}
               </div>
+            </div>
+            <div className="flex-none">
+              <button
+                className="rounded-md border-black-300 bg-red-500 hover:bg-red-700 my-2 mr-1 active:bg-red-300 py-1 px-2"
+                onClick={close}
+              >
+                &times;
+              </button>
+            </div>
+          </div>
+          {/* content section */}
+          <div className='py-5'>
+            {children}
+          </div>
+          {/* end of content section*/}
+          {/* confirmation button */}
+          <div className="flex">
+            <div className="flex-auto mb-2 mt-3 mx-2">
+              <button
+                className="w-full py-1 rounded-md text-xl text-white font-semibold bg-orange-700 hover:bg-orange-800 active:bg-orange-500"
+                onClick={() => {
+                  handleActionAndClose(close)
+                }}
+              >
+                Confirm
+              </button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </Popup>
   )
+
 }
 
 export default ApiCardWithModal
