@@ -10,12 +10,13 @@ const ApiCardWithModal = (props) => {
   }
 
   return (
-    <div className="grid grid-cols-1 rounded-lg border border-gray-600">
+    <div className="grid grid-cols-1 rounded-lg border-2 border-gray-600">
       <button
         className={
-          'w-full h-20 rounded-lg text-white ' +
-          (halfOpacity !== true ? 'bg-orange-700 ' : 'bg-orange-700/50 ') +
-          (halfOpacity !== true ? 'hover:bg-orange-800' : 'hover:bg-orange-800/50')
+          'w-full h-16 rounded-lg text-white ' +
+          (halfOpacity !== true
+            ? 'bg-orange-700 hover:bg-orange-800 active:bg-orange-500'
+            : 'bg-orange-700/50 hover:bg-orange-800/50 active:bg-orange-500/50')
         }
         onClick={() => setShowModal(!showModal)}
       >
