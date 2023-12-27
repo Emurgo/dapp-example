@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {getAddressFromBytes} from '../../utils/wasmTools'
+import {getBech32AddressFromHex} from '../../utils/cslTools'
 import ApiCardWithModal from './apiCardWithModal'
 import {ModalWindowContent, CommonStyles} from '../ui-constants'
 
@@ -14,9 +14,8 @@ const GetUsedAddresses = ({api, wasm, onRawResponse, onResponse, onWaiting}) => 
         onWaiting(false)
         onRawResponse(hexAddresses)
         const addresses = []
-        for (const element of hexAddresses) {
-          const wasmAddress = getAddressFromBytes(wasm, element)
-          addresses.push(wasmAddress.to_bech32())
+        for (const hexAddr of hexAddresses) {
+          addresses.push(getBech32AddressFromHex(wasm, hexAddr))
         }
         onResponse(addresses)
       })

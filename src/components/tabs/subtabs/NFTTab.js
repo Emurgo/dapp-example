@@ -11,7 +11,7 @@ import {
   getTransactionOutputBuilder,
   getTxBuilder,
   toInt,
-} from '../../../utils/wasmTools'
+} from '../../../utils/cslTools'
 import {CONNECTED} from '../../../utils/connectionStates'
 import SelectWithLabel from '../../selectWithLabel'
 import InputWithLabel from '../../inputWithLabel'

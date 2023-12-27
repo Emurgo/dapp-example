@@ -1,5 +1,6 @@
 import React from 'react'
 import {useCollapse} from 'react-collapsed'
+import VoteDelationCard from '../../cards/voteDelegation'
 
 const Cip95AdditionaPart = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
     const {getCollapseProps, getToggleProps, isExpanded} = useCollapse()
@@ -49,7 +50,7 @@ const Cip95AdditionaPart = ({api, wasm, onRawResponse, onResponse, onWaiting}) =
           <div {...getCollapseProps()}>
             <div className="grid justify-items-stretch grid-cols-1 lg:grid-cols-4 gap-2 pt-3">
               <div>
-                {/* <AuthCard api={api} onRawResponse={onRawResponse} onResponse={onResponse} onWaiting={onWaiting} /> */}
+                <VoteDelationCard api={api} onRawResponse={onRawResponse} onResponse={onResponse} onWaiting={onWaiting} />
               </div>
               <div>
                 {/* <ListNFTsCard api={api} onRawResponse={onRawResponse} onResponse={onResponse} onWaiting={onWaiting} /> */}

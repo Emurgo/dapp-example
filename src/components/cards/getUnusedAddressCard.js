@@ -1,6 +1,6 @@
 import React from 'react'
-import {hexToBytes} from '../../utils/utils'
 import ApiCard from './apiCard'
+import {getBech32AddressFromHex} from '../../utils/cslTools'
 
 const GetUnusedAddressesCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
   const getUnusedAddressesClick = () => {
@@ -12,8 +12,7 @@ const GetUnusedAddressesCard = ({api, wasm, onRawResponse, onResponse, onWaiting
         onRawResponse(hexAddresses)
         const addresses = []
         for (const element of hexAddresses) {
-          const wasmAddress = wasm.Address.from_bytes(hexToBytes(element))
-          addresses.push(wasmAddress.to_bech32())
+          addresses.push(getBech32AddressFromHex(wasm, element))
         }
         onResponse(addresses)
       })

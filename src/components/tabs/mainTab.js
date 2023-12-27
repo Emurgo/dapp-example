@@ -1,9 +1,9 @@
 import Cip30Tab from './subtabs/cip30Tab'
+import Cip95Tab from './subtabs/cip95Tab'
 import NFTTab from './subtabs/NFTTab'
 import {Routes, Route, Link, useLocation, Navigate} from 'react-router-dom'
 import useYoroi from '../../hooks/yoroiProvider'
 import {CONNECTED, NO_CARDANO} from '../../utils/connectionStates'
-import Cip95Tab from './subtabs/cip95Tab'
 
 const MainTab = () => {
   const {pathname} = useLocation()

@@ -1,6 +1,7 @@
 import React from 'react'
-import {hexToBytes, wasmMultiassetToJSONs} from '../../utils/utils'
+import {wasmMultiassetToJSONs} from '../../utils/utils'
 import ApiCard from './apiCard'
+import {getCslValue} from '../../utils/cslTools'
 
 const GetBalanceCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
   const getBalanceClick = () => {
@@ -10,9 +11,9 @@ const GetBalanceCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
       .then((hexBalance) => {
         onWaiting(false)
         onRawResponse(hexBalance)
-        const wasmValue = wasm.Value.from_bytes(hexToBytes(hexBalance))
-        const adaValue = wasmValue.coin().to_str()
-        const assetValue = wasmMultiassetToJSONs(wasmValue.multiasset())
+        const cslValue = getCslValue(wasm, hexBalance)
+        const adaValue = cslValue.coin().to_str()
+        const assetValue = wasmMultiassetToJSONs(cslValue.multiasset())
         onResponse({lovelaces: adaValue, assets: assetValue})
       })
       .catch((e) => {

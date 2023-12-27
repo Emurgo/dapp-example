@@ -8,8 +8,8 @@ import {
   getTransactionWitnessSetFromBytes,
   getTxBuilder,
   getTransactionOutput,
-  getWasmUtxos,
-} from '../../utils/wasmTools'
+  getCslUtxos,
+} from '../../utils/cslTools'
 import ApiCardWithModal from './apiCardWithModal'
 import {CommonStyles, ModalWindowContent} from '../ui-constants'
 
@@ -30,7 +30,7 @@ const SignTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) 
 
     const hexUtxos = await api?.getUtxos()
 
-    const wasmUtxos = getWasmUtxos(wasm, hexUtxos)
+    const wasmUtxos = getCslUtxos(wasm, hexUtxos)
     txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset(wasm))
     txBuilder.add_change_if_needed(wasmChangeAddress)
 
