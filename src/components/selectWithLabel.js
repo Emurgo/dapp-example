@@ -18,7 +18,7 @@ const SelectWithLabel = (props) => {
         name={selectID}
         id={selectID}
       >
-        {selectArray.map((arrayItem, index) => (
+        {selectArray.map((arrayItem) => (
           <option className="border rounded-md text-white" key={arrayItem.label + 'Key'} value={arrayItem.value}>
             {arrayItem.label}
           </option>
