@@ -1,5 +1,6 @@
 import Cip30Tab from './subtabs/cip30Tab'
 import Cip95Tab from './subtabs/cip95Tab'
+import Cip95ToolsTab from './subtabs/cip95ToolsTab'
 import NFTTab from './subtabs/NFTTab'
 import {Routes, Route, Link, useLocation, Navigate} from 'react-router-dom'
 import useYoroi from '../../hooks/yoroiProvider'
@@ -8,7 +9,6 @@ import {CONNECTED, NO_CARDANO} from '../../utils/connectionStates'
 const MainTab = () => {
   const {pathname} = useLocation()
   const {connectionState} = useYoroi()
-  console.log(`[dApp][MainTab] wallet connection state is ${connectionState}`)
 
   const ACTIVE_COLOURS = 'text-blue-600 active bg-gray-800 text-blue-500'
   const INACTIVE_COLOURS = 'hover:bg-gray-800 hover:text-gray-300'
@@ -50,6 +50,17 @@ const MainTab = () => {
                 </button>
               </Link>
             </li>
+            <li className="mr-2">
+              <Link to="CIP-95Tools">
+                <button
+                  className={
+                    'inline-block p-4 rounded-t-lg ' + (pathname === '/CIP-95Tools' ? ACTIVE_COLOURS : INACTIVE_COLOURS)
+                  }
+                >
+                  CIP-95 Tools
+                </button>
+              </Link>
+            </li>
             {/* <li className="mr-2">
                             <button className={"inline-block p-4 rounded-t-lg cursor-not-allowed " + (pathname === "/Contracts" ? ACTIVE_COLOURS : INACTIVE_COLOURS)}>Contracts</button>
                         </li> */}
@@ -75,7 +86,7 @@ const MainTab = () => {
       <Routes>
         <Route path="/CIP-30" element={connectionState === CONNECTED ? <Cip30Tab /> : <Navigate replace to={'/'} />} />
         <Route path="/CIP-95" element={connectionState === CONNECTED ? <Cip95Tab /> : <Navigate replace to={'/'} />} />
-        {/* <Route path="/Contracts" element={<ContractTab />} /> */}
+        <Route path="/CIP-95Tools" element={connectionState === CONNECTED ? <Cip95ToolsTab /> : <Navigate replace to={'/'} />} />
         <Route path="/NFTs" element={connectionState === CONNECTED ? <NFTTab /> : <Navigate replace to={'/'} />} />
       </Routes>
     </>

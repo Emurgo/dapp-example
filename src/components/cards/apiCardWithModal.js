@@ -5,11 +5,11 @@ export const ApiCardWithModal = (props) => {
   const {buttonLabel, clickFunction, halfOpacity, children} = props
 
   const handleActionAndClose = (closeFunc) => {
-    console.log(`[dApp][ApiCardWithModalV2] is called`)
+    console.log(`[dApp][ApiCardWithModal][${buttonLabel}] is called`)
     // action here
     clickFunction()
     closeFunc()
-    console.log(`[dApp][ApiCardWithModalV2] is closed`)
+    console.log(`[dApp][ApiCardWithModal][${buttonLabel}] is closed`)
   }
 
   const overlayStyle = {background: 'rgba(0,0,0,0.75)'}

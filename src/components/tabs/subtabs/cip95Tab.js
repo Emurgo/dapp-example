@@ -4,7 +4,6 @@ import useWasm from '../../../hooks/useWasm'
 import ResponsesPart from './responsesPart'
 import {CONNECTED} from '../../../utils/connectionStates'
 import Cip95OfficialPart from './cip95OfficialPart'
-import Cip95AdditionaPart from './cip95AdditionalPart'
 
 const Cip95Tab = () => {
   const {api, connectionState} = useYoroi()
@@ -20,8 +19,8 @@ const Cip95Tab = () => {
   return (
     <div className="container mx-auto text-gray-300 py-5">
       {connectionState === CONNECTED ? (
-        <div className="grid grid-rows-3 gap-2">
-          <div className="row-span-1">
+        <div>
+          <div className="mb-3">
             <Cip95OfficialPart
               api={api}
               wasm={wasm}
@@ -30,16 +29,7 @@ const Cip95Tab = () => {
               setWaiterState={setWaiterState}
             />
           </div>
-          <div className="row-span-2">
-            <Cip95AdditionaPart
-              api={api}
-              wasm={wasm}
-              setRawCurrentText={setRawCurrentText}
-              setResponse={setResponse}
-              setWaiterState={setWaiterState}
-            />
-          </div>
-          <div className="row-span-3">
+          <div>
             <ResponsesPart rawCurrentText={rawCurrentText} currentText={currentText} currentWaiterState={waiterState} />
           </div>
         </div>

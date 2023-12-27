@@ -19,20 +19,26 @@ const Cip95SignDataCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) =>
     onWaiting(true)
 
     const payloadHex = getPayloadHex(message)
-
-    api?.cip95
-      .signData(addressOrDRep, payloadHex)
-      .then((sig) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(sig)
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        console.error(e)
-      })
+    try {
+      api?.cip95
+        .signData(addressOrDRep, payloadHex)
+        .then((sig) => {
+          onWaiting(false)
+          onRawResponse('')
+          onResponse(sig)
+        })
+        .catch((e) => {
+          onWaiting(false)
+          onRawResponse('')
+          onResponse(e)
+          console.error(e)
+        })
+    } catch (error) {
+      onWaiting(false)
+      onRawResponse('')
+      onResponse(error, false)
+      console.error(error)
+    }
   }
 
   const apiProps = {
