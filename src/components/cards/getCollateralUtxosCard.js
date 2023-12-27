@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
-import {bytesToHex, hexToBytes, wasmMultiassetToJSONs} from '../../utils/utils'
 import ApiCardWithModal from './apiCardWithModal'
 import {CommonStyles, ModalWindowContent} from '../ui-constants'
+import {getUtxoFromHex} from '../../utils/cslTools'
 
 const GetCollateralUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
   const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState('2000000')
@@ -14,16 +14,8 @@ const GetCollateralUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting
         onWaiting(false)
         onRawResponse(hexUtxos)
         let utxos = []
-        for (const element of hexUtxos) {
-          const utxo = {}
-          const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(element))
-          const output = wasmUtxo.output()
-          const input = wasmUtxo.input()
-          utxo.tx_hash = bytesToHex(input.transaction_id().to_bytes())
-          utxo.tx_index = input.index()
-          utxo.receiver = output.address().to_bech32()
-          utxo.amount = output.amount().coin().to_str()
-          utxo.asset = wasmMultiassetToJSONs(output.amount().multiasset())
+        for (const hexUtxo of hexUtxos) {
+          const utxo = getUtxoFromHex(wasm, hexUtxo)
           utxos.push(utxo)
         }
         onResponse(utxos)

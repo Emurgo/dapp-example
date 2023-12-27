@@ -30,8 +30,8 @@ const SignTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) 
 
     const hexUtxos = await api?.getUtxos()
 
-    const wasmUtxos = getCslUtxos(wasm, hexUtxos)
-    txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset(wasm))
+    const cslUtxos = getCslUtxos(wasm, hexUtxos)
+    txBuilder.add_inputs_from(cslUtxos, getLargestFirstMultiAsset(wasm))
     txBuilder.add_change_if_needed(wasmChangeAddress)
 
     const wasmUnsignedTransaction = txBuilder.build_tx()
