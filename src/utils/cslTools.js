@@ -76,3 +76,47 @@ export const getUtxoFromHex = (wasm, hexUtxo) => {
 }
 
 export const getCertificateBuilder = (wasm) => wasm.CertificatesBuilder.new()
+
+export const getCredential = (wasm, keyHash) => wasm.Credential.from_keyhash(keyHash)
+
+export const getVotingBuilder = (wasm) => wasm.VotingBuilder.new()
+
+export const getVoterFromDRepIDHex = (wasm, dRepIDHex) => {
+  if (dRepIDHex) {
+    const dRepKeyHash = keyHashFromHex(dRepIDHex)
+    return wasm.Voter.new_drep(getCredential(wasm, dRepKeyHash))
+  }
+  throw new Error('DRepIDHex is empty, you need to get it first')
+}
+
+export const keyHashFromHex = (wasm, hexValue) => wasm.Ed25519KeyHash.from_hex(hexValue)
+
+export const keyHashFromBech32 = (wasm, bech32Value) => wasm.Ed25519KeyHash.from_bech32(bech32Value)
+
+export const getCslCredentialFromHex = (wasm, hexValue) => {
+  console.debug('[cslTools][getCslCredentialFromHex]::hexValue', hexValue)
+  const keyHash = keyHashFromHex(wasm, hexValue)
+  console.debug('[cslTools][getCslCredentialFromHex]::keyHash', keyHash)
+  const cred = getCredential(wasm, keyHash)
+  console.debug('[cslTools][getCslCredentialFromHex]::cred', cred)
+  return cred
+}
+
+export const getCslCredentialFromBech32 = (wasm, bech32Value) => {
+  console.debug('[cslTools][getCslCredentialFromBech32]::bech32Value', bech32Value)
+  const keyHash = keyHashFromBech32(wasm, bech32Value)
+  console.debug('[cslTools][getCslCredentialFromBech32]::keyHash', keyHash)
+  const cred = getCredential(wasm, keyHash)
+  console.debug('[cslTools][getCslCredentialFromBech32]::cred', cred)
+  return cred
+}
+
+export const getDRepAbstain = (wasm) => wasm.DRep.new_always_abstain()
+
+export const getDRepNoConfidence = (wasm) => wasm.DRep.new_always_no_confidence()
+
+export const getDRepNewKeyHash = (wasm, credHash) => wasm.DRep.new_key_hash(credHash)
+
+export const getVoteDelegCert = (wasm, stakeCred, dRepKeyHash) => wasm.VoteDelegation.new(stakeCred, dRepKeyHash)
+
+export const getCertOfNewVoteDelegation = (wasm, voteCert) => wasm.Certificate.new_vote_delegation(voteCert)
