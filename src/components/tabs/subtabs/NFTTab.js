@@ -11,7 +11,7 @@ import {
   getTransactionOutputBuilder,
   getTxBuilder,
   toInt,
-} from '../../../utils/wasmTools'
+} from '../../../utils/cslTools'
 import {CONNECTED} from '../../../utils/connectionStates'
 import SelectWithLabel from '../../selectWithLabel'
 import InputWithLabel from '../../inputWithLabel'
@@ -321,9 +321,12 @@ const NFTTab = () => {
                 </div>
                 <div className="flex-1">
                   <div className="mb-6 h-full">
-                    <label className="block mb-2 text-sm font-medium text-gray-300">Metadata JSON</label>
+                    <label htmlFor="metadataJson" className="block mb-2 text-sm font-medium text-gray-300">
+                      Metadata JSON
+                    </label>
                     <textarea
                       className="flex-1 w-full h-full rounded bg-gray-900 text-white px-2 readonly"
+                      id="metadataJson"
                       readOnly
                       value={JSON.stringify(currentMintingInfo, null, 4)}
                     ></textarea>
@@ -377,10 +380,13 @@ const NFTTab = () => {
           <div className="grid justify-items-center py-5 px-5">
             <div className="block p-6 min-w-full rounded-lg border shadow-md bg-gray-800 border-gray-700">
               <div className="mb-6">
-                <label className="block mb-2 text-sm font-medium text-gray-300">Current Minting Batch</label>
+                <label htmlFor="mintingBatch" className="block mb-2 text-sm font-medium text-gray-300">
+                  Current Minting Batch
+                </label>
                 <textarea
                   className="flex-row w-full rounded bg-gray-900 text-white px-2 readonly"
                   rows="10"
+                  id="mintingBatch"
                   readOnly
                   value={JSON.stringify(mintingTxInfo, null, 4)}
                 ></textarea>

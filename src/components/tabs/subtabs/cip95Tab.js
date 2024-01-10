@@ -19,15 +19,19 @@ const Cip95Tab = () => {
   return (
     <div className="container mx-auto text-gray-300 py-5">
       {connectionState === CONNECTED ? (
-        <div className="grid grid-cols-3 gap-2">
-          <Cip95OfficialPart
-            api={api}
-            wasm={wasm}
-            setRawCurrentText={setRawCurrentText}
-            setResponse={setResponse}
-            setWaiterState={setWaiterState}
-          />
-          <ResponsesPart rawCurrentText={rawCurrentText} currentText={currentText} currentWaiterState={waiterState} />
+        <div>
+          <div className="mb-3">
+            <Cip95OfficialPart
+              api={api}
+              wasm={wasm}
+              setRawCurrentText={setRawCurrentText}
+              setResponse={setResponse}
+              setWaiterState={setWaiterState}
+            />
+          </div>
+          <div>
+            <ResponsesPart rawCurrentText={rawCurrentText} currentText={currentText} currentWaiterState={waiterState} />
+          </div>
         </div>
       ) : (
         <div></div>

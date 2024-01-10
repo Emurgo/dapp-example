@@ -29,16 +29,11 @@ const Cip30Tab = () => {
               setResponse={setResponse}
               setWaiterState={setWaiterState}
             />
-            <ResponsesPart
-              rawCurrentText={rawCurrentText}
-              currentText={currentText}
-              currentWaiterState={waiterState}
-            />
+            <ResponsesPart rawCurrentText={rawCurrentText} currentText={currentText} currentWaiterState={waiterState} />
           </div>
           <div>
             <ExperimentalPart
               api={api}
-              wasm={wasm}
               onRawResponse={setRawCurrentText}
               onResponse={setResponse}
               onWaiting={setWaiterState}

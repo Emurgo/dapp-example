@@ -1,6 +1,6 @@
 import React from 'react'
-import {hexToBytes} from '../../utils/utils'
 import ApiCard from './apiCard'
+import {getBech32AddressFromHex} from '../../utils/cslTools'
 
 const GetRewardAddressesCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
   const getRewardAddressesClick = () => {
@@ -11,9 +11,8 @@ const GetRewardAddressesCard = ({api, wasm, onRawResponse, onResponse, onWaiting
         onWaiting(false)
         onRawResponse(hexAddresses)
         const addresses = []
-        for (let i = 0; i < hexAddresses.length; i++) {
-          const wasmAddress = wasm.Address.from_bytes(hexToBytes(hexAddresses[i]))
-          addresses.push(wasmAddress.to_bech32())
+        for (const hexAddr of hexAddresses) {
+          addresses.push(getBech32AddressFromHex(wasm, hexAddr))
         }
         onResponse(addresses)
       })

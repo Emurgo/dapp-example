@@ -1,4 +1,6 @@
 import React from 'react'
+import {CommonStyles} from './ui-constants'
+import {ModalWindowContent} from './ui-constants'
 
 const InputWithLabel = (props) => {
   const {inputName, inputValue, onChangeFunction} = props
@@ -6,14 +8,14 @@ const InputWithLabel = (props) => {
   const nftInputID = inputValue.split(' ').join('')
 
   return (
-    <div className="mb-6 pr-4">
-      <label htmlFor={'input-' + nftInputID} className="block mb-2 text-sm font-medium text-gray-300">
+    <div className="mt-3">
+      <label htmlFor={'input-' + nftInputID} className={ModalWindowContent.contentLabelStyle}>
         {inputName}
       </label>
       <input
         type="text"
         id={'input-' + nftInputID}
-        className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+        className={CommonStyles.inputStyles}
         value={inputValue}
         onChange={onChangeFunction}
       />
