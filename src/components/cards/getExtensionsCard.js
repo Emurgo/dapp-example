@@ -4,7 +4,7 @@ import ApiCard from './apiCard'
 const GetExtensionsCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const getExtensionsClick = () => {
     onWaiting(true)
-    Promise.resolve(api?.getExtensions())
+    api?.getExtensions()
       .then((response) => {
         onWaiting(false)
         onRawResponse('')
