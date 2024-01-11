@@ -61,7 +61,7 @@ const Cip95TabTools = () => {
   }
 
   return (
-    <div className="container mx-auto text-gray-300 py-5">
+    <div className="py-5 px-5 text-gray-300">
       {connectionState === CONNECTED ? (
         <div>
           <div className="mb-2">
