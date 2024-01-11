@@ -47,7 +47,7 @@ const AccessButton = () => {
             </div>
           </div>
         ) : connectionState === IN_PROGRESS ? (
-          <div className="pt-5 pb-20 text-xl font-bold tracking-tight text-green-500">
+          <div className="pt-5 pb-5 text-m font-bold tracking-tight text-green-500">
             <label>Wallet connecting is in progress ...</label>
           </div>
         ) : (
