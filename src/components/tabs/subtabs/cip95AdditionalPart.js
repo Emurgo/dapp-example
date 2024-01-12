@@ -1,6 +1,9 @@
 import React, {useState} from 'react'
-import VoteDelationCard from '../../cards/voteDelegation'
 import {getCertificateBuilder} from '../../../utils/cslTools'
+import TabsComponent from '../tabsComponent'
+import GovBasicFunctionsTab from './govBasicFunctionsTab'
+import GovActionsTab from './govActionsTab'
+import ConstitCommCertsTab from './constitCommCertsTab'
 
 const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) => {
   const [currentCertsInTx, setCertInTx] = useState([])
@@ -27,10 +30,12 @@ const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) 
   const newGetters = Object.assign(getters, {currentCertsInTx, getCertBuilder})
   const newSetters = Object.assign(setters, {handleAddingCertInTx})
 
-  return (
-    <div className="grid justify-items-stretch grid-cols-1 lg:grid-cols-5 gap-2">
-      <div>
-        <VoteDelationCard
+  const data = [
+    {
+      label: 'Governance Basic Functions',
+      value: 'govBasicFuncs',
+      children: (
+        <GovBasicFunctionsTab
           api={api}
           wasm={wasm}
           onWaiting={onWaiting}
@@ -38,7 +43,22 @@ const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) 
           getters={newGetters}
           setters={newSetters}
         />
-      </div>
+      ),
+    },
+    {
+      label: 'Governance Actions',
+      value: 'govActions',
+      children: <GovActionsTab />,
+    },
+    {
+      label: 'Constitutional Commitee Certs',
+      value: 'ccCerts',
+      children: <ConstitCommCertsTab />,
+    },
+  ]
+  return (
+    <div className="block rounded-lg border bg-gray-900 border-gray-700">
+      <TabsComponent tabsData={data} />
     </div>
   )
 }

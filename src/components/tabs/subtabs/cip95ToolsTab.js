@@ -29,7 +29,7 @@ const Cip95TabTools = () => {
   // Unregistered public stake key
   const [currentUnregPubStakeKey, setUnregPubStakeKey] = useState('')
 
-  const showWarning = () =>{
+  const showWarning = () => {
     setErrorState(true)
     setTimeout(() => setErrorState(false), 3000)
   }
@@ -72,14 +72,23 @@ const Cip95TabTools = () => {
             {/* info panel here */}
             <InfoPanel getters={getters} />
           </div>
+          {/* Info and error message is here */}
           <div className="grid justify-items-center content-end h-12 text-2xl">
             <label className="text-white">{currentWaiterState ? 'Waiting ...' : ''}</label>
             <label className="text-red-500">
               {currentErrorState ? 'An error has happend. Please check logs.' : ''}
             </label>
           </div>
+          {/* Tabs with gov. actions */}
           <div>
-            <Cip95AdditionalPart api={api} wasm={wasm} onWaiting={setWaiterState} onError={showWarning} getters={getters} setters={setters} />
+            <Cip95AdditionalPart
+              api={api}
+              wasm={wasm}
+              onWaiting={setWaiterState}
+              onError={showWarning}
+              getters={getters}
+              setters={setters}
+            />
           </div>
         </div>
       ) : (
