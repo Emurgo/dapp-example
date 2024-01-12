@@ -1,6 +1,4 @@
 import React, {useState} from 'react'
-import ApiCardWithModal from './apiCardWithModal'
-import {ModalWindowContent} from '../ui-constants'
 import InputWithLabel from '../inputWithLabel'
 import {
   getCertOfNewVoteDelegation,
@@ -11,8 +9,9 @@ import {
   getDRepNoConfidence,
   getVoteDelegCert,
 } from '../../utils/cslTools'
+import GovToolsPanel from './govToolsPanel'
 
-const VoteDelationCard = ({api, wasm, onWaiting, onError, getters, setters}) => {
+const VoteDelegationPanel = ({api, wasm, onWaiting, onError, getters, setters}) => {
   const [currentTarget, setTarget] = useState('')
   const [currentStake, setStake] = useState('')
   const {currentDRepIdBech32, currentRegPubStakeKey, currentUnregPubStakeKey, getCertBuilder} = getters
@@ -28,7 +27,9 @@ const VoteDelationCard = ({api, wasm, onWaiting, onError, getters, setters}) => 
         return getCslCredentialFromBech32(wasm, input)
       } catch (err2) {
         onWaiting(false)
-        console.error(`Error in parsing credential, not Hex or Bech32: ${JSON.stringify(err1)}, ${JSON.stringify(err2)}`)
+        console.error(
+          `Error in parsing credential, not Hex or Bech32: ${JSON.stringify(err1)}, ${JSON.stringify(err2)}`,
+        )
         onError()
         return null
       }
@@ -83,31 +84,29 @@ const VoteDelationCard = ({api, wasm, onWaiting, onError, getters, setters}) => 
     }
   }
 
-  const apiProps = {
-    buttonLabel: 'voteDelegation',
+  const panelProps = {
+    certLabel: 'voteDelegation',
     clickFunction: buildVoteDelegationCert,
   }
 
   return (
-    <ApiCardWithModal {...apiProps}>
-      <div className={ModalWindowContent.contentPadding}>
-        <InputWithLabel
-          inputName="Target of vote delegation | abstain | no confidence"
-          inputValue={currentDRepIdBech32}
-          onChangeFunction={(event) => {
-            setTarget(event.target.value)
-          }}
-        />
-        <InputWithLabel
-          inputName="Stake credential"
-          inputValue={currentRegPubStakeKey.length > 0 ? currentRegPubStakeKey: currentUnregPubStakeKey}
-          onChangeFunction={(event) => {
-            setStake(event.target.value)
-          }}
-        />
-      </div>
-    </ApiCardWithModal>
+    <GovToolsPanel {...panelProps}>
+      <InputWithLabel
+        inputName="Target of vote delegation | abstain | no confidence"
+        inputValue={currentDRepIdBech32}
+        onChangeFunction={(event) => {
+          setTarget(event.target.value)
+        }}
+      />
+      <InputWithLabel
+        inputName="Stake credential"
+        inputValue={currentRegPubStakeKey.length > 0 ? currentRegPubStakeKey : currentUnregPubStakeKey}
+        onChangeFunction={(event) => {
+          setStake(event.target.value)
+        }}
+      />
+    </GovToolsPanel>
   )
 }
 
-export default VoteDelationCard
+export default VoteDelegationPanel
