@@ -1,8 +1,27 @@
 import React from 'react'
 import TabsComponent from '../tabsComponent'
 import VoteDelegationPanel from '../../cards/govActions/voteDelegationPanel'
+import {getCslCredentialFromBech32, getCslCredentialFromHex} from '../../../utils/cslTools'
+import DRepRegistrationPanel from '../../cards/govActions/dRepRegistrationPanel'
 
 const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters}) => {
+  const handleInput = (input) => {
+    try {
+      return getCslCredentialFromHex(wasm, input)
+    } catch (err1) {
+      try {
+        return getCslCredentialFromBech32(wasm, input)
+      } catch (err2) {
+        onWaiting(false)
+        console.error(
+          `Error in parsing credential, not Hex or Bech32: ${JSON.stringify(err1)}, ${JSON.stringify(err2)}`,
+        )
+        onError()
+        return null
+      }
+    }
+  }
+
   const data = [
     {
       label: 'Vote Delegation',
@@ -15,13 +34,24 @@ const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters})
           onError={onError}
           getters={getters}
           setters={setters}
+          handleInput={handleInput}
         />
       ),
     },
     {
       label: 'DRep Registration',
       value: 'drepReg',
-      children: <></>,
+      children: (
+        <DRepRegistrationPanel
+          api={api}
+          wasm={wasm}
+          onWaiting={onWaiting}
+          onError={onError}
+          getters={getters}
+          setters={setters}
+          handleInput={handleInput}
+        />
+      ),
     },
     {
       label: 'DRep Update',

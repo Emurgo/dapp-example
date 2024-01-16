@@ -2,8 +2,6 @@ import React, {useState} from 'react'
 import InputWithLabel from '../../inputWithLabel'
 import {
   getCertOfNewVoteDelegation,
-  getCslCredentialFromBech32,
-  getCslCredentialFromHex,
   getDRepAbstain,
   getDRepNewKeyHash,
   getDRepNoConfidence,
@@ -11,30 +9,15 @@ import {
 } from '../../../utils/cslTools'
 import GovToolsPanel from '../govToolsPanel'
 
-const VoteDelegationPanel = ({api, wasm, onWaiting, onError, getters, setters}) => {
+const VoteDelegationPanel = (props) => {
+  const {wasm, onWaiting, onError, getters, setters, handleInput} = props
+
   const [currentTarget, setTarget] = useState('')
   const [currentStake, setStake] = useState('')
   const {currentDRepIdBech32, currentRegPubStakeKey, currentUnregPubStakeKey, getCertBuilder} = getters
   const {handleAddingCertInTx} = setters
 
   const suitableStake = currentRegPubStakeKey.length > 0 ? currentRegPubStakeKey : currentUnregPubStakeKey
-
-  const handleInput = (input) => {
-    try {
-      return getCslCredentialFromHex(wasm, input)
-    } catch (err1) {
-      try {
-        return getCslCredentialFromBech32(wasm, input)
-      } catch (err2) {
-        onWaiting(false)
-        console.error(
-          `Error in parsing credential, not Hex or Bech32: ${JSON.stringify(err1)}, ${JSON.stringify(err2)}`,
-        )
-        onError()
-        return null
-      }
-    }
-  }
 
   const buildVoteDelegationCert = () => {
     onWaiting(true)
@@ -52,8 +35,6 @@ const VoteDelegationPanel = ({api, wasm, onWaiting, onError, getters, setters}) 
         if (currentTarget.length === 0) {
           setTarget(currentDRepIdBech32)
           target = currentDRepIdBech32
-        } else {
-          setTarget(currentTarget)
         }
         const dRepKeyCred = handleInput(target)
         targetDRep = getDRepNewKeyHash(wasm, dRepKeyCred.to_keyhash())
@@ -63,8 +44,6 @@ const VoteDelegationPanel = ({api, wasm, onWaiting, onError, getters, setters}) 
       if (currentStake.length === 0) {
         setStake(suitableStake)
         pubStake = suitableStake
-      } else {
-        setStake(currentStake)
       }
       const stakeCred = handleInput(pubStake)
       if (stakeCred == null) {
@@ -93,14 +72,14 @@ const VoteDelegationPanel = ({api, wasm, onWaiting, onError, getters, setters}) 
     <GovToolsPanel {...panelProps}>
       <InputWithLabel
         inputName="Target of vote delegation | abstain | no confidence"
-        inputValue={currentDRepIdBech32}
+        inputValue={currentTarget}
         onChangeFunction={(event) => {
           setTarget(event.target.value)
         }}
       />
       <InputWithLabel
         inputName="Stake credential"
-        inputValue={currentRegPubStakeKey.length > 0 ? currentRegPubStakeKey : currentUnregPubStakeKey}
+        inputValue={currentStake}
         onChangeFunction={(event) => {
           setStake(event.target.value)
         }}
