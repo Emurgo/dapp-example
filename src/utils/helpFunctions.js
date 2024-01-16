@@ -64,3 +64,22 @@ export const getUnregPubStakeKey = async (api, wasm) => {
 
   return stakeKeyHash
 }
+
+const randomBytes = (count) => {
+  const result = Array(count)
+  for (let i = 0; i < count; ++i) {
+    result[i] = Math.floor(256 * Math.random())
+  }
+  return result
+}
+
+const toHexString = (byteArray) => {
+  return Array.from(byteArray, function (byte) {
+    return ('0' + (byte & 0xff).toString(16)).slice(-2)
+  }).join('')
+}
+
+export const getRandomHex = (bytes) => {
+  const byteArr = randomBytes(bytes)
+  return toHexString(byteArr)
+}
