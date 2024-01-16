@@ -120,3 +120,21 @@ export const getDRepNewKeyHash = (wasm, credHash) => wasm.DRep.new_key_hash(cred
 export const getVoteDelegCert = (wasm, stakeCred, dRepKeyHash) => wasm.VoteDelegation.new(stakeCred, dRepKeyHash)
 
 export const getCertOfNewVoteDelegation = (wasm, voteCert) => wasm.Certificate.new_vote_delegation(voteCert)
+
+export const getURL = (wasm, url) => wasm.URL.new(url)
+
+export const getAnchorHash = (wasm, urlHash) => wasm.AnchorDataHash.from_hex(urlHash)
+
+export const getAnchor = (wasm, url, urlHash) => {
+  const anchorURL = getURL(wasm, url)
+  const anchorHash = getAnchorHash(wasm, urlHash)
+  return wasm.Anchor.new(anchorURL, anchorHash)
+}
+
+export const getDRepRegCert = (wasm, dRepCed, dRepDeposit) =>
+  wasm.DrepRegistration.new(dRepCed, wasm.BigNum.from_str(dRepDeposit))
+
+export const getDRepRegWithAnchorCert = (wasm, dRepCred, dRepDeposit, anchor) =>
+  wasm.DrepRegistration.new_with_anchor(dRepCred, wasm.BigNum.from_str(dRepDeposit), anchor)
+
+export const getCertOfNewDRepReg = (wasm, dRepRegCert) => wasm.Certificate.new_drep_registration(dRepRegCert)
