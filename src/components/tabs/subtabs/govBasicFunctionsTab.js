@@ -1,6 +1,6 @@
 import React from 'react'
 import TabsComponent from '../tabsComponent'
-import VoteDelegationPanel from '../../cards/voteDelegationPanel'
+import VoteDelegationPanel from '../../cards/govActions/voteDelegationPanel'
 
 const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters}) => {
   const data = [

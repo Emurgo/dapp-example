@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import InputWithLabel from '../inputWithLabel'
+import InputWithLabel from '../../inputWithLabel'
 import {
   getCertOfNewVoteDelegation,
   getCslCredentialFromBech32,
@@ -8,8 +8,8 @@ import {
   getDRepNewKeyHash,
   getDRepNoConfidence,
   getVoteDelegCert,
-} from '../../utils/cslTools'
-import GovToolsPanel from './govToolsPanel'
+} from '../../../utils/cslTools'
+import GovToolsPanel from '../govToolsPanel'
 
 const VoteDelegationPanel = ({api, wasm, onWaiting, onError, getters, setters}) => {
   const [currentTarget, setTarget] = useState('')
