@@ -117,10 +117,6 @@ export const getDRepNoConfidence = (wasm) => wasm.DRep.new_always_no_confidence(
 
 export const getDRepNewKeyHash = (wasm, credHash) => wasm.DRep.new_key_hash(credHash)
 
-export const getVoteDelegCert = (wasm, stakeCred, dRepKeyHash) => wasm.VoteDelegation.new(stakeCred, dRepKeyHash)
-
-export const getCertOfNewVoteDelegation = (wasm, voteCert) => wasm.Certificate.new_vote_delegation(voteCert)
-
 export const getURL = (wasm, url) => wasm.URL.new(url)
 
 export const getAnchorHash = (wasm, urlHash) => wasm.AnchorDataHash.from_hex(urlHash)
@@ -131,16 +127,30 @@ export const getAnchor = (wasm, url, urlHash) => {
   return wasm.Anchor.new(anchorURL, anchorHash)
 }
 
-export const getDRepRegCert = (wasm, dRepCed, dRepDeposit) =>
-  wasm.DrepRegistration.new(dRepCed, wasm.BigNum.from_str(dRepDeposit))
+// Vote Delegation Certificate
+export const getVoteDelegCert = (wasm, stakeCred, dRepKeyHash) => wasm.VoteDelegation.new(stakeCred, dRepKeyHash)
+
+export const getCertOfNewVoteDelegation = (wasm, voteCert) => wasm.Certificate.new_vote_delegation(voteCert)
+
+// DRep Registration Certificate
+export const getDRepRegCert = (wasm, dRepCred, dRepDeposit) =>
+  wasm.DrepRegistration.new(dRepCred, wasm.BigNum.from_str(dRepDeposit))
 
 export const getDRepRegWithAnchorCert = (wasm, dRepCred, dRepDeposit, anchor) =>
   wasm.DrepRegistration.new_with_anchor(dRepCred, wasm.BigNum.from_str(dRepDeposit), anchor)
 
 export const getCertOfNewDRepReg = (wasm, dRepRegCert) => wasm.Certificate.new_drep_registration(dRepRegCert)
 
-export const getDRepUpdateCert = (wasm, dRepCed) => wasm.DrepUpdate.new(dRepCed)
+// DRep Update Certificate
+export const getDRepUpdateCert = (wasm, dRepCred) => wasm.DrepUpdate.new(dRepCred)
 
 export const getDRepUpdateWithAnchorCert = (wasm, dRepCred, anchor) => wasm.DrepUpdate.new_with_anchor(dRepCred, anchor)
 
 export const getCertOfNewDRepUpdate = (wasm, dRepUpdateCert) => wasm.Certificate.new_drep_update(dRepUpdateCert)
+
+// DRep Retirement Certificate
+export const getDRepRetirementCert = (wasm, dRepCred, dRepRefundAmount) =>
+  wasm.DrepDeregistration.new(dRepCred, wasm.BigNum.from_str(dRepRefundAmount))
+
+export const getCertOfNewDRepRetirement = (wasm, dRepRetirementCert) =>
+  wasm.Certificate.new_drep_deregistration(dRepRetirementCert)

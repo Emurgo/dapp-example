@@ -4,6 +4,7 @@ import VoteDelegationPanel from '../../cards/govActions/voteDelegationPanel'
 import {getCslCredentialFromBech32, getCslCredentialFromHex} from '../../../utils/cslTools'
 import DRepRegistrationPanel from '../../cards/govActions/dRepRegistrationPanel'
 import DRepUpdatePanel from '../../cards/govActions/dRepUpdatePanel'
+import DRepRetirementPanel from '../../cards/govActions/dRepRetirementPanel'
 
 const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters}) => {
   const handleInput = (input) => {
@@ -72,7 +73,17 @@ const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters})
     {
       label: 'DRep Retirement',
       value: 'drepRet',
-      children: <></>,
+      children: (
+        <DRepRetirementPanel
+          api={api}
+          wasm={wasm}
+          onWaiting={onWaiting}
+          onError={onError}
+          getters={getters}
+          setters={setters}
+          handleInput={handleInput}
+        />
+      ),
     },
     {
       label: 'Vote',
