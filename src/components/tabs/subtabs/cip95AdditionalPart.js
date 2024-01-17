@@ -6,8 +6,8 @@ import GovActionsTab from './govActionsTab'
 import ConstitCommCertsTab from './constitCommCertsTab'
 
 const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) => {
-  const [currentCertsInTx, setCertInTx] = useState([])
-  const [currentCertBuilder, setCertBuilder] = useState(null)
+  const [certsInTx, setCertsInTx] = useState([])
+  const [certBuilder, setCertBuilder] = useState(null)
 
   const handleAddingCertInTx = (certBuilderWithCert) => {
     setCertBuilder(certBuilderWithCert)
@@ -17,17 +17,17 @@ const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) 
       certsInJson.push(certs.get(i).to_json())
     }
     console.log('CertInTx', certsInJson)
-    setCertInTx(certsInJson)
+    setCertsInTx(certsInJson)
   }
 
   const getCertBuilder = (wasm) => {
-    if (currentCertBuilder) {
-      return currentCertBuilder
+    if (certBuilder) {
+      return certBuilder
     }
     return getCertificateBuilder(wasm)
   }
 
-  const newGetters = Object.assign(getters, {currentCertsInTx, getCertBuilder})
+  const newGetters = Object.assign(getters, {certsInTx, getCertBuilder})
   const newSetters = Object.assign(setters, {handleAddingCertInTx})
 
   const data = [

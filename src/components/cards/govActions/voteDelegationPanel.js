@@ -11,11 +11,11 @@ import GovToolsPanel from '../govToolsPanel'
 
 const VoteDelegationPanel = (props) => {
   const {wasm, onWaiting, onError, getters, setters, handleInput} = props
-
-  const [currentTarget, setTarget] = useState('')
-  const [currentStake, setStake] = useState('')
   const {currentDRepIdBech32, currentRegPubStakeKey, currentUnregPubStakeKey, getCertBuilder} = getters
   const {handleAddingCertInTx} = setters
+
+  const [target, setTarget] = useState(currentDRepIdBech32)
+  const [stake, setStake] = useState('')
 
   const suitableStake = currentRegPubStakeKey.length > 0 ? currentRegPubStakeKey : currentUnregPubStakeKey
 
@@ -26,22 +26,22 @@ const VoteDelegationPanel = (props) => {
     const certBuilder = getCertBuilder(wasm)
     try {
       let targetDRep
-      if (currentTarget.toUpperCase() === 'ABSTAIN') {
+      if (target.toUpperCase() === 'ABSTAIN') {
         targetDRep = getDRepAbstain(wasm)
-      } else if (currentTarget.toUpperCase() === 'NO CONFIDENCE') {
+      } else if (target.toUpperCase() === 'NO CONFIDENCE') {
         targetDRep = getDRepNoConfidence(wasm)
       } else {
-        let target = currentTarget
-        if (currentTarget.length === 0) {
+        let tempTarget = target
+        if (target.length === 0) {
           setTarget(currentDRepIdBech32)
-          target = currentDRepIdBech32
+          tempTarget = currentDRepIdBech32
         }
-        const dRepKeyCred = handleInput(target)
+        const dRepKeyCred = handleInput(tempTarget)
         targetDRep = getDRepNewKeyHash(wasm, dRepKeyCred.to_keyhash())
       }
 
-      let pubStake = currentStake
-      if (currentStake.length === 0) {
+      let pubStake = stake
+      if (stake.length === 0) {
         setStake(suitableStake)
         pubStake = suitableStake
       }
@@ -72,14 +72,14 @@ const VoteDelegationPanel = (props) => {
     <GovToolsPanel {...panelProps}>
       <InputWithLabel
         inputName="Target of vote delegation | abstain | no confidence"
-        inputValue={currentTarget}
+        inputValue={target}
         onChangeFunction={(event) => {
           setTarget(event.target.value)
         }}
       />
       <InputWithLabel
         inputName="Stake credential"
-        inputValue={currentStake}
+        inputValue={stake}
         onChangeFunction={(event) => {
           setStake(event.target.value)
         }}
