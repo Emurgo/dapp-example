@@ -16,7 +16,7 @@ const DRepUpdatePanel = (props) => {
   const {currentDRepIdBech32, getCertBuilder} = getters
 
   const [dRepID, setDRepID] = useState(currentDRepIdBech32)
-  const [metadataURL, setMetadatURL] = useState('')
+  const [metadataURL, setMetadataURL] = useState('')
   const [metadataHash, setMetadataHash] = useState('')
 
   const buildDRepUpdateCert = () => {
@@ -60,7 +60,7 @@ const DRepUpdatePanel = (props) => {
         inputName="Metadata URL (Optional)"
         inputValue={metadataURL}
         onChangeFunction={(event) => {
-          setMetadatURL(event.target.value)
+          setMetadataURL(event.target.value)
         }}
       />
       <InputWithLabel

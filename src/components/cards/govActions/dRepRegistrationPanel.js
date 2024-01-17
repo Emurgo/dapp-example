@@ -12,7 +12,7 @@ const DRepRegistrationPanel = (props) => {
 
   const [dRepID, setDRepID] = useState(currentDRepIdBech32)
   const [depositAmount, setDepositAmount] = useState('2000000')
-  const [metadataURL, setMetadatURL] = useState('')
+  const [metadataURL, setMetadataURL] = useState('')
   const [metadataHash, setMetadataHash] = useState('')
 
   const buildDRepRegistrationCert = () => {
@@ -66,7 +66,7 @@ const DRepRegistrationPanel = (props) => {
         inputName="Metadata URL (Optional)"
         inputValue={metadataURL}
         onChangeFunction={(event) => {
-          setMetadatURL(event.target.value)
+          setMetadataURL(event.target.value)
         }}
       />
       <InputWithLabel
