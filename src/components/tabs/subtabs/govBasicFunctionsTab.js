@@ -3,6 +3,7 @@ import TabsComponent from '../tabsComponent'
 import VoteDelegationPanel from '../../cards/govActions/voteDelegationPanel'
 import {getCslCredentialFromBech32, getCslCredentialFromHex} from '../../../utils/cslTools'
 import DRepRegistrationPanel from '../../cards/govActions/dRepRegistrationPanel'
+import DRepUpdatePanel from '../../cards/govActions/dRepUpdatePanel'
 
 const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters}) => {
   const handleInput = (input) => {
@@ -56,7 +57,17 @@ const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters})
     {
       label: 'DRep Update',
       value: 'drepUpdate',
-      children: <></>,
+      children: (
+        <DRepUpdatePanel
+          api={api}
+          wasm={wasm}
+          onWaiting={onWaiting}
+          onError={onError}
+          getters={getters}
+          setters={setters}
+          handleInput={handleInput}
+        />
+      ),
     },
     {
       label: 'DRep Retirement',
