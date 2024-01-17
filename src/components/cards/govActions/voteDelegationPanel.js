@@ -11,13 +11,13 @@ import GovToolsPanel from '../govToolsPanel'
 
 const VoteDelegationPanel = (props) => {
   const {wasm, onWaiting, onError, getters, setters, handleInput} = props
-  const {currentDRepIdBech32, currentRegPubStakeKey, currentUnregPubStakeKey, getCertBuilder} = getters
+  const {dRepIdBech32, regPubStakeKey, unregPubStakeKey, getCertBuilder} = getters
   const {handleAddingCertInTx} = setters
 
-  const [target, setTarget] = useState(currentDRepIdBech32)
+  const [target, setTarget] = useState(dRepIdBech32)
   const [stake, setStake] = useState('')
 
-  const suitableStake = currentRegPubStakeKey.length > 0 ? currentRegPubStakeKey : currentUnregPubStakeKey
+  const suitableStake = regPubStakeKey.length > 0 ? regPubStakeKey : unregPubStakeKey
 
   const buildVoteDelegationCert = () => {
     onWaiting(true)
@@ -33,8 +33,8 @@ const VoteDelegationPanel = (props) => {
       } else {
         let tempTarget = target
         if (target.length === 0) {
-          setTarget(currentDRepIdBech32)
-          tempTarget = currentDRepIdBech32
+          setTarget(dRepIdBech32)
+          tempTarget = dRepIdBech32
         }
         const dRepKeyCred = handleInput(tempTarget)
         targetDRep = getDRepNewKeyHash(wasm, dRepKeyCred.to_keyhash())

@@ -7,8 +7,8 @@ const DRepRetirementPanel = (props) => {
   const {wasm, onWaiting, onError, getters, setters, handleInput} = props
 
   const {handleAddingCertInTx} = setters
-  const {currentDRepIdBech32, getCertBuilder} = getters
-  const [dRepID, setDRepID] = useState(currentDRepIdBech32)
+  const {dRepIdBech32, getCertBuilder} = getters
+  const [dRepID, setDRepID] = useState(dRepIdBech32)
   const [depositRefundAmount, setDepositRefundAmount] = useState('2000000')
 
   const buildDRepRetirementCert = () => {
@@ -43,7 +43,7 @@ const DRepRetirementPanel = (props) => {
       />
       <InputWithLabel
         inputName="DRep Registration Deposit Refund Amount (lovelaces)"
-        inputValue={currentDRepIdBech32}
+        inputValue={dRepID}
         onChangeFunction={(event) => {
           setDepositRefundAmount(event.target.value)
         }}

@@ -13,9 +13,9 @@ const DRepUpdatePanel = (props) => {
   const {wasm, onWaiting, onError, getters, setters, handleInput} = props
 
   const {handleAddingCertInTx} = setters
-  const {currentDRepIdBech32, getCertBuilder} = getters
+  const {dRepIdBech32, getCertBuilder} = getters
 
-  const [dRepID, setDRepID] = useState(currentDRepIdBech32)
+  const [dRepID, setDRepID] = useState(dRepIdBech32)
   const [metadataURL, setMetadataURL] = useState('')
   const [metadataHash, setMetadataHash] = useState('')
 
