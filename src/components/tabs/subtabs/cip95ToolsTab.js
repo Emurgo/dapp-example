@@ -24,6 +24,7 @@ const Cip95TabTools = () => {
   // Public DRep Key
   const [dRepIdBech32, setDRepIdBech32] = useState('')
   const [dRepIdHex, setDRepIdHex] = useState('')
+  const [dRepIdInputValue, setDRepIdInputValue] = useState('')
   // Registered public stake key
   const [regPubStakeKey, setRegPubStakeKey] = useState('')
   // Unregistered public stake key
@@ -46,6 +47,7 @@ const Cip95TabTools = () => {
     setRewardAddress,
     setDRepIdBech32,
     setDRepIdHex,
+    setDRepIdInputValue,
     setRegPubStakeKey,
     setUnregPubStakeKey,
   }
@@ -56,6 +58,7 @@ const Cip95TabTools = () => {
     rewardAddress,
     dRepIdBech32,
     dRepIdHex,
+    dRepIdInputValue,
     regPubStakeKey,
     unregPubStakeKey,
   }

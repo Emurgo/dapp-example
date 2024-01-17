@@ -11,10 +11,9 @@ import GovToolsPanel from '../govToolsPanel'
 
 const VoteDelegationPanel = (props) => {
   const {wasm, onWaiting, onError, getters, setters, handleInput} = props
-  const {dRepIdBech32, regPubStakeKey, unregPubStakeKey, getCertBuilder} = getters
-  const {handleAddingCertInTx} = setters
+  const {dRepIdBech32, dRepIdInputValue, regPubStakeKey, unregPubStakeKey, getCertBuilder} = getters
+  const {handleAddingCertInTx, setDRepIdInputValue} = setters
 
-  const [target, setTarget] = useState(dRepIdBech32)
   const [stake, setStake] = useState('')
 
   const suitableStake = regPubStakeKey.length > 0 ? regPubStakeKey : unregPubStakeKey
@@ -26,14 +25,14 @@ const VoteDelegationPanel = (props) => {
     const certBuilder = getCertBuilder(wasm)
     try {
       let targetDRep
-      if (target.toUpperCase() === 'ABSTAIN') {
+      if (dRepIdInputValue.toUpperCase() === 'ABSTAIN') {
         targetDRep = getDRepAbstain(wasm)
-      } else if (target.toUpperCase() === 'NO CONFIDENCE') {
+      } else if (dRepIdInputValue.toUpperCase() === 'NO CONFIDENCE') {
         targetDRep = getDRepNoConfidence(wasm)
       } else {
-        let tempTarget = target
-        if (target.length === 0) {
-          setTarget(dRepIdBech32)
+        let tempTarget = dRepIdInputValue
+        if (dRepIdInputValue.length === 0) {
+          setDRepIdInputValue(dRepIdBech32)
           tempTarget = dRepIdBech32
         }
         const dRepKeyCred = handleInput(tempTarget)
@@ -72,9 +71,9 @@ const VoteDelegationPanel = (props) => {
     <GovToolsPanel {...panelProps}>
       <InputWithLabel
         inputName="Target of vote delegation | abstain | no confidence"
-        inputValue={target}
+        inputValue={dRepIdInputValue}
         onChangeFunction={(event) => {
-          setTarget(event.target.value)
+          setDRepIdInputValue(event.target.value)
         }}
       />
       <InputWithLabel

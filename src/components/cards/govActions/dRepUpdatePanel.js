@@ -12,10 +12,9 @@ import {getRandomHex} from '../../../utils/helpFunctions'
 const DRepUpdatePanel = (props) => {
   const {wasm, onWaiting, onError, getters, setters, handleInput} = props
 
-  const {handleAddingCertInTx} = setters
-  const {dRepIdBech32, getCertBuilder} = getters
+  const {handleAddingCertInTx, setDRepIdInputValue} = setters
+  const {dRepIdInputValue, getCertBuilder} = getters
 
-  const [dRepID, setDRepID] = useState(dRepIdBech32)
   const [metadataURL, setMetadataURL] = useState('')
   const [metadataHash, setMetadataHash] = useState('')
 
@@ -23,7 +22,7 @@ const DRepUpdatePanel = (props) => {
     onWaiting(true)
     const certBuilder = getCertBuilder(wasm)
     try {
-      const dRepCred = handleInput(dRepID)
+      const dRepCred = handleInput(dRepIdInputValue)
       let dRepUpdateCert = null
       if (metadataURL.length > 0) {
         const dataHash = metadataHash.length > 0 ? metadataHash : getRandomHex(32)
@@ -51,9 +50,9 @@ const DRepUpdatePanel = (props) => {
     <GovToolsPanel {...panelProps}>
       <InputWithLabel
         inputName="DRep ID (Bech32 or Hex encoded)"
-        inputValue={dRepID}
+        inputValue={dRepIdInputValue}
         onChangeFunction={(event) => {
-          setDRepID(event.target.value)
+          setDRepIdInputValue(event.target.value)
         }}
       />
       <InputWithLabel

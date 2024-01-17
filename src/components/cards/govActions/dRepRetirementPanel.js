@@ -6,16 +6,15 @@ import {getCertOfNewDRepRetirement, getDRepRetirementCert} from '../../../utils/
 const DRepRetirementPanel = (props) => {
   const {wasm, onWaiting, onError, getters, setters, handleInput} = props
 
-  const {handleAddingCertInTx} = setters
-  const {dRepIdBech32, getCertBuilder} = getters
-  const [dRepID, setDRepID] = useState(dRepIdBech32)
+  const {handleAddingCertInTx, setDRepIdInputValue} = setters
+  const {dRepIdInputValue, getCertBuilder} = getters
   const [depositRefundAmount, setDepositRefundAmount] = useState('2000000')
 
   const buildDRepRetirementCert = () => {
     onWaiting(true)
     const certBuilder = getCertBuilder(wasm)
     try {
-      const dRepCred = handleInput(dRepID)
+      const dRepCred = handleInput(dRepIdInputValue)
       const dRepRetirementCert = getDRepRetirementCert(wasm, dRepCred, depositRefundAmount)
       certBuilder.add(getCertOfNewDRepRetirement(wasm, dRepRetirementCert))
       handleAddingCertInTx(certBuilder)
@@ -36,14 +35,14 @@ const DRepRetirementPanel = (props) => {
     <GovToolsPanel {...panelProps}>
       <InputWithLabel
         inputName="DRep ID (Bech32 or Hex encoded)"
-        inputValue={dRepID}
+        inputValue={dRepIdInputValue}
         onChangeFunction={(event) => {
-          setDRepID(event.target.value)
+          setDRepIdInputValue(event.target.value)
         }}
       />
       <InputWithLabel
         inputName="DRep Registration Deposit Refund Amount (lovelaces)"
-        inputValue={dRepID}
+        inputValue={depositRefundAmount}
         onChangeFunction={(event) => {
           setDepositRefundAmount(event.target.value)
         }}

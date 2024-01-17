@@ -19,6 +19,7 @@ const GetAllInfoCard = ({api, wasm, onWaiting, onError, setters}) => {
     setRewardAddress,
     setDRepIdBech32,
     setDRepIdHex,
+    setDRepIdInputValue,
     setRegPubStakeKey,
     setUnregPubStakeKey,
   } = setters
@@ -77,6 +78,7 @@ const GetAllInfoCard = ({api, wasm, onWaiting, onError, setters}) => {
         console.log('[dApp][GetAllInfoCard][getPubDRepKey]: ', drepKey)
         setDRepIdBech32(drepKey.dRepIDBech32)
         setDRepIdHex(drepKey.dRepIDHex)
+        setDRepIdInputValue(drepKey.dRepIDBech32)
         onWaiting(false)
       })
       .catch((e) => {
