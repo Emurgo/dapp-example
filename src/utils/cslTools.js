@@ -138,3 +138,9 @@ export const getDRepRegWithAnchorCert = (wasm, dRepCred, dRepDeposit, anchor) =>
   wasm.DrepRegistration.new_with_anchor(dRepCred, wasm.BigNum.from_str(dRepDeposit), anchor)
 
 export const getCertOfNewDRepReg = (wasm, dRepRegCert) => wasm.Certificate.new_drep_registration(dRepRegCert)
+
+export const getDRepUpdateCert = (wasm, dRepCed) => wasm.DrepUpdate.new(dRepCed)
+
+export const getDRepUpdateWithAnchorCert = (wasm, dRepCred, anchor) => wasm.DrepUpdate.new_with_anchor(dRepCred, anchor)
+
+export const getCertOfNewDRepUpdate = (wasm, dRepUpdateCert) => wasm.Certificate.new_drep_update(dRepUpdateCert)
