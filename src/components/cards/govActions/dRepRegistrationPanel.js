@@ -42,7 +42,7 @@ const DRepRegistrationPanel = (props) => {
   }
 
   const panelProps = {
-    certLabel: 'voteDelegation',
+    certLabel: 'dRepRegistration',
     clickFunction: buildDRepRegistrationCert,
   }
 
