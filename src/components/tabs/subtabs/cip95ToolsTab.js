@@ -10,24 +10,24 @@ const Cip95TabTools = () => {
   const {api, connectionState} = useYoroi()
   const wasm = useWasm()
   // Waiter label
-  const [currentWaiterState, setWaiterState] = useState(false)
+  const [waiterState, setWaiterState] = useState(false)
   // Error label
-  const [currentErrorState, setErrorState] = useState(false)
+  const [errorState, setErrorState] = useState(false)
   // Balance
-  const [currentBalance, setBalance] = useState('')
+  const [balance, setBalance] = useState('')
   // UTxOs
-  const [currentUtxos, setUtxos] = useState([])
+  const [utxos, setUtxos] = useState([])
   // ChangeAddress
-  const [currentChangeAddress, setChangeAddress] = useState('')
+  const [changeAddress, setChangeAddress] = useState('')
   // Reward/stake address
-  const [currentRewardAddress, setRewardAddress] = useState('')
+  const [rewardAddress, setRewardAddress] = useState('')
   // Public DRep Key
-  const [currentDRepIdBech32, setDRepIdBech32] = useState('')
-  const [currentDRepIdHex, setDRepIdHex] = useState('')
+  const [dRepIdBech32, setDRepIdBech32] = useState('')
+  const [dRepIdHex, setDRepIdHex] = useState('')
   // Registered public stake key
-  const [currentRegPubStakeKey, setRegPubStakeKey] = useState('')
+  const [regPubStakeKey, setRegPubStakeKey] = useState('')
   // Unregistered public stake key
-  const [currentUnregPubStakeKey, setUnregPubStakeKey] = useState('')
+  const [unregPubStakeKey, setUnregPubStakeKey] = useState('')
 
   const showWarning = () => {
     setErrorState(true)
@@ -50,14 +50,14 @@ const Cip95TabTools = () => {
     setUnregPubStakeKey,
   }
   const getters = {
-    currentBalance,
-    currentUtxos,
-    currentChangeAddress,
-    currentRewardAddress,
-    currentDRepIdBech32,
-    currentDRepIdHex,
-    currentRegPubStakeKey,
-    currentUnregPubStakeKey,
+    balance,
+    utxos,
+    changeAddress,
+    rewardAddress,
+    dRepIdBech32,
+    dRepIdHex,
+    regPubStakeKey,
+    unregPubStakeKey,
   }
 
   return (
@@ -74,9 +74,9 @@ const Cip95TabTools = () => {
           </div>
           {/* Info and error message is here */}
           <div className="grid justify-items-center content-end h-12 text-2xl">
-            <label className="text-white">{currentWaiterState ? 'Waiting ...' : ''}</label>
+            <label className="text-white">{waiterState ? 'Waiting ...' : ''}</label>
             <label className="text-red-500">
-              {currentErrorState ? 'An error has happend. Please check logs.' : ''}
+              {errorState ? 'An error has happend. Please check logs.' : ''}
             </label>
           </div>
           {/* Tabs with gov. actions */}

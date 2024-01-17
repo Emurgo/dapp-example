@@ -28,7 +28,7 @@ const DRepRetirementPanel = (props) => {
   }
 
   const panelProps = {
-    certLabel: 'dRepUpdate',
+    certLabel: 'dRepRetirement',
     clickFunction: buildDRepRetirementCert,
   }
 
