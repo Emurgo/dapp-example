@@ -43,7 +43,12 @@ const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) 
   }
 
   const newGetters = Object.assign(getters, {certsInTx, votesInTx, getCertBuilder, getVotingBuilder})
-  const newSetters = Object.assign(setters, {handleAddingCertInTx, handleAddingVotesInTx})
+  const newSetters = Object.assign(setters, {
+    handleAddingCertInTx,
+    handleAddingVotesInTx,
+    setCertBuilder,
+    setVotingBuilder,
+  })
 
   const data = [
     {
@@ -75,6 +80,7 @@ const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) 
     <div className="block rounded-lg border bg-gray-900 border-gray-700">
       <TabsComponent tabsData={data} />
     </div>
+    // The button "Build, Sign, Submit" should be here
   )
 }
 
