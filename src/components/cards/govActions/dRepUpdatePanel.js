@@ -10,7 +10,7 @@ import {
 import {getRandomHex} from '../../../utils/helpFunctions'
 
 const DRepUpdatePanel = (props) => {
-  const {wasm, onWaiting, onError, getters, setters, handleInput} = props
+  const {wasm, onWaiting, onError, getters, setters, handleInputCreds} = props
 
   const {handleAddingCertInTx, setDRepIdInputValue} = setters
   const {dRepIdInputValue, getCertBuilder} = getters
@@ -22,7 +22,7 @@ const DRepUpdatePanel = (props) => {
     onWaiting(true)
     const certBuilder = getCertBuilder(wasm)
     try {
-      const dRepCred = handleInput(dRepIdInputValue)
+      const dRepCred = handleInputCreds(dRepIdInputValue)
       let dRepUpdateCert = null
       if (metadataURL.length > 0) {
         const dataHash = metadataHash.length > 0 ? metadataHash : getRandomHex(32)
@@ -42,6 +42,7 @@ const DRepUpdatePanel = (props) => {
   }
 
   const panelProps = {
+    buttonName: 'Build Cert',
     certLabel: 'dRepUpdate',
     clickFunction: buildDRepUpdateCert,
   }

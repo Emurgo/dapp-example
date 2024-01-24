@@ -5,9 +5,10 @@ import {getCslCredentialFromBech32, getCslCredentialFromHex} from '../../../util
 import DRepRegistrationPanel from '../../cards/govActions/dRepRegistrationPanel'
 import DRepUpdatePanel from '../../cards/govActions/dRepUpdatePanel'
 import DRepRetirementPanel from '../../cards/govActions/dRepRetirementPanel'
+import VotePanel from '../../cards/govActions/votePanel'
 
 const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters}) => {
-  const handleInput = (input) => {
+  const handleInputCreds = (input) => {
     try {
       return getCslCredentialFromHex(wasm, input)
     } catch (err1) {
@@ -24,71 +25,41 @@ const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters})
     }
   }
 
+  const panelsProps = {
+    api,
+    wasm,
+    onWaiting,
+    onError,
+    getters,
+    setters,
+    handleInputCreds,
+  }
+
   const data = [
     {
       label: 'Vote Delegation',
       value: 'voteDeleg',
-      children: (
-        <VoteDelegationPanel
-          api={api}
-          wasm={wasm}
-          onWaiting={onWaiting}
-          onError={onError}
-          getters={getters}
-          setters={setters}
-          handleInput={handleInput}
-        />
-      ),
+      children: <VoteDelegationPanel {...panelsProps} />,
     },
     {
       label: 'DRep Registration',
       value: 'drepReg',
-      children: (
-        <DRepRegistrationPanel
-          api={api}
-          wasm={wasm}
-          onWaiting={onWaiting}
-          onError={onError}
-          getters={getters}
-          setters={setters}
-          handleInput={handleInput}
-        />
-      ),
+      children: <DRepRegistrationPanel {...panelsProps} />,
     },
     {
       label: 'DRep Update',
       value: 'drepUpdate',
-      children: (
-        <DRepUpdatePanel
-          api={api}
-          wasm={wasm}
-          onWaiting={onWaiting}
-          onError={onError}
-          getters={getters}
-          setters={setters}
-          handleInput={handleInput}
-        />
-      ),
+      children: <DRepUpdatePanel {...panelsProps} />,
     },
     {
       label: 'DRep Retirement',
       value: 'drepRet',
-      children: (
-        <DRepRetirementPanel
-          api={api}
-          wasm={wasm}
-          onWaiting={onWaiting}
-          onError={onError}
-          getters={getters}
-          setters={setters}
-          handleInput={handleInput}
-        />
-      ),
+      children: <DRepRetirementPanel {...panelsProps} />,
     },
     {
       label: 'Vote',
       value: 'vote',
-      children: <></>,
+      children: <VotePanel {...panelsProps} />,
     },
     {
       label: 'Register Stake Key',

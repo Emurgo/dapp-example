@@ -5,7 +5,7 @@ import {getAnchor, getCertOfNewDRepReg, getDRepRegCert, getDRepRegWithAnchorCert
 import {bytesToHex} from '../../../utils/utils'
 
 const DRepRegistrationPanel = (props) => {
-  const {wasm, onWaiting, onError, getters, setters, handleInput} = props
+  const {wasm, onWaiting, onError, getters, setters, handleInputCreds} = props
 
   const {handleAddingCertInTx, setDRepIdInputValue} = setters
   const {dRepIdInputValue, getCertBuilder} = getters
@@ -18,7 +18,7 @@ const DRepRegistrationPanel = (props) => {
     onWaiting(true)
     const certBuilder = getCertBuilder(wasm)
     try {
-      const dRepCred = handleInput(dRepIdInputValue)
+      const dRepCred = handleInputCreds(dRepIdInputValue)
       let dRepRegCert = null
       if (metadataURL.length > 0) {
         const dataHash =
@@ -41,6 +41,7 @@ const DRepRegistrationPanel = (props) => {
   }
 
   const panelProps = {
+    buttonName: 'Build Cert',
     certLabel: 'dRepRegistration',
     clickFunction: buildDRepRegistrationCert,
   }

@@ -10,7 +10,7 @@ import {
 import GovToolsPanel from '../govToolsPanel'
 
 const VoteDelegationPanel = (props) => {
-  const {wasm, onWaiting, onError, getters, setters, handleInput} = props
+  const {wasm, onWaiting, onError, getters, setters, handleInputCreds} = props
   const {dRepIdBech32, dRepIdInputValue, regPubStakeKey, unregPubStakeKey, getCertBuilder} = getters
   const {handleAddingCertInTx, setDRepIdInputValue} = setters
 
@@ -35,7 +35,7 @@ const VoteDelegationPanel = (props) => {
           setDRepIdInputValue(dRepIdBech32)
           tempTarget = dRepIdBech32
         }
-        const dRepKeyCred = handleInput(tempTarget)
+        const dRepKeyCred = handleInputCreds(tempTarget)
         targetDRep = getDRepNewKeyHash(wasm, dRepKeyCred.to_keyhash())
       }
 
@@ -44,7 +44,7 @@ const VoteDelegationPanel = (props) => {
         setStake(suitableStake)
         pubStake = suitableStake
       }
-      const stakeCred = handleInput(pubStake)
+      const stakeCred = handleInputCreds(pubStake)
       if (stakeCred == null) {
         return null
       }
@@ -63,6 +63,7 @@ const VoteDelegationPanel = (props) => {
   }
 
   const panelProps = {
+    buttonName: 'Build Cert',
     certLabel: 'voteDelegation',
     clickFunction: buildVoteDelegationCert,
   }
