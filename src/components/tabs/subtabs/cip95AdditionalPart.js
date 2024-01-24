@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {getCertificateBuilder} from '../../../utils/cslTools'
+import {getCertificateBuilder, getCslVotingBuilder} from '../../../utils/cslTools'
 import TabsComponent from '../tabsComponent'
 import GovBasicFunctionsTab from './govBasicFunctionsTab'
 import GovActionsTab from './govActionsTab'
@@ -7,7 +7,9 @@ import ConstitCommCertsTab from './constitCommCertsTab'
 
 const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) => {
   const [certsInTx, setCertsInTx] = useState([])
+  const [votesInTx, setVotesInTx] = useState([])
   const [certBuilder, setCertBuilder] = useState(null)
+  const [votingBuilder, setVotingBuilder] = useState(null)
 
   const handleAddingCertInTx = (certBuilderWithCert) => {
     setCertBuilder(certBuilderWithCert)
@@ -20,6 +22,12 @@ const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) 
     setCertsInTx(certsInJson)
   }
 
+  const handleAddingVotesInTx = (votingBuilderWithVote) => {
+    setVotingBuilder(votingBuilderWithVote)
+    setVotesInTx(votingBuilderWithVote.build().to_json())
+    console.log('Votes in Tx', votesInTx)
+  }
+
   const getCertBuilder = (wasm) => {
     if (certBuilder) {
       return certBuilder
@@ -27,8 +35,15 @@ const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) 
     return getCertificateBuilder(wasm)
   }
 
-  const newGetters = Object.assign(getters, {certsInTx, getCertBuilder})
-  const newSetters = Object.assign(setters, {handleAddingCertInTx})
+  const getVotingBuilder = (wasm) => {
+    if (votingBuilder) {
+      return votingBuilder
+    }
+    return getCslVotingBuilder(wasm)
+  }
+
+  const newGetters = Object.assign(getters, {certsInTx, votesInTx, getCertBuilder, getVotingBuilder})
+  const newSetters = Object.assign(setters, {handleAddingCertInTx, handleAddingVotesInTx})
 
   const data = [
     {
