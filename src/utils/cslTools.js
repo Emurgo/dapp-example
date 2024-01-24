@@ -75,19 +75,11 @@ export const getUtxoFromHex = (wasm, hexUtxo) => {
   return utxo
 }
 
+export const getTransactionHashFromHex = (wasm, txHex) => wasm.TransactionHash.from_hex(txHex)
+
 export const getCertificateBuilder = (wasm) => wasm.CertificatesBuilder.new()
 
 export const getCredential = (wasm, keyHash) => wasm.Credential.from_keyhash(keyHash)
-
-export const getVotingBuilder = (wasm) => wasm.VotingBuilder.new()
-
-export const getVoterFromDRepIDHex = (wasm, dRepIDHex) => {
-  if (dRepIDHex) {
-    const dRepKeyHash = keyHashFromHex(dRepIDHex)
-    return wasm.Voter.new_drep(getCredential(wasm, dRepKeyHash))
-  }
-  throw new Error('DRepIDHex is empty, you need to get it first')
-}
 
 export const keyHashFromHex = (wasm, hexValue) => wasm.Ed25519KeyHash.from_hex(hexValue)
 
@@ -154,3 +146,16 @@ export const getDRepRetirementCert = (wasm, dRepCred, dRepRefundAmount) =>
 
 export const getCertOfNewDRepRetirement = (wasm, dRepRetirementCert) =>
   wasm.Certificate.new_drep_deregistration(dRepRetirementCert)
+
+// Vote
+export const getVotingProcedureWithAnchor = (wasm, votingChoice, anchor) =>
+  wasm.VotingProcedure.new_with_anchor(votingChoice, anchor)
+
+export const getCslVotingBuilder = (wasm) => wasm.VotingBuilder.new()
+
+export const getGovActionId = (wasm, govActionTxHashInHex, govActionIndex) =>
+  wasm.GovernanceActionId.new(getTransactionHashFromHex(wasm, govActionTxHashInHex), govActionIndex)
+
+export const getVoter = (wasm, dRepKeyHash) => wasm.Voter.new_drep(dRepKeyHash)
+
+export const getVotingProcedure = (wasm, votingChoice) => wasm.VotingProcedure.new(votingChoice)
