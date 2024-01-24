@@ -1,3 +1,4 @@
+import {protocolParams} from './networkConfig'
 import {hexToBytes, bytesToHex, wasmMultiassetToJSONs} from './utils'
 import {Buffer} from 'buffer'
 
@@ -6,18 +7,22 @@ export const toInt = (wasm, number) => wasm.Int.new_i32(number)
 export const getTxBuilder = (wasm) => {
   return wasm.TransactionBuilder.new(
     wasm.TransactionBuilderConfigBuilder.new()
-      .fee_algo(wasm.LinearFee.new(wasm.BigNum.from_str('44'), wasm.BigNum.from_str('155381')))
-      .coins_per_utxo_word(wasm.BigNum.from_str('34482'))
-      .pool_deposit(wasm.BigNum.from_str('500000000'))
-      .key_deposit(wasm.BigNum.from_str('2000000'))
+      .fee_algo(
+        wasm.LinearFee.new(
+          wasm.BigNum.from_str(protocolParams.linearFee.minFeeA),
+          wasm.BigNum.from_str(protocolParams.linearFee.minFeeB)
+          ))
+      .pool_deposit(wasm.BigNum.from_str(protocolParams.poolDeposit))
+      .key_deposit(wasm.BigNum.from_str(protocolParams.keyDeposit))
+      .coins_per_utxo_word(wasm.BigNum.from_str(protocolParams.coinsPerUtxoWord))
+      .max_value_size(protocolParams.maxValueSize)
+      .max_tx_size(protocolParams.maxTxSize)
       .ex_unit_prices(
         wasm.ExUnitPrices.new(
           wasm.UnitInterval.new(wasm.BigNum.from_str('577'), wasm.BigNum.from_str('10000')),
           wasm.UnitInterval.new(wasm.BigNum.from_str('721'), wasm.BigNum.from_str('10000000')),
         ),
       )
-      .max_value_size(5000)
-      .max_tx_size(16384)
       .build(),
   )
 }
