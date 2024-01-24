@@ -10,7 +10,6 @@ import {
   getUTxOs,
 } from '../../utils/helpFunctions'
 
-// we need onWaiting
 const GetAllInfoCard = ({api, wasm, onWaiting, onError, setters}) => {
   const {
     setBalance,
