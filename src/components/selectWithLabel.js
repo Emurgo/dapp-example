@@ -1,15 +1,13 @@
 import React from 'react'
+import {ModalWindowContent} from './ui-constants'
 
 const SelectWithLabel = (props) => {
   const {selectName, selectArray, onChangeFunction} = props
   const selectID = selectName.split(' ').join('')
 
   return (
-    <div className="mb-6 pr-4">
-      <label
-        htmlFor={selectID}
-        className="block mb-2 text-sm font-medium text-gray-300 focus:ring-blue-500 focus:border-blue-500"
-      >
+    <div className="mt-3">
+      <label htmlFor={selectID} className={ModalWindowContent.contentLabelStyle}>
         {selectName}
       </label>
       <select
