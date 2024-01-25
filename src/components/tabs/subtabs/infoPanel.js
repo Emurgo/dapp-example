@@ -7,6 +7,8 @@ const InfoPanel = ({getters}) => {
     utxos,
     changeAddress,
     rewardAddress,
+    usedAddress,
+    unusedAddress,
     dRepIdBech32,
     dRepIdHex,
     regPubStakeKey,
@@ -43,6 +45,14 @@ const InfoPanel = ({getters}) => {
         <div>
           <span>Reward address: </span>
           <span className={textColor}>{rewardAddress.length > 0 ? rewardAddress : '-'}</span>
+        </div>
+        <div>
+          <span>Used address: </span>
+          <span className={textColor}>{usedAddress.length > 0 ? usedAddress : '-'}</span>
+        </div>
+        <div>
+          <span>Unused address: </span>
+          <span className={textColor}>{unusedAddress.length > 0 ? unusedAddress : '-'}</span>
         </div>
         <div>
           <span>DRep ID Hex: </span>
