@@ -38,7 +38,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          PATH_TO_DELETE: "/*"
+          PATH_TO_DELETE: "/"
 
       - name: Deploying application to Amazon S3
         uses: dvelasquez/deploy-s3-action@main
@@ -48,7 +48,7 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
           AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
           BUCKET_PATH: "/" 
-          DIST_LOCATION_CODE: ./dist
+          DIST_LOCATION_CODE: ./build
 
       - name: Invalidate CloudFront
         uses: chetan/invalidate-cloudfront-action@v2
