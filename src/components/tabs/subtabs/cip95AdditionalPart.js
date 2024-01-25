@@ -4,6 +4,7 @@ import TabsComponent from '../tabsComponent'
 import GovBasicFunctionsTab from './govBasicFunctionsTab'
 import GovActionsTab from './govActionsTab'
 import ConstitCommCertsTab from './constitCommCertsTab'
+import Cip95BuildSignSubmitCard from '../../cards/cip95BuildSignSubmitCard'
 
 const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) => {
   const [certsInTx, setCertsInTx] = useState([])
@@ -42,7 +43,14 @@ const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) 
     return getCslVotingBuilder(wasm)
   }
 
-  const newGetters = Object.assign(getters, {certsInTx, votesInTx, getCertBuilder, getVotingBuilder})
+  const newGetters = Object.assign(getters, {
+    certsInTx,
+    votesInTx,
+    getCertBuilder,
+    getVotingBuilder,
+    certBuilder,
+    votingBuilder,
+  })
   const newSetters = Object.assign(setters, {
     handleAddingCertInTx,
     handleAddingVotesInTx,
@@ -77,10 +85,19 @@ const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) 
     },
   ]
   return (
-    <div className="block rounded-lg border bg-gray-900 border-gray-700">
-      <TabsComponent tabsData={data} />
-    </div>
-    // The button "Build, Sign, Submit" should be here
+    <>
+      <Cip95BuildSignSubmitCard
+        api={api}
+        wasm={wasm}
+        onWaiting={onWaiting}
+        onError={onError}
+        getters={newGetters}
+        setters={newSetters}
+      />
+      <div className="block rounded-lg border mt-5 bg-gray-900 border-gray-700">
+        <TabsComponent tabsData={data} />
+      </div>
+    </>
   )
 }
 
