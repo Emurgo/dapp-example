@@ -7,6 +7,8 @@ import {
   getRegPubStakeKey,
   getRewardAddress,
   getUnregPubStakeKey,
+  getUsedAddress,
+  getUnusedAddress,
   getUTxOs,
 } from '../../utils/helpFunctions'
 
@@ -16,6 +18,8 @@ const GetAllInfoCard = ({api, wasm, onWaiting, onError, setters}) => {
     setAndMapUtxos,
     setChangeAddress,
     setRewardAddress,
+    setUsedAddress,
+    setUnusedAddress,
     setDRepIdBech32,
     setDRepIdHex,
     setDRepIdInputValue,
@@ -28,7 +32,6 @@ const GetAllInfoCard = ({api, wasm, onWaiting, onError, setters}) => {
       .then((adaValue) => {
         console.log('[dApp][GetAllInfoCard][getBalance]: ', adaValue)
         setBalance(adaValue)
-        onWaiting(false)
       })
       .catch((e) => {
         console.error(e)
@@ -40,7 +43,6 @@ const GetAllInfoCard = ({api, wasm, onWaiting, onError, setters}) => {
       .then((utxos) => {
         console.log('[dApp][GetAllInfoCard][getUTxOs]: ', utxos)
         setAndMapUtxos(utxos)
-        onWaiting(false)
       })
       .catch((e) => {
         console.error(e)
@@ -52,7 +54,6 @@ const GetAllInfoCard = ({api, wasm, onWaiting, onError, setters}) => {
       .then((bech32Addr) => {
         console.log('[dApp][GetAllInfoCard][getChangeAddress]: ', bech32Addr)
         setChangeAddress(bech32Addr)
-        onWaiting(false)
       })
       .catch((e) => {
         console.error(e)
@@ -64,7 +65,28 @@ const GetAllInfoCard = ({api, wasm, onWaiting, onError, setters}) => {
       .then((bech32Addr) => {
         console.log('[dApp][GetAllInfoCard][getRewardAddress]: ', bech32Addr)
         setRewardAddress(bech32Addr)
+      })
+      .catch((e) => {
+        console.error(e)
         onWaiting(false)
+        onError()
+      })
+
+    getUsedAddress(api, wasm)
+      .then((bech32Addr) => {
+        console.log('[dApp][GetAllInfoCard][getUsedAddress]: ', bech32Addr)
+        setUsedAddress(bech32Addr)
+      })
+      .catch((e) => {
+        console.error(e)
+        onWaiting(false)
+        onError()
+      })
+
+    getUnusedAddress(api, wasm)
+      .then((bech32Addr) => {
+        console.log('[dApp][GetAllInfoCard][getUnusedAddress]: ', bech32Addr)
+        setUnusedAddress(bech32Addr)
       })
       .catch((e) => {
         console.error(e)
@@ -78,7 +100,6 @@ const GetAllInfoCard = ({api, wasm, onWaiting, onError, setters}) => {
         setDRepIdBech32(drepKey.dRepIDBech32)
         setDRepIdHex(drepKey.dRepIDHex)
         setDRepIdInputValue(drepKey.dRepIDBech32)
-        onWaiting(false)
       })
       .catch((e) => {
         console.error(e)
@@ -90,7 +111,6 @@ const GetAllInfoCard = ({api, wasm, onWaiting, onError, setters}) => {
       .then((stakeKeyHash) => {
         console.log('[dApp][GetAllInfoCard][getRegPubStakeKey]: ', stakeKeyHash)
         setRegPubStakeKey(stakeKeyHash)
-        onWaiting(false)
       })
       .catch((e) => {
         console.error(e)
