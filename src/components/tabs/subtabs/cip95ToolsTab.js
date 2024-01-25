@@ -17,10 +17,15 @@ const Cip95TabTools = () => {
   const [balance, setBalance] = useState('')
   // UTxOs
   const [utxos, setUtxos] = useState([])
+  const [hexUtxos, setHexUtxos] = useState([])
   // ChangeAddress
   const [changeAddress, setChangeAddress] = useState('')
   // Reward/stake address
   const [rewardAddress, setRewardAddress] = useState('')
+  // Used address
+  const [usedAddress, setUsedAddress] = useState('')
+  // Unused address
+  const [unusedAddress, setUnusedAddress] = useState('')
   // Public DRep Key
   const [dRepIdBech32, setDRepIdBech32] = useState('')
   const [dRepIdHex, setDRepIdHex] = useState('')
@@ -29,6 +34,7 @@ const Cip95TabTools = () => {
   const [regPubStakeKey, setRegPubStakeKey] = useState('')
   // Unregistered public stake key
   const [unregPubStakeKey, setUnregPubStakeKey] = useState('')
+  const [totalRefunds, setTotalRefunds] = useState('')
 
   const showWarning = () => {
     setErrorState(true)
@@ -37,7 +43,9 @@ const Cip95TabTools = () => {
 
   const setAndMapUtxos = (utxos) => {
     const mappedUtxos = utxos.map((utxo) => `${utxo.tx_hash} #${utxo.tx_index}: ${utxo.amount}`)
+    const mappedHexUtxos = utxos.map((utxo) => utxo.hex)
     setUtxos(mappedUtxos)
+    setHexUtxos(mappedHexUtxos)
   }
 
   const setters = {
@@ -45,22 +53,29 @@ const Cip95TabTools = () => {
     setAndMapUtxos,
     setChangeAddress,
     setRewardAddress,
+    setUsedAddress,
+    setUnusedAddress,
     setDRepIdBech32,
     setDRepIdHex,
     setDRepIdInputValue,
     setRegPubStakeKey,
     setUnregPubStakeKey,
+    setTotalRefunds,
   }
   const getters = {
     balance,
     utxos,
+    hexUtxos,
     changeAddress,
     rewardAddress,
+    usedAddress,
+    unusedAddress,
     dRepIdBech32,
     dRepIdHex,
     dRepIdInputValue,
     regPubStakeKey,
     unregPubStakeKey,
+    totalRefunds,
   }
 
   return (
@@ -78,9 +93,7 @@ const Cip95TabTools = () => {
           {/* Info and error message is here */}
           <div className="grid justify-items-center content-end h-12 text-2xl">
             <label className="text-white">{waiterState ? 'Waiting ...' : ''}</label>
-            <label className="text-red-500">
-              {errorState ? 'An error has happend. Please check logs.' : ''}
-            </label>
+            <label className="text-red-500">{errorState ? 'An error has happend. Please check logs.' : ''}</label>
           </div>
           {/* Tabs with gov. actions */}
           <div>
