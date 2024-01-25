@@ -10,24 +10,31 @@ const Cip95TabTools = () => {
   const {api, connectionState} = useYoroi()
   const wasm = useWasm()
   // Waiter label
-  const [currentWaiterState, setWaiterState] = useState(false)
+  const [waiterState, setWaiterState] = useState(false)
   // Error label
-  const [currentErrorState, setErrorState] = useState(false)
+  const [errorState, setErrorState] = useState(false)
   // Balance
-  const [currentBalance, setBalance] = useState('')
+  const [balance, setBalance] = useState('')
   // UTxOs
-  const [currentUtxos, setUtxos] = useState([])
+  const [utxos, setUtxos] = useState([])
+  const [hexUtxos, setHexUtxos] = useState([])
   // ChangeAddress
-  const [currentChangeAddress, setChangeAddress] = useState('')
+  const [changeAddress, setChangeAddress] = useState('')
   // Reward/stake address
-  const [currentRewardAddress, setRewardAddress] = useState('')
+  const [rewardAddress, setRewardAddress] = useState('')
+  // Used address
+  const [usedAddress, setUsedAddress] = useState('')
+  // Unused address
+  const [unusedAddress, setUnusedAddress] = useState('')
   // Public DRep Key
-  const [currentDRepIdBech32, setDRepIdBech32] = useState('')
-  const [currentDRepIdHex, setDRepIdHex] = useState('')
+  const [dRepIdBech32, setDRepIdBech32] = useState('')
+  const [dRepIdHex, setDRepIdHex] = useState('')
+  const [dRepIdInputValue, setDRepIdInputValue] = useState('')
   // Registered public stake key
-  const [currentRegPubStakeKey, setRegPubStakeKey] = useState('')
+  const [regPubStakeKey, setRegPubStakeKey] = useState('')
   // Unregistered public stake key
-  const [currentUnregPubStakeKey, setUnregPubStakeKey] = useState('')
+  const [unregPubStakeKey, setUnregPubStakeKey] = useState('')
+  const [totalRefunds, setTotalRefunds] = useState('')
 
   const showWarning = () => {
     setErrorState(true)
@@ -36,7 +43,9 @@ const Cip95TabTools = () => {
 
   const setAndMapUtxos = (utxos) => {
     const mappedUtxos = utxos.map((utxo) => `${utxo.tx_hash} #${utxo.tx_index}: ${utxo.amount}`)
+    const mappedHexUtxos = utxos.map((utxo) => utxo.hex)
     setUtxos(mappedUtxos)
+    setHexUtxos(mappedHexUtxos)
   }
 
   const setters = {
@@ -44,20 +53,29 @@ const Cip95TabTools = () => {
     setAndMapUtxos,
     setChangeAddress,
     setRewardAddress,
+    setUsedAddress,
+    setUnusedAddress,
     setDRepIdBech32,
     setDRepIdHex,
+    setDRepIdInputValue,
     setRegPubStakeKey,
     setUnregPubStakeKey,
+    setTotalRefunds,
   }
   const getters = {
-    currentBalance,
-    currentUtxos,
-    currentChangeAddress,
-    currentRewardAddress,
-    currentDRepIdBech32,
-    currentDRepIdHex,
-    currentRegPubStakeKey,
-    currentUnregPubStakeKey,
+    balance,
+    utxos,
+    hexUtxos,
+    changeAddress,
+    rewardAddress,
+    usedAddress,
+    unusedAddress,
+    dRepIdBech32,
+    dRepIdHex,
+    dRepIdInputValue,
+    regPubStakeKey,
+    unregPubStakeKey,
+    totalRefunds,
   }
 
   return (
@@ -74,10 +92,8 @@ const Cip95TabTools = () => {
           </div>
           {/* Info and error message is here */}
           <div className="grid justify-items-center content-end h-12 text-2xl">
-            <label className="text-white">{currentWaiterState ? 'Waiting ...' : ''}</label>
-            <label className="text-red-500">
-              {currentErrorState ? 'An error has happend. Please check logs.' : ''}
-            </label>
+            <label className="text-white">{waiterState ? 'Waiting ...' : ''}</label>
+            <label className="text-red-500">{errorState ? 'An error has happend. Please check logs.' : ''}</label>
           </div>
           {/* Tabs with gov. actions */}
           <div>

@@ -1,23 +1,31 @@
+import {protocolParams} from './networkConfig'
 import {hexToBytes, bytesToHex, wasmMultiassetToJSONs} from './utils'
 import {Buffer} from 'buffer'
 
 export const toInt = (wasm, number) => wasm.Int.new_i32(number)
 
+export const strToBigNum = (wasm, numberIsStr) => wasm.BigNum.from_str(numberIsStr)
+
 export const getTxBuilder = (wasm) => {
   return wasm.TransactionBuilder.new(
     wasm.TransactionBuilderConfigBuilder.new()
-      .fee_algo(wasm.LinearFee.new(wasm.BigNum.from_str('44'), wasm.BigNum.from_str('155381')))
-      .coins_per_utxo_word(wasm.BigNum.from_str('34482'))
-      .pool_deposit(wasm.BigNum.from_str('500000000'))
-      .key_deposit(wasm.BigNum.from_str('2000000'))
-      .ex_unit_prices(
-        wasm.ExUnitPrices.new(
-          wasm.UnitInterval.new(wasm.BigNum.from_str('577'), wasm.BigNum.from_str('10000')),
-          wasm.UnitInterval.new(wasm.BigNum.from_str('721'), wasm.BigNum.from_str('10000000')),
+      .fee_algo(
+        wasm.LinearFee.new(
+          strToBigNum(wasm, protocolParams.linearFee.minFeeA),
+          strToBigNum(wasm, protocolParams.linearFee.minFeeB),
         ),
       )
-      .max_value_size(5000)
-      .max_tx_size(16384)
+      .pool_deposit(strToBigNum(wasm, protocolParams.poolDeposit))
+      .key_deposit(strToBigNum(wasm, protocolParams.keyDeposit))
+      .coins_per_utxo_word(strToBigNum(wasm, protocolParams.coinsPerUtxoWord))
+      .max_value_size(protocolParams.maxValueSize)
+      .max_tx_size(protocolParams.maxTxSize)
+      .ex_unit_prices(
+        wasm.ExUnitPrices.new(
+          wasm.UnitInterval.new(strToBigNum(wasm, '577'), strToBigNum(wasm, '10000')),
+          wasm.UnitInterval.new(strToBigNum(wasm, '721'), strToBigNum(wasm, '10000000')),
+        ),
+      )
       .build(),
   )
 }
@@ -34,12 +42,21 @@ export const getCslUtxos = (wasm, hexUtxos) => {
 
 export const getLargestFirstMultiAsset = (wasm) => wasm.CoinSelectionStrategyCIP2.LargestFirstMultiAsset
 
-export const getTransactionOutput = (wasm, wasmOutputAddress, buildTransactionInput) =>
-  wasm.TransactionOutput.new(wasmOutputAddress, wasm.Value.new(wasm.BigNum.from_str(buildTransactionInput.amount)))
+export const getTransactionOutput = (wasm, wasmOutputAddress, buildTransactionInput) => {
+  if (buildTransactionInput.amount) {
+    return wasm.TransactionOutput.new(
+      wasmOutputAddress,
+      wasm.Value.new(strToBigNum(wasm, buildTransactionInput.amount)),
+    )
+  }
+  return wasm.TransactionOutput.new(wasmOutputAddress, wasm.Value.new(buildTransactionInput))
+}
 
 export const getAddressFromBytes = (wasm, changeAddress) => wasm.Address.from_bytes(hexToBytes(changeAddress))
 
 export const getTransactionFromBytes = (wasm, txHex) => wasm.Transaction.from_bytes(hexToBytes(txHex))
+
+export const getTransactionWitnessSetNew = (wasm) => wasm.TransactionWitnessSet.new()
 
 export const getTransactionWitnessSetFromBytes = (wasm, witnessHex) =>
   wasm.TransactionWitnessSet.from_bytes(hexToBytes(witnessHex))
@@ -60,6 +77,8 @@ export const getAssetName = (wasm, assetNameString) => wasm.AssetName.new(Buffer
 
 export const getBech32AddressFromHex = (wasm, addressHex) => wasm.Address.from_bytes(hexToBytes(addressHex)).to_bech32()
 
+export const getAddressFromBech32 = (wasm, bech32Value) => wasm.Address.from_bech32(bech32Value)
+
 export const getCslValue = (wasm, hexValue) => wasm.Value.from_bytes(hexToBytes(hexValue))
 
 export const getUtxoFromHex = (wasm, hexUtxo) => {
@@ -72,22 +91,15 @@ export const getUtxoFromHex = (wasm, hexUtxo) => {
   utxo.receiver = output.address().to_bech32()
   utxo.amount = output.amount().coin().to_str()
   utxo.asset = wasmMultiassetToJSONs(output.amount().multiasset())
+  utxo.hex = hexUtxo
   return utxo
 }
+
+export const getTransactionHashFromHex = (wasm, txHex) => wasm.TransactionHash.from_hex(txHex)
 
 export const getCertificateBuilder = (wasm) => wasm.CertificatesBuilder.new()
 
 export const getCredential = (wasm, keyHash) => wasm.Credential.from_keyhash(keyHash)
-
-export const getVotingBuilder = (wasm) => wasm.VotingBuilder.new()
-
-export const getVoterFromDRepIDHex = (wasm, dRepIDHex) => {
-  if (dRepIDHex) {
-    const dRepKeyHash = keyHashFromHex(dRepIDHex)
-    return wasm.Voter.new_drep(getCredential(wasm, dRepKeyHash))
-  }
-  throw new Error('DRepIDHex is empty, you need to get it first')
-}
 
 export const keyHashFromHex = (wasm, hexValue) => wasm.Ed25519KeyHash.from_hex(hexValue)
 
@@ -117,6 +129,53 @@ export const getDRepNoConfidence = (wasm) => wasm.DRep.new_always_no_confidence(
 
 export const getDRepNewKeyHash = (wasm, credHash) => wasm.DRep.new_key_hash(credHash)
 
+export const getURL = (wasm, url) => wasm.URL.new(url)
+
+export const getAnchorHash = (wasm, urlHash) => wasm.AnchorDataHash.from_hex(urlHash)
+
+export const getAnchor = (wasm, url, urlHash) => {
+  const anchorURL = getURL(wasm, url)
+  const anchorHash = getAnchorHash(wasm, urlHash)
+  return wasm.Anchor.new(anchorURL, anchorHash)
+}
+
+// Vote Delegation Certificate
 export const getVoteDelegCert = (wasm, stakeCred, dRepKeyHash) => wasm.VoteDelegation.new(stakeCred, dRepKeyHash)
 
 export const getCertOfNewVoteDelegation = (wasm, voteCert) => wasm.Certificate.new_vote_delegation(voteCert)
+
+// DRep Registration Certificate
+export const getDRepRegCert = (wasm, dRepCred, dRepDeposit) =>
+  wasm.DrepRegistration.new(dRepCred, strToBigNum(wasm, dRepDeposit))
+
+export const getDRepRegWithAnchorCert = (wasm, dRepCred, dRepDeposit, anchor) =>
+  wasm.DrepRegistration.new_with_anchor(dRepCred, strToBigNum(wasm, dRepDeposit), anchor)
+
+export const getCertOfNewDRepReg = (wasm, dRepRegCert) => wasm.Certificate.new_drep_registration(dRepRegCert)
+
+// DRep Update Certificate
+export const getDRepUpdateCert = (wasm, dRepCred) => wasm.DrepUpdate.new(dRepCred)
+
+export const getDRepUpdateWithAnchorCert = (wasm, dRepCred, anchor) => wasm.DrepUpdate.new_with_anchor(dRepCred, anchor)
+
+export const getCertOfNewDRepUpdate = (wasm, dRepUpdateCert) => wasm.Certificate.new_drep_update(dRepUpdateCert)
+
+// DRep Retirement Certificate
+export const getDRepRetirementCert = (wasm, dRepCred, dRepRefundAmount) =>
+  wasm.DrepDeregistration.new(dRepCred, strToBigNum(wasm, dRepRefundAmount))
+
+export const getCertOfNewDRepRetirement = (wasm, dRepRetirementCert) =>
+  wasm.Certificate.new_drep_deregistration(dRepRetirementCert)
+
+// Vote
+export const getVotingProcedureWithAnchor = (wasm, votingChoice, anchor) =>
+  wasm.VotingProcedure.new_with_anchor(votingChoice, anchor)
+
+export const getCslVotingBuilder = (wasm) => wasm.VotingBuilder.new()
+
+export const getGovActionId = (wasm, govActionTxHashInHex, govActionIndex) =>
+  wasm.GovernanceActionId.new(getTransactionHashFromHex(wasm, govActionTxHashInHex), govActionIndex)
+
+export const getVoter = (wasm, dRepKeyHash) => wasm.Voter.new_drep(dRepKeyHash)
+
+export const getVotingProcedure = (wasm, votingChoice) => wasm.VotingProcedure.new(votingChoice)

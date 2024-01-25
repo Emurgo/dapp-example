@@ -1,42 +1,65 @@
 import React from 'react'
 import TabsComponent from '../tabsComponent'
-import VoteDelegationPanel from '../../cards/voteDelegationPanel'
+import VoteDelegationPanel from '../../cards/govActions/voteDelegationPanel'
+import {getCslCredentialFromBech32, getCslCredentialFromHex} from '../../../utils/cslTools'
+import DRepRegistrationPanel from '../../cards/govActions/dRepRegistrationPanel'
+import DRepUpdatePanel from '../../cards/govActions/dRepUpdatePanel'
+import DRepRetirementPanel from '../../cards/govActions/dRepRetirementPanel'
+import VotePanel from '../../cards/govActions/votePanel'
 
 const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters}) => {
+  const handleInputCreds = (input) => {
+    try {
+      return getCslCredentialFromHex(wasm, input)
+    } catch (err1) {
+      try {
+        return getCslCredentialFromBech32(wasm, input)
+      } catch (err2) {
+        onWaiting(false)
+        console.error(
+          `Error in parsing credential, not Hex or Bech32: ${JSON.stringify(err1)}, ${JSON.stringify(err2)}`,
+        )
+        onError()
+        return null
+      }
+    }
+  }
+
+  const panelsProps = {
+    api,
+    wasm,
+    onWaiting,
+    onError,
+    getters,
+    setters,
+    handleInputCreds,
+  }
+
   const data = [
     {
       label: 'Vote Delegation',
       value: 'voteDeleg',
-      children: (
-        <VoteDelegationPanel
-          api={api}
-          wasm={wasm}
-          onWaiting={onWaiting}
-          onError={onError}
-          getters={getters}
-          setters={setters}
-        />
-      ),
+      children: <VoteDelegationPanel {...panelsProps} />,
     },
     {
       label: 'DRep Registration',
       value: 'drepReg',
-      children: <></>,
+      children: <DRepRegistrationPanel {...panelsProps} />,
     },
     {
       label: 'DRep Update',
       value: 'drepUpdate',
-      children: <></>,
+      children: <DRepUpdatePanel {...panelsProps} />,
     },
     {
       label: 'DRep Retirement',
       value: 'drepRet',
-      children: <></>,
+      children: <DRepRetirementPanel {...panelsProps} />,
     },
     {
       label: 'Vote',
       value: 'vote',
-      children: <></>,
+      children: <VotePanel {...panelsProps} />,
     },
     {
       label: 'Register Stake Key',

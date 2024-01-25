@@ -1,6 +1,5 @@
 import React from 'react'
-import {CommonStyles} from './ui-constants'
-import {ModalWindowContent} from './ui-constants'
+import {CommonStyles, ModalWindowContent} from './ui-constants'
 
 const InputWithLabel = (props) => {
   const {inputName, inputValue, onChangeFunction} = props

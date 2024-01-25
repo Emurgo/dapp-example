@@ -7,7 +7,7 @@ export const getBalance = async (api, wasm) => {
   return adaValue
 }
 
-export const getUTxOs = async (api, wasm, amountLovelaces, requestParam = {page: 0, limit: 5}) => {
+export const getUTxOs = async (api, wasm, amountLovelaces, requestParam = {page: 0, limit: 20}) => {
   const utxos = []
   const hexUtxos = await api.getUtxos(amountLovelaces, requestParam)
   for (const hexUtxo of hexUtxos) {
@@ -63,4 +63,42 @@ export const getUnregPubStakeKey = async (api, wasm) => {
   const stakeKeyHash = wasm.PublicKey.from_hex(unregPubStakeKeyHex).hash().to_hex()
 
   return stakeKeyHash
+}
+
+export const getUsedAddress = async (api, wasm) => {
+  const requestParam = {page: 0, limit: 1}
+  const hexAddresses = await api.getUsedAddresses(requestParam)
+  const addresses = []
+  for (const hexAddr of hexAddresses) {
+    addresses.push(getBech32AddressFromHex(wasm, hexAddr))
+  }
+  return addresses[0]
+}
+
+export const getUnusedAddress = async (api, wasm) => {
+  const hexAddresses = await api.getUnusedAddresses()
+  const addresses = []
+  for (const hexAddr of hexAddresses) {
+    addresses.push(getBech32AddressFromHex(wasm, hexAddr))
+  }
+  return addresses[0]
+}
+
+const randomBytes = (count) => {
+  const result = Array(count)
+  for (let i = 0; i < count; ++i) {
+    result[i] = Math.floor(256 * Math.random())
+  }
+  return result
+}
+
+const toHexString = (byteArray) => {
+  return Array.from(byteArray, function (byte) {
+    return ('0' + (byte & 0xff).toString(16)).slice(-2)
+  }).join('')
+}
+
+export const getRandomHex = (bytes) => {
+  const byteArr = randomBytes(bytes)
+  return toHexString(byteArr)
 }

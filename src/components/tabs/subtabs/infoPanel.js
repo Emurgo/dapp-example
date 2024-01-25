@@ -3,14 +3,16 @@ import React from 'react'
 // We need getters here
 const InfoPanel = ({getters}) => {
   const {
-    currentBalance,
-    currentUtxos,
-    currentChangeAddress,
-    currentRewardAddress,
-    currentDRepIdBech32,
-    currentDRepIdHex,
-    currentRegPubStakeKey,
-    currentUnregPubStakeKey,
+    balance,
+    utxos,
+    changeAddress,
+    rewardAddress,
+    usedAddress,
+    unusedAddress,
+    dRepIdBech32,
+    dRepIdHex,
+    regPubStakeKey,
+    unregPubStakeKey,
   } = getters
 
   const textColor = 'text-orange-700'
@@ -20,12 +22,12 @@ const InfoPanel = ({getters}) => {
       <div className="grid justify-items-stretch grid-cols-1 lg:grid-cols-2 gap-2">
         <div>
           <span>Balance: </span>
-          <span className={textColor}>{currentBalance.length > 0 ? currentBalance : '-'}</span>
+          <span className={textColor}>{balance.length > 0 ? balance : '-'}</span>
         </div>
         <div>
           <span>UTxOs: </span>
-          {currentUtxos.length > 0 ? (
-            currentUtxos.map((utxo, index) => (
+          {utxos.length > 0 ? (
+            utxos.map((utxo, index) => (
               <p className={textColor} key={index}>
                 {utxo}
               </p>
@@ -37,28 +39,36 @@ const InfoPanel = ({getters}) => {
         <div>
           <span>Change address: </span>
           <span className={'w-full break-words ' + textColor}>
-            {currentChangeAddress.length > 0 ? currentChangeAddress : '-'}
+            {changeAddress.length > 0 ? changeAddress : '-'}
           </span>
         </div>
         <div>
           <span>Reward address: </span>
-          <span className={textColor}>{currentRewardAddress.length > 0 ? currentRewardAddress : '-'}</span>
+          <span className={textColor}>{rewardAddress.length > 0 ? rewardAddress : '-'}</span>
+        </div>
+        <div>
+          <span>Used address: </span>
+          <span className={textColor}>{usedAddress.length > 0 ? usedAddress : '-'}</span>
+        </div>
+        <div>
+          <span>Unused address: </span>
+          <span className={textColor}>{unusedAddress.length > 0 ? unusedAddress : '-'}</span>
         </div>
         <div>
           <span>DRep ID Hex: </span>
-          <span className={textColor}>{currentDRepIdHex.length > 0 ? currentDRepIdHex : '-'}</span>
+          <span className={textColor}>{dRepIdHex.length > 0 ? dRepIdHex : '-'}</span>
         </div>
         <div>
           <span>DRep ID Bech32: </span>
-          <span className={textColor}>{currentDRepIdBech32.length > 0 ? currentDRepIdBech32 : '-'}</span>
+          <span className={textColor}>{dRepIdBech32.length > 0 ? dRepIdBech32 : '-'}</span>
         </div>
         <div>
           <span>Registered public key (first): </span>
-          <span className={textColor}>{currentRegPubStakeKey.length > 0 ? currentRegPubStakeKey : '-'}</span>
+          <span className={textColor}>{regPubStakeKey.length > 0 ? regPubStakeKey : '-'}</span>
         </div>
         <div>
           <span>Unregistered public key (first): </span>
-          <span className={textColor}>{currentUnregPubStakeKey.length > 0 ? currentUnregPubStakeKey : '-'}</span>
+          <span className={textColor}>{unregPubStakeKey.length > 0 ? unregPubStakeKey : '-'}</span>
         </div>
       </div>
     </div>

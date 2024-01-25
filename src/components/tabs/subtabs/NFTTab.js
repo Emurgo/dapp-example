@@ -10,6 +10,7 @@ import {
   getPubKeyHash,
   getTransactionOutputBuilder,
   getTxBuilder,
+  strToBigNum,
   toInt,
 } from '../../../utils/cslTools'
 import {CONNECTED} from '../../../utils/connectionStates'
@@ -171,7 +172,7 @@ const NFTTab = () => {
       metadata[scriptHashHex][assetInfo.NFTName] = assetInfo.metadata
       metadata['version'] = isV2nft ? '2.0' : '1.0'
       console.debug(`[dApp][NFT_Tab][mint] metadata -> ${JSON.stringify(metadata)}`)
-      txBuilder.add_json_metadatum(wasm.BigNum.from_str('721'), JSON.stringify(metadata))
+      txBuilder.add_json_metadatum(strToBigNum(wasm, '721'), JSON.stringify(metadata))
       txBuilder.add_mint_asset_and_output_min_required_coin(
         wasmNativeScript,
         getAssetName(wasm, assetInfo.metadata.name),
