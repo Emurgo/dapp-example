@@ -72,6 +72,7 @@ const VotePanel = (props) => {
     <GovToolsPanel {...panelProps}>
       <InputWithLabel
         inputName="DRep ID"
+        helpText="Bech32 or Hex encoded"
         inputValue={dRepIdInputValue}
         onChangeFunction={(event) => {
           setDRepIdInputValue(event.target.value)

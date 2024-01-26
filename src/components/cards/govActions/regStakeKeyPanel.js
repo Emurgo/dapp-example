@@ -64,7 +64,8 @@ const RegisterStakeKeyPanel = (props) => {
         }}
       />
       <InputWithLabel
-        inputName="Stake Key Deposit Amount (lovelaces, this should align with current protocol parameters)"
+        inputName="Stake Key Deposit Amount (lovelaces)"
+        helpText="This should align with current protocol parameters"
         inputValue={stakeDepositAmount}
         onChangeFunction={(event) => {
           setStakeDepositAmount(event.target.value)
