@@ -180,10 +180,19 @@ export const getVoter = (wasm, dRepKeyHash) => wasm.Voter.new_drep(dRepKeyHash)
 
 export const getVotingProcedure = (wasm, votingChoice) => wasm.VotingProcedure.new(votingChoice)
 
-// Stake Key Certificate
+// Register Stake Key Certificate
 export const getStakeKeyRegCertWithCoin = (wasm, stakeCred, deposit) =>
   wasm.StakeRegistration.new_with_coin(stakeCred, strToBigNum(wasm, deposit))
 
 export const getStakeKeyRegCert = (wasm, stakeCred) => wasm.StakeRegistration.new(stakeCred)
 
 export const getCertOfNewStakeReg = (wasm, stakeKeyRegCert) => wasm.Certificate.new_stake_registration(stakeKeyRegCert)
+
+// Unregister Stake key Certificate
+export const getStakeKeyDeregCertWithCoin = (wasm, stakeCred, deposit) =>
+  wasm.StakeDeregistration.new_with_coin(stakeCred, strToBigNum(wasm, deposit))
+
+export const getStakeKeyDeregCert = (wasm, stakeCred) => wasm.StakeDeregistration.new(stakeCred)
+
+export const getCertOfNewStakeDereg = (wasm, stakeKeyDeregCert) =>
+  wasm.Certificate.new_stake_deregistration(stakeKeyDeregCert)
