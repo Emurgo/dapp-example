@@ -6,6 +6,7 @@ import DRepRegistrationPanel from '../../cards/govActions/dRepRegistrationPanel'
 import DRepUpdatePanel from '../../cards/govActions/dRepUpdatePanel'
 import DRepRetirementPanel from '../../cards/govActions/dRepRetirementPanel'
 import VotePanel from '../../cards/govActions/votePanel'
+import RegisterStakeKeyPanel from '../../cards/govActions/regStakeKeyPanel'
 
 const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters}) => {
   const handleInputCreds = (input) => {
@@ -64,7 +65,7 @@ const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters})
     {
       label: 'Register Stake Key',
       value: 'regStakeKey',
-      children: <></>,
+      children: <RegisterStakeKeyPanel {...panelsProps} />,
     },
     {
       label: 'Unregister Stake Key',
