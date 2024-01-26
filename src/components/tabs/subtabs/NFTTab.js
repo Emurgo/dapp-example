@@ -74,7 +74,7 @@ const NFTTab = () => {
 
   const handleNFTsAmount = () => {
     setIsMoreThenOneNFT(!isMoreThenOneNFT)
-    console.debug(`[dApp][NFT_Tab] mint MoreThenOneNFT is set: ${!isV2nft}`)
+    console.debug(`[dApp][NFT_Tab] mint MoreThenOneNFT is set: ${!isMoreThenOneNFT}`)
     if (isMoreThenOneNFT === false) {
       setNFTsAmount(1)
     }
