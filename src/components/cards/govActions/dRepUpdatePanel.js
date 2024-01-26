@@ -50,7 +50,8 @@ const DRepUpdatePanel = (props) => {
   return (
     <GovToolsPanel {...panelProps}>
       <InputWithLabel
-        inputName="DRep ID (Bech32 or Hex encoded)"
+        inputName="DRep ID"
+        helpText="Bech32 or Hex encoded"
         inputValue={dRepIdInputValue}
         onChangeFunction={(event) => {
           setDRepIdInputValue(event.target.value)

@@ -71,7 +71,8 @@ const VoteDelegationPanel = (props) => {
   return (
     <GovToolsPanel {...panelProps}>
       <InputWithLabel
-        inputName="Target of vote delegation | abstain | no confidence"
+        inputName="Target of vote delegation"
+        helpText="DRep ID | abstain | no confidence"
         inputValue={dRepIdInputValue}
         onChangeFunction={(event) => {
           setDRepIdInputValue(event.target.value)

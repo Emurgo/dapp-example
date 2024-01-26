@@ -35,14 +35,16 @@ const DRepRetirementPanel = (props) => {
   return (
     <GovToolsPanel {...panelProps}>
       <InputWithLabel
-        inputName="DRep ID (Bech32 or Hex encoded)"
+        inputName="DRep ID"
+        helpText="Bech32 or Hex encoded"
         inputValue={dRepIdInputValue}
         onChangeFunction={(event) => {
           setDRepIdInputValue(event.target.value)
         }}
       />
       <InputWithLabel
-        inputName="DRep Registration Deposit Refund Amount (lovelaces)"
+        inputName="DRep Registration Deposit Refund Amount"
+        helpText="This should be align with how much was paid during registration (in lovelace)"
         inputValue={depositRefundAmount}
         onChangeFunction={(event) => {
           setDepositRefundAmount(event.target.value)
