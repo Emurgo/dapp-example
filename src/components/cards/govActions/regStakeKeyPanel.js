@@ -1,8 +1,9 @@
 import React, {useState} from 'react'
+import CheckboxWithLabel from '../../checkboxWithLabel'
 import InputWithLabel from '../../inputWithLabel'
 import GovToolsPanel from '../govToolsPanel'
 import {protocolParams} from '../../../utils/networkConfig'
-import { getCertOfNewStakeReg, getStakeKeyRegCert, getStakeKeyRegCertWithCoin } from '../../../utils/cslTools'
+import {getCertOfNewStakeReg, getStakeKeyRegCert, getStakeKeyRegCertWithCoin} from '../../../utils/cslTools'
 
 const RegisterStakeKeyPanel = (props) => {
   const {wasm, onWaiting, onError, getters, setters, handleInputCreds} = props
@@ -23,17 +24,17 @@ const RegisterStakeKeyPanel = (props) => {
     onWaiting(true)
     const certBuilder = getCertBuilder(wasm)
     try {
-        // building StakeKeyRegCert
-        const stakeCred = handleInputCreds(stakeKeyHash)
-        let stakeKeyRegCert
-        if (useConway){
-            stakeKeyRegCert = getStakeKeyRegCertWithCoin(wasm, stakeCred, stakeDepositAmount)
-        } else {
-            stakeKeyRegCert = getStakeKeyRegCert(wasm, stakeCred)
-        }
-        certBuilder.add(getCertOfNewStakeReg(wasm, stakeKeyRegCert))
-        handleAddingCertInTx(certBuilder)
-        onWaiting(false)
+      // building StakeKeyRegCert
+      const stakeCred = handleInputCreds(stakeKeyHash)
+      let stakeKeyRegCert
+      if (useConway) {
+        stakeKeyRegCert = getStakeKeyRegCertWithCoin(wasm, stakeCred, stakeDepositAmount)
+      } else {
+        stakeKeyRegCert = getStakeKeyRegCert(wasm, stakeCred)
+      }
+      certBuilder.add(getCertOfNewStakeReg(wasm, stakeKeyRegCert))
+      handleAddingCertInTx(certBuilder)
+      onWaiting(false)
     } catch (error) {
       console.error(error)
       onWaiting(false)
@@ -49,20 +50,12 @@ const RegisterStakeKeyPanel = (props) => {
 
   return (
     <GovToolsPanel {...panelProps}>
-      <div className="text-l tracking-tight text-gray-300 mt-5">
-        <div>
-          <input
-            type="checkbox"
-            id="useNewConwayStakeRegCert"
-            name="useNewConwayStakeRegCert"
-            checked={useConway}
-            onChange={handleUseConwayCert}
-          />
-          <label htmlFor="isMoreThenOneNFT" className="font-bold">
-            <span /> Use the new Conway Stake Registration Certificate (with coin)
-          </label>
-        </div>
-      </div>
+      <CheckboxWithLabel
+        currentState={useConway}
+        onChangeFunc={handleUseConwayCert}
+        name="useNewConwayStakeRegCert"
+        labelText="Use the new Conway Stake Registration Certificate (with coin)"
+      />
       <InputWithLabel
         inputName="Stake Key Hash"
         inputValue={stakeKeyHash}
