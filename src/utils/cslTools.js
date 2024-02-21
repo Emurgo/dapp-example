@@ -17,7 +17,12 @@ export const getTxBuilder = (wasm) => {
       )
       .pool_deposit(strToBigNum(wasm, protocolParams.poolDeposit))
       .key_deposit(strToBigNum(wasm, protocolParams.keyDeposit))
-      .coins_per_utxo_word(strToBigNum(wasm, protocolParams.coinsPerUtxoWord))
+      .coins_per_utxo_byte(
+        strToBigNum(
+          wasm,
+          Math.floor(parseFloat(protocolParams.coinsPerUtxoWord) / 8).toString(10)
+        )
+      )
       .max_value_size(protocolParams.maxValueSize)
       .max_tx_size(protocolParams.maxTxSize)
       .ex_unit_prices(
