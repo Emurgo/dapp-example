@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "private": true,
   "dependencies": {
-    "@emurgo/cardano-serialization-lib-browser": "^12.0.0-alpha.13",
+    "@emurgo/cardano-serialization-lib-browser": "^12.0.0-alpha.18",
     "@emurgo/cip4-js": "^1.0.7",
     "@material-tailwind/react": "^2.1.8",
     "@testing-library/jest-dom": "^6.1.5",
