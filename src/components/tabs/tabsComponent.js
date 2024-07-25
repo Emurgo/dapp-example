@@ -22,7 +22,9 @@ const TabsComponent = ({tabsData}) => {
       </TabsHeader>
       <TabsBody>
         {tabsData.map(({value, children}) => (
-          <TabPanel key={value} value={value} children={children} />
+          <TabPanel key={value} value={value}>
+            {activeTab === value ? children : <div></div>}
+          </TabPanel>
         ))}
       </TabsBody>
     </Tabs>
