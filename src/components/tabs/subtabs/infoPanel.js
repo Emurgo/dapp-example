@@ -19,7 +19,7 @@ const InfoPanel = ({getters}) => {
   const spanProperties = 'w-full break-words ' + textColor
 
   return (
-    <div className="block p-5 min-w-full rounded-lg border shadow-md bg-gray-900 border-gray-700">
+    <div className="block p-5 min-w-full text-sm rounded-lg border shadow-md bg-gray-900 border-gray-700">
       <div className="grid justify-items-stretch grid-cols-1 lg:grid-cols-2 gap-2">
         <div>
           <span>Balance: </span>
