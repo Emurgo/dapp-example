@@ -17,6 +17,12 @@ const Cip95BuildSignSubmitCard = (props) => {
   const {setCertBuilder, setVotingBuilder} = setters
   const {certBuilder, votingBuilder, changeAddress, usedAddress, totalRefunds, hexUtxos} = getters
 
+  const errorHappen = (errorMessage) => {
+    onWaiting(false)
+    onError()
+    console.error(errorMessage)
+  }
+
   const buildSignSubmit = () => {
     onWaiting(true)
     try {
@@ -69,20 +75,16 @@ const Cip95BuildSignSubmitCard = (props) => {
               console.log('The transaction is sent:', txId)
             })
             .catch((e) => {
-              onWaiting(false)
-              console.log(e)
+              errorHappen(e)
             })
         })
         .catch((e) => {
-          onWaiting(false)
-          console.log(e)
+          errorHappen(e)
         })
 
       onWaiting(false)
     } catch (e) {
-      console.error(e)
-      onError()
-      onWaiting(false)
+      errorHappen(e)
     }
   }
 
