@@ -5,6 +5,7 @@ import GovBasicFunctionsTab from './govBasicFunctionsTab'
 import GovActionsTab from './govActionsTab'
 import ConstitCommCertsTab from './constitCommCertsTab'
 import Cip95BuildSignSubmitCard from '../../cards/cip95BuildSignSubmitCard'
+import CertificatesInTxPart from './certificatesInTxPart'
 
 const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) => {
   const [certsInTx, setCertsInTx] = useState([])
@@ -94,6 +95,10 @@ const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) 
         getters={newGetters}
         setters={newSetters}
       />
+      {/* Here the expandable panel with tx certificates should be */}
+      <div>
+        <CertificatesInTxPart getters={getters}/>
+      </div>
       <div className="block rounded-lg border mt-5 bg-gray-900 border-gray-700">
         <TabsComponent tabsData={data} />
       </div>
