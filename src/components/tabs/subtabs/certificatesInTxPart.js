@@ -1,6 +1,6 @@
 import React from 'react'
 import ExpandablePanel from '../../expandablePanel'
-import { iconCollapsed16, iconExpanded16 } from '../../ui-constants'
+import {iconCollapsed16, iconExpanded16} from '../../ui-constants'
 
 const CertificatesInTxPart = ({getters}) => {
   const {certsInTx, votesInTx} = getters
@@ -35,24 +35,24 @@ const CertificatesInTxPart = ({getters}) => {
       expandedIcon={iconExpanded16}
     >
       <div>
-          {getAllInOne().map((certInfo) => (
-            <ExpandablePanel
-              title={'-> ' + certInfo[0]}
-              generalPanelStyles={nestedPanelsStyles}
-              titleStyles={nestedPanelsTitleStyles}
-              collapsedIcon={iconCollapsed16}
-              expandedIcon={iconExpanded16}
-            >
-              <div className="pt-1">
-                <textarea
-                  className="w-full h-64 rounded bg-gray-900 text-white px-2 readonly"
-                  readOnly
-                  value={JSON.stringify(certInfo[1], null, 4)}
-                ></textarea>
-              </div>
-            </ExpandablePanel>
-          ))}
-        </div>
+        {getAllInOne().map((certInfo) => (
+          <ExpandablePanel
+            title={'-> ' + certInfo[0]}
+            generalPanelStyles={nestedPanelsStyles}
+            titleStyles={nestedPanelsTitleStyles}
+            collapsedIcon={iconCollapsed16}
+            expandedIcon={iconExpanded16}
+          >
+            <div className="pt-1">
+              <textarea
+                className="w-full h-64 rounded bg-gray-900 text-white px-2 readonly"
+                readOnly
+                value={JSON.stringify(certInfo[1], null, 4)}
+              ></textarea>
+            </div>
+          </ExpandablePanel>
+        ))}
+      </div>
     </ExpandablePanel>
   )
 }
