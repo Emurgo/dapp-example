@@ -1,6 +1,6 @@
 import React from 'react'
 import {useCollapse} from 'react-collapsed'
-import ExpandablePanel from '../../expandabablePanel'
+import ExpandablePanel from '../../expandablePanel'
 
 const CertificatesInTxPart = ({getters}) => {
   const {getCollapseProps, getToggleProps, isExpanded} = useCollapse()
