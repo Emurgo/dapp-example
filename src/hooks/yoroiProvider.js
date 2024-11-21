@@ -154,7 +154,7 @@ export const YoroiProvider = ({children}) => {
       if (throwError) {
         throw new Error(JSON.stringify(error))
       } else {
-        console.error(`[dApp][connect] ${error}`)
+        console.error(`[dApp][connect] ${JSON.stringify(error)}`)
       }
     }
   }
