@@ -11,36 +11,63 @@ import ApiCardWithModal from './apiCardWithModal'
 import {ModalWindowContent, CommonStyles} from '../ui-constants'
 
 const BuildTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
-  const [buildTransactionInput, setBuildTransactionInput] = useState({amount: '2000000', address: ''})
+  const [buildTransactionInput, setBuildTransactionInput] = useState({amount: '2000000', address: '', sendAll: false})
 
   const buildTransactionClick = async () => {
     const txBuilder = getTxBuilder(wasm)
 
     try {
       onWaiting(true)
-      const changeAddress = await api?.getChangeAddress()
-      const wasmChangeAddress = getAddressFromBytes(wasm, changeAddress)
+      let wasmChangeAddress;
+      let isSendAll = buildTransactionInput.sendAll;
+      if (isSendAll) {
+        if (!buildTransactionInput.address) {
+          alert('Receiver address is required')
+          throw new Error('Receiver address is required')
+        }
+      } else {
+        const changeAddress = await api?.getChangeAddress()
+        wasmChangeAddress = getAddressFromBytes(wasm, changeAddress)
+      }
       const wasmOutputAddress = buildTransactionInput.address
         ? wasm.Address.from_bech32(buildTransactionInput.address)
         : wasmChangeAddress
-      const wasmOutput = getTransactionOutput(wasm, wasmOutputAddress, buildTransactionInput)
-      txBuilder.add_output(wasmOutput)
 
       const hexUtxos = await api?.getUtxos()
-
       const wasmUtxos = getCslUtxos(wasm, hexUtxos)
-      txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset(wasm))
-      txBuilder.add_change_if_needed(wasmChangeAddress)
+
+      if (isSendAll) {
+
+        for (let i = 0; i < wasmUtxos.len(); i++) {
+          const wasmUtxo = wasmUtxos.get(i)
+          const output = wasmUtxo.output()
+          txBuilder.add_regular_input(
+            output.address(),
+            wasmUtxo.input(),
+            output.amount(),
+          )
+        }
+
+        // Sending everything to the receiver
+        txBuilder.add_change_if_needed(wasmOutputAddress)
+
+      } else {
+        const wasmOutput = getTransactionOutput(wasm, wasmOutputAddress, buildTransactionInput)
+        txBuilder.add_output(wasmOutput)
+
+        txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset(wasm))
+        txBuilder.add_change_if_needed(wasmChangeAddress)
+      }
 
       const wasmUnsignedTransaction = txBuilder.build_tx()
 
-      onWaiting(false)
       onRawResponse(bytesToHex(wasmUnsignedTransaction.to_bytes()))
       onResponse('', false)
     } catch (error) {
-      onWaiting(false)
       onRawResponse('')
       onRawResponse(error)
+    } finally {
+      onWaiting(false)
     }
   }
 
@@ -49,6 +76,8 @@ const BuildTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting})
     clickFunction: buildTransactionClick,
     halfOpacity: true,
   }
+
+  const isAmountInputDisabled = buildTransactionInput.sendAll;
 
   return (
     <ApiCardWithModal {...apiProps}>
@@ -61,10 +90,29 @@ const BuildTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting})
             type="number"
             min="1000000"
             id="amount"
-            className={CommonStyles.inputStyles}
+            className={isAmountInputDisabled ? CommonStyles.inputStylesDisabled : CommonStyles.inputStyles}
             placeholder=""
             value={buildTransactionInput.amount}
             onChange={(event) => setBuildTransactionInput({...buildTransactionInput, amount: event.target.value})}
+            disabled={isAmountInputDisabled}
+          />
+        </div>
+        <div>
+          <label htmlFor="sendAll" className={ModalWindowContent.contentLabelStyle} style={{ display: 'inline' }}>
+            Send all (no change)
+          </label>
+          <input
+            type="checkbox"
+            id="sendAll"
+            style={{ marginLeft: '15px', marginTop: '8px' }}
+            checked={buildTransactionInput.sendAll}
+            onChange={(event) => {
+              setBuildTransactionInput({
+                ...buildTransactionInput,
+                amount: '',
+                sendAll: event.target.checked,
+              });
+            }}
           />
         </div>
         <div className="mt-3">
