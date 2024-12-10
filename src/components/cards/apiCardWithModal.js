@@ -2,7 +2,7 @@ import React from 'react'
 import Popup from 'reactjs-popup'
 
 export const ApiCardWithModal = (props) => {
-  const {buttonLabel, submitButtonLabel, clickFunction, halfOpacity, children} = props
+  const {buttonLabel, clickFunction, halfOpacity, children} = props
 
   const handleActionAndClose = (closeFunc) => {
     console.log(`[dApp][ApiCardWithModal][${buttonLabel}] is called`)
@@ -54,7 +54,7 @@ export const ApiCardWithModal = (props) => {
                   handleActionAndClose(close)
                 }}
               >
-                {submitButtonLabel || 'Send'}
+                Send
               </button>
             </div>
           </div>
