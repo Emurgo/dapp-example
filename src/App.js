@@ -8,6 +8,7 @@ import Cip30Tab from './components/tabs/subtabs/cip30Tab'
 import Cip95Tab from './components/tabs/subtabs/cip95Tab'
 import Cip95TabTools from './components/tabs/subtabs/cip95ToolsTab'
 import NFTTab from './components/tabs/subtabs/NFTTab'
+import UtilsTab from './components/tabs/subtabs/utilsTab';
 
 const App = () => {
   const {connectionState} = useYoroi()
@@ -39,6 +40,11 @@ const App = () => {
       label: 'NFTs',
       value: 'nfts',
       children: <NFTTab />,
+    },
+    {
+      label: 'Utils',
+      value: 'utils',
+      children: <UtilsTab />,
     },
   ]
 
