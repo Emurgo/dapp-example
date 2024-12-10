@@ -25,14 +25,12 @@ const reservedKeys = [
 export const YoroiProvider = ({children}) => {
   console.log('[dApp][YoroiProvider] is called')
   const [api, setApi] = useState(null)
-  const [authEnabled, setAuthEnabled] = useState(false)
   const [connectionState, setConnectionState] = useState(NOT_CONNECTED)
   const [availableWallets, setAvailableWallets] = useState([])
   const [selectedWallet, setSelectedWallet] = useState('')
 
   const setConnectionStateFalse = () => {
     setConnectionState(NOT_CONNECTED)
-    setAuthEnabled(false)
     setApi(null)
   }
 
@@ -84,8 +82,9 @@ export const YoroiProvider = ({children}) => {
     let connectResult = null
     console.log(`[dApp][tryConnectSilent] is called`)
     try {
-      console.log(`[dApp][tryConnectSilent] trying {true, true}`)
-      connectResult = await connect(walletName, true, true, true)
+      console.log(`[dApp][tryConnectSilent] trying {false, true}`)
+      setConnectionState(IN_PROGRESS)
+      connectResult = await connect(walletName, false, true, false)
       if (connectResult != null) {
         console.log('[dApp][tryConnectSilent] RE-CONNECTED!')
         setSelectedWallet(walletName)
@@ -93,22 +92,8 @@ export const YoroiProvider = ({children}) => {
         return
       }
     } catch (error) {
-      console.warn(`[dApp][tryConnectSilent]: failed {true, true}`)
-      console.warn('[dApp][tryConnectSilent] no silent re-connection with auth is available')
-      try {
-        console.log(`[dApp][tryConnectSilent] trying {false, true}`)
-        setConnectionState(IN_PROGRESS)
-        connectResult = await connect(walletName, false, true, false)
-        if (connectResult != null) {
-          console.log('[dApp][tryConnectSilent] RE-CONNECTED!')
-          setSelectedWallet(walletName)
-          setConnectionState(CONNECTED)
-          return
-        }
-      } catch (error) {
-        setConnectionState(NOT_CONNECTED)
-        console.error(error)
-      }
+      setConnectionState(NOT_CONNECTED)
+      console.error(error)
     }
   }
 
@@ -139,10 +124,6 @@ export const YoroiProvider = ({children}) => {
       })
       console.log(`[dApp][connect] wallet API object is received`)
       setApi(connectedApi)
-      if (requestId && connectedApi.experimental && connectedApi.experimental.auth) {
-        const auth = connectedApi.experimental.auth()
-        setAuthEnabled(auth?.isEnabled())
-      }
       setConnectionState(CONNECTED)
       if (connectedApi.experimental?.onDisconnect) {
         connectedApi.experimental.onDisconnect(setConnectionStateFalse)
@@ -162,7 +143,6 @@ export const YoroiProvider = ({children}) => {
   const values = {
     api,
     connect,
-    authEnabled,
     connectionState,
     availableWallets,
     setAvailableWallets,

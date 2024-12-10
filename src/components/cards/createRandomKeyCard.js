@@ -1,7 +1,7 @@
 import React from 'react'
 import ApiCard from './apiCard'
 
-const CreateRandomKeyPart = ({wasm, onResponse, onWaiting}) => {
+const CreateRandomKeyPart = ({wasm, onRawResponse, onResponse, onWaiting}) => {
 
   const clickFunction = () => {
     onWaiting(true)
@@ -12,6 +12,7 @@ const CreateRandomKeyPart = ({wasm, onResponse, onWaiting}) => {
       const cred = wasm.Credential.from_keyhash(hash);
       const mainnetAddress = wasm.EnterpriseAddress.new(1, cred).to_address().to_bech32();
       const testnetAddress = wasm.EnterpriseAddress.new(0, cred).to_address().to_bech32();
+      onRawResponse('');
       onResponse({
         privateKeyHex: wasmSK.to_raw_key().to_hex(),
         publicKeyHex: wasmPK.to_raw_key().to_hex(),
@@ -19,6 +20,10 @@ const CreateRandomKeyPart = ({wasm, onResponse, onWaiting}) => {
         mainnetAddress,
         testnetAddress,
       });
+    } catch(e) {
+      onRawResponse('');
+      onResponse(e);
+      console.error(e);
     } finally {
       onWaiting(false);
     }

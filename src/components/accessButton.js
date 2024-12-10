@@ -1,24 +1,12 @@
 import React from 'react'
 import useYoroi from '../hooks/yoroiProvider'
-import {textPartFromWalletChecksumImagePart} from '@emurgo/cip4-js'
 import {IN_PROGRESS} from '../utils/connectionStates'
 import WalletsModal from './walletsModal'
 
 const AccessButton = () => {
   // add selectedWallet here
-  const {api, authEnabled, connectionState, availableWallets, selectedWallet} = useYoroi()
+  const {api, connectionState, availableWallets, selectedWallet} = useYoroi()
   console.log(`[dApp][AccessButton] available wallets: ${availableWallets.length}`)
-
-  const getWalletPlate = (apiObject, isAuthEnabled) => {
-    let walletId = 'anonymous wallet'
-    console.log(`[dApp][getWalletPlate] isAuthEnabled - ${isAuthEnabled}`)
-    if (isAuthEnabled) {
-      const auth = apiObject.experimental.auth && apiObject.experimental.auth()
-      walletId = auth.getWalletId()
-      return textPartFromWalletChecksumImagePart(walletId)
-    }
-    return walletId
-  }
 
   const getWalletIcon = () => {
     return window.cardano[selectedWallet].icon
@@ -42,7 +30,7 @@ const AccessButton = () => {
             <div className="col-span-3 text-xl font-bold tracking-tight text-white text-center ml-1">
               <div className="py-5">
                 <div>Connected To {getWalletName()}</div>
-                <div className="py-1">{getWalletPlate(api, authEnabled)}</div>
+                <div className="py-1">anonymous wallet</div>
               </div>
             </div>
           </div>
