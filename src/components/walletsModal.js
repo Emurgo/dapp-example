@@ -6,7 +6,6 @@ import {NO_CARDANO} from '../utils/connectionStates'
 const WalletsModal = () => {
   const {connect, availableWallets, setSelectedWallet, connectionState} = useYoroi()
   const [selectedUserWallet, setSelectedUserWallet] = useState('')
-  const [isAuthChecked, setIsAuthChecked] = useState(false)
   console.log(`[dApp][WalletsModal] is called`)
 
   const handleSelectionAndClose = (closeFunc) => {
@@ -14,11 +13,7 @@ const WalletsModal = () => {
     setSelectedWallet(selectedUserWallet)
     closeFunc()
     console.log(`[dApp][WalletsModal] is closed`)
-    connect(selectedUserWallet, isAuthChecked, false)
-  }
-
-  const handleOnChangeAuth = () => {
-    setIsAuthChecked(!isAuthChecked)
+    connect(selectedUserWallet, false, false)
   }
 
   const overlayStyle = {background: 'rgba(0,0,0,0.5)'}
@@ -72,23 +67,6 @@ const WalletsModal = () => {
               </div>
             ))}
           </div>
-          {/* auth checkbox */}
-          {selectedUserWallet === 'yoroi' && (
-            <div className="grid justify-items-center py-5 text-l font-bold tracking-tight text-white">
-              <div>
-                <input
-                  type="checkbox"
-                  id="authRequired"
-                  name="authRequiredCheckbox"
-                  checked={isAuthChecked}
-                  onChange={handleOnChangeAuth}
-                />
-                <label htmlFor="authRequired">
-                  <span /> Request authentication
-                </label>
-              </div>
-            </div>
-          )}
           {/* confirmation button */}
           <div className="flex">
             <div className="flex-auto">

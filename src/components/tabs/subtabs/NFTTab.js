@@ -41,20 +41,20 @@ const NFTTab = () => {
   const [currentNFTName, setCurrentNFTName] = useState('')
   const [currentImageUrl, setCurrentImageUrl] = useState('')
   const [currentDescription, setCurrentDescription] = useState('')
-  const [currentImageType, setImageType] = useState('image/jpeg')
+  const [imageType, setImageType] = useState('image/jpeg')
   const emptyTokenInfo = {
     NFTName: '',
     metadata: {
       name: '<string>',
       image: '<uri | array>',
-      mediaType: currentImageType,
+      mediaType: imageType,
       tokenType: 'nft',
       description: '<string | array>',
       totalSupply: 1,
       files: [
         {
           name: '<string>',
-          mediaType: currentImageType,
+          mediaType: imageType,
           src: '<uri | array>',
         },
       ],
@@ -62,10 +62,10 @@ const NFTTab = () => {
   }
   const [currentMintingInfo, setCurrentMintingInfo] = useState(emptyTokenInfo)
   const [mintingTxInfo, setMintingTxInfo] = useState([])
-  const [isV2nft, setV2nft] = useState(false)
+  const [isV2nft, setIsV2nft] = useState(false)
   const [isMoreThenOneNFT, setIsMoreThenOneNFT] = useState(false)
   const [currentErrorState, setCurrentErrorState] = useState(false)
-  const [currentNFTsAmount, setNFTsAmount] = useState(1)
+  const [currentNFTsAmount, setCurrentNFTsAmount] = useState(1)
 
   const handleError = () => {
     setCurrentErrorState(true)
@@ -76,12 +76,12 @@ const NFTTab = () => {
     setIsMoreThenOneNFT(!isMoreThenOneNFT)
     console.debug(`[dApp][NFT_Tab] mint MoreThenOneNFT is set: ${!isMoreThenOneNFT}`)
     if (isMoreThenOneNFT === false) {
-      setNFTsAmount(1)
+      setCurrentNFTsAmount(1)
     }
   }
 
   const handleNftVersionOnChange = () => {
-    setV2nft(!isV2nft)
+    setIsV2nft(!isV2nft)
     console.debug(`[dApp][NFT_Tab] V2 is set: ${!isV2nft}`)
     setCurrentMintingInfo(emptyTokenInfo)
     setMintingTxInfo([])
@@ -296,7 +296,7 @@ const NFTTab = () => {
                           className="text-sm border rounded-lg block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                           placeholder={1}
                           value={currentNFTsAmount}
-                          onChange={(event) => setNFTsAmount(Number(event.target.value))}
+                          onChange={(event) => setCurrentNFTsAmount(Number(event.target.value))}
                         />
                       ) : (
                         <></>

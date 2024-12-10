@@ -9,6 +9,7 @@ import {
 } from '../../utils/cslTools'
 import ApiCardWithModal from './apiCardWithModal'
 import {ModalWindowContent, CommonStyles} from '../ui-constants'
+import CheckboxWithLabel from '../checkboxWithLabel'
 
 const BuildTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
   const [buildTransactionInput, setBuildTransactionInput] = useState({amount: '2000000', address: '', sendAll: false})
@@ -18,8 +19,8 @@ const BuildTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting})
 
     try {
       onWaiting(true)
-      let wasmChangeAddress;
-      let isSendAll = buildTransactionInput.sendAll;
+      let wasmChangeAddress
+      let isSendAll = buildTransactionInput.sendAll
       if (isSendAll) {
         if (!buildTransactionInput.address) {
           alert('Receiver address is required')
@@ -37,7 +38,6 @@ const BuildTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting})
       const wasmUtxos = getCslUtxos(wasm, hexUtxos)
 
       if (isSendAll) {
-
         for (let i = 0; i < wasmUtxos.len(); i++) {
           const wasmUtxo = wasmUtxos.get(i)
           const output = wasmUtxo.output()
@@ -50,7 +50,6 @@ const BuildTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting})
 
         // Sending everything to the receiver
         txBuilder.add_change_if_needed(wasmOutputAddress)
-
       } else {
         const wasmOutput = getTransactionOutput(wasm, wasmOutputAddress, buildTransactionInput)
         txBuilder.add_output(wasmOutput)
@@ -77,7 +76,7 @@ const BuildTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting})
     halfOpacity: true,
   }
 
-  const isAmountInputDisabled = buildTransactionInput.sendAll;
+  const isAmountInputDisabled = buildTransactionInput.sendAll
 
   return (
     <ApiCardWithModal {...apiProps}>
@@ -97,24 +96,18 @@ const BuildTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting})
             disabled={isAmountInputDisabled}
           />
         </div>
-        <div>
-          <label htmlFor="sendAll" className={ModalWindowContent.contentLabelStyle} style={{ display: 'inline' }}>
-            Send all (no change)
-          </label>
-          <input
-            type="checkbox"
-            id="sendAll"
-            style={{ marginLeft: '15px', marginTop: '8px' }}
-            checked={buildTransactionInput.sendAll}
-            onChange={(event) => {
-              setBuildTransactionInput({
-                ...buildTransactionInput,
-                amount: '',
-                sendAll: event.target.checked,
-              });
-            }}
-          />
-        </div>
+        <CheckboxWithLabel
+          currentState={buildTransactionInput.sendAll}
+          onChangeFunc={(event) => {
+            setBuildTransactionInput({
+              ...buildTransactionInput,
+              amount: '',
+              sendAll: event.target.checked,
+            })
+          }}
+          name="sendAll"
+          labelText="Send all (no change)"
+        />
         <div className="mt-3">
           <label htmlFor="receiverAddress" className={ModalWindowContent.contentLabelStyle}>
             Receiver address
