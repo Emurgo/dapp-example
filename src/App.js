@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import AccessButton from './components/accessButton'
 import MainTab from './components/tabs/mainTab'
 import TabsComponent from './components/tabs/tabsComponent'
@@ -11,9 +11,32 @@ import NFTTab from './components/tabs/subtabs/NFTTab'
 import UtilsTab from './components/tabs/subtabs/utilsTab';
 
 const App = () => {
-  const {connectionState} = useYoroi()
+  const {connectionState, selectedWallet, setConnectionState, setConnectionStateFalse} = useYoroi()
   const isWalletConnected = connectionState === CONNECTED
   const isNotCardanoWallet = connectionState === NO_CARDANO
+
+  useEffect(() => {
+    const getConnectionState = async () => {
+      try {
+        const walletObject = window.cardano[selectedWallet]
+        const conState = await walletObject.isEnabled()
+        console.log(`[dApp][App] Wallet "${selectedWallet}" is enabled: ${conState}`)
+        if (conState) {
+          setConnectionState(CONNECTED)
+        } else {
+          setConnectionStateFalse()
+        }
+      } catch (error) {
+        setConnectionStateFalse()
+        console.error(error)
+      }
+    }
+
+    if (isWalletConnected) {
+      const connectionTimer = setInterval(getConnectionState, 3000)
+      return () => clearInterval(connectionTimer)
+    }
+  }, [isWalletConnected, selectedWallet, setConnectionState, setConnectionStateFalse])
 
   const mainTabProps = {
     isWalletConnected,
