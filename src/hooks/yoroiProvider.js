@@ -23,7 +23,7 @@ const reservedKeys = [
 ]
 
 export const YoroiProvider = ({children}) => {
-  console.log('[dApp][YoroiProvider] is called')
+  console.debug('[dApp][YoroiProvider] is called')
   const [api, setApi] = useState(null)
   const [connectionState, setConnectionState] = useState(NO_CARDANO)
   const [availableWallets, setAvailableWallets] = useState([])
@@ -59,9 +59,9 @@ export const YoroiProvider = ({children}) => {
    */
     const tryConnectSilent = async (walletName) => {
       let connectResult = null
-      console.log(`[dApp][tryConnectSilent] is called`)
+      console.debug(`[dApp][tryConnectSilent] is called`)
       try {
-        console.log(`[dApp][tryConnectSilent] trying {false, true}`)
+        console.debug(`[dApp][tryConnectSilent] trying {false, true}`)
         setConnectionState(IN_PROGRESS)
         connectResult = await connect(walletName, false, true, false)
         if (connectResult != null) {
@@ -87,7 +87,7 @@ export const YoroiProvider = ({children}) => {
       walletObject
         .isEnabled()
         .then((response) => {
-          console.log(`[dApp] Connection is enabled: ${response}`)
+          console.debug(`[dApp] Connection is enabled: ${response}`)
           if (response) {
             tryConnectSilent(existingWallet).then()
           } else {
@@ -110,7 +110,7 @@ export const YoroiProvider = ({children}) => {
    */
   const connect = async (walletName, requestId, silent, throwError = false) => {
     setConnectionState(IN_PROGRESS)
-    console.log(`[dApp][connect] is called`)
+    console.debug(`[dApp][connect] is called`)
 
     if (!window.cardano) {
       console.error('There are no cardano wallets are installed')
@@ -119,14 +119,14 @@ export const YoroiProvider = ({children}) => {
     }
 
     console.log(`[dApp][connect] connecting the wallet "${walletName}"`)
-    console.log(`[dApp][connect] {requestIdentification: ${requestId}, onlySilent: ${silent}}`)
+    console.debug(`[dApp][connect] {requestIdentification: ${requestId}, onlySilent: ${silent}}`)
 
     try {
       const connectedApi = await window.cardano[walletName].enable({
         requestIdentification: requestId,
         onlySilent: silent,
       })
-      console.log(`[dApp][connect] wallet API object is received`)
+      console.debug(`[dApp][connect] wallet API object is received`)
       setApi(connectedApi)
       setSelectedWallet(walletName)
       setConnectionState(CONNECTED)

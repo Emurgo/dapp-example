@@ -17,6 +17,7 @@ const App = () => {
 
   useEffect(() => {
     const getConnectionState = async () => {
+      console.debug(`[dApp][App] Checking connection works`)
       try {
         const walletObject = window.cardano[selectedWallet]
         const conState = await walletObject.isEnabled()
@@ -34,7 +35,10 @@ const App = () => {
 
     if (isWalletConnected) {
       const connectionTimer = setInterval(getConnectionState, 3000)
-      return () => clearInterval(connectionTimer)
+      return () => {
+        console.debug(`[dApp][App] Checking connection is stopped`)
+        clearInterval(connectionTimer)
+      }
     }
   }, [isWalletConnected, selectedWallet, setConnectionState, setConnectionStateFalse])
 
