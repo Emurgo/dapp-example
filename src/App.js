@@ -8,7 +8,7 @@ import Cip30Tab from './components/tabs/subtabs/cip30Tab'
 import Cip95Tab from './components/tabs/subtabs/cip95Tab'
 import Cip95TabTools from './components/tabs/subtabs/cip95ToolsTab'
 import NFTTab from './components/tabs/subtabs/NFTTab'
-import UtilsTab from './components/tabs/subtabs/utilsTab';
+import UtilsTab from './components/tabs/subtabs/utilsTab'
 
 const App = () => {
   const {connectionState, selectedWallet, setConnectionState, setConnectionStateFalse} = useYoroi()
@@ -20,7 +20,7 @@ const App = () => {
       try {
         const walletObject = window.cardano[selectedWallet]
         const conState = await walletObject.isEnabled()
-        console.log(`[dApp][App] Wallet "${selectedWallet}" is enabled: ${conState}`)
+
         if (conState) {
           setConnectionState(CONNECTED)
         } else {
