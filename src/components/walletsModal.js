@@ -23,7 +23,7 @@ const WalletsModal = () => {
   const buttonProps = {
     className:
       'rounded-md border-black-300 bg-blue-500 hover:bg-blue-300 active:bg-blue-700 py-5 px-5 disabled:opacity-50',
-    disabled: connectionState === NO_CARDANO ?? 'disabled',
+    disabled: connectionState === NO_CARDANO ? 'disabled' : '',
   }
 
   return (
