@@ -15,12 +15,23 @@ const App = () => {
   const isWalletConnected = connectionState === CONNECTED
   const isNotCardanoWallet = connectionState === NO_CARDANO
 
+  const walletStateWithTimeout = async (walletObject, timeout = 2000) => {
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error('Checking connection timeout'))
+      }, timeout)
+    })
+    const walletEnabledPromise = walletObject.isEnabled()
+    const response = await Promise.race([walletEnabledPromise, timeoutPromise])
+    return response 
+  }
+
   useEffect(() => {
     const getConnectionState = async () => {
       console.debug(`[dApp][App] Checking connection works`)
       try {
         const walletObject = window.cardano[selectedWallet]
-        const conState = await walletObject.isEnabled()
+        const conState = await walletStateWithTimeout(walletObject, 2000)
 
         if (conState) {
           setConnectionState(CONNECTED)
