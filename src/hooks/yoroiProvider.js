@@ -110,6 +110,7 @@ export const YoroiProvider = ({children}) => {
    */
   const connect = async (walletName, requestId, silent, throwError = false) => {
     setConnectionState(IN_PROGRESS)
+    setApi(null)
     console.debug(`[dApp][connect] is called`)
 
     if (!window.cardano) {
