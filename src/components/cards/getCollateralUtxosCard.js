@@ -1,15 +1,17 @@
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
 import {CommonStyles, ModalWindowContent} from '../ui-constants'
-import {getUtxoFromHex} from '../../utils/cslTools'
+import {getAmountInHex, getUtxoFromHex} from '../../utils/cslTools'
 
 const GetCollateralUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
   const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState('2000000')
 
+  const amountInHex = getAmountInHex(wasm, getCollateralUtxosInput)
+
   const getCollateralUtxosClick = () => {
     onWaiting(true)
     api
-      ?.getCollateral(getCollateralUtxosInput)
+      ?.getCollateral(amountInHex)
       .then((hexUtxos) => {
         onWaiting(false)
         onRawResponse(hexUtxos)
