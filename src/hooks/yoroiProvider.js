@@ -23,15 +23,27 @@ const reservedKeys = [
 ]
 
 export const YoroiProvider = ({children}) => {
-  console.log('[dApp][YoroiProvider] is called')
+  console.debug('[dApp][YoroiProvider] is called')
   const [api, setApi] = useState(null)
-  const [connectionState, setConnectionState] = useState(NOT_CONNECTED)
+  const [connectionState, setConnectionState] = useState(NO_CARDANO)
   const [availableWallets, setAvailableWallets] = useState([])
   const [selectedWallet, setSelectedWallet] = useState('')
 
   const setConnectionStateFalse = () => {
     setConnectionState(NOT_CONNECTED)
     setApi(null)
+  }
+
+  const getAvailableWallets = () => {
+    // We need to filter like this because of the Nami wallet.
+    // It injects everything into the cardano object not only the object "nami".
+    const userWallets = Object.keys(window.cardano).filter((cardanoKey) => !reservedKeys.includes(cardanoKey))
+    return userWallets.map((walletName) => {
+      return {
+        walletObjKey: walletName,
+        walletObjInfo: window.cardano[walletName],
+      }
+    })
   }
 
   useEffect(() => {
@@ -41,30 +53,45 @@ export const YoroiProvider = ({children}) => {
       return
     }
 
-    // We need to filter like this because of the Nami wallet.
-    // It injects everything into the cardano object not only the object "nami".
-    const userWallets = Object.keys(window.cardano).filter((cardanoKey) => !reservedKeys.includes(cardanoKey))
-    const allInfoWallets = userWallets.map((walletName) => {
-      return {
-        walletObjKey: walletName,
-        walletObjInfo: window.cardano[walletName],
+    /**
+   * @param {string} walletName - A wallet name as it is presented in the Cardano object
+   * @returns {Promise<void>}
+   */
+    const tryConnectSilent = async (walletName) => {
+      let connectResult = null
+      console.debug(`[dApp][tryConnectSilent] is called`)
+      try {
+        console.debug(`[dApp][tryConnectSilent] trying {false, true}`)
+        setConnectionState(IN_PROGRESS)
+        connectResult = await connect(walletName, false, true, false)
+        if (connectResult != null) {
+          console.log('[dApp][tryConnectSilent] RE-CONNECTED!')
+          setSelectedWallet(walletName)
+          setConnectionState(CONNECTED)
+          return
+        }
+      } catch (error) {
+        setSelectedWallet('')
+        setConnectionState(NOT_CONNECTED)
+        console.error(error)
       }
-    })
-    console.log('allInfoWallets: ', allInfoWallets)
-    setAvailableWallets(allInfoWallets)
+    }
 
-    if (userWallets.length === 1) {
-      const existingWallet = userWallets[0]
+    const availableWallets = getAvailableWallets()
+    console.log('[dApp] allInfoWallets: ', availableWallets)
+    setAvailableWallets(availableWallets)
+
+    if (availableWallets.length === 1) {
+      const existingWallet = availableWallets[0].walletObjKey
       const walletObject = window.cardano[existingWallet]
       walletObject
         .isEnabled()
         .then((response) => {
-          console.log(`[dApp] Connection is enabled: ${response}`)
+          console.debug(`[dApp] Connection is enabled: ${response}`)
           if (response) {
             tryConnectSilent(existingWallet).then()
           } else {
             setConnectionState(NOT_CONNECTED)
-            return
           }
         })
         .catch((err) => {
@@ -76,29 +103,6 @@ export const YoroiProvider = ({children}) => {
 
   /**
    * @param {string} walletName - A wallet name as it is presented in the Cardano object
-   * @returns {Promise<void>}
-   */
-  const tryConnectSilent = async (walletName) => {
-    let connectResult = null
-    console.log(`[dApp][tryConnectSilent] is called`)
-    try {
-      console.log(`[dApp][tryConnectSilent] trying {false, true}`)
-      setConnectionState(IN_PROGRESS)
-      connectResult = await connect(walletName, false, true, false)
-      if (connectResult != null) {
-        console.log('[dApp][tryConnectSilent] RE-CONNECTED!')
-        setSelectedWallet(walletName)
-        setConnectionState(CONNECTED)
-        return
-      }
-    } catch (error) {
-      setConnectionState(NOT_CONNECTED)
-      console.error(error)
-    }
-  }
-
-  /**
-   * @param {string} walletName - A wallet name as it is presented in the Cardano object
    * @param {bool} requestId - Request connection with or without required authentication
    * @param {bool} silent - Request connection with or without showing the connection pop-up
    * @param {bool} throwError - Throw an error which possibly can be while connecting to the wallet
@@ -106,7 +110,8 @@ export const YoroiProvider = ({children}) => {
    */
   const connect = async (walletName, requestId, silent, throwError = false) => {
     setConnectionState(IN_PROGRESS)
-    console.log(`[dApp][connect] is called`)
+    setApi(null)
+    console.debug(`[dApp][connect] is called`)
 
     if (!window.cardano) {
       console.error('There are no cardano wallets are installed')
@@ -115,22 +120,21 @@ export const YoroiProvider = ({children}) => {
     }
 
     console.log(`[dApp][connect] connecting the wallet "${walletName}"`)
-    console.log(`[dApp][connect] {requestIdentification: ${requestId}, onlySilent: ${silent}}`)
+    console.debug(`[dApp][connect] {requestIdentification: ${requestId}, onlySilent: ${silent}}`)
 
     try {
       const connectedApi = await window.cardano[walletName].enable({
         requestIdentification: requestId,
         onlySilent: silent,
       })
-      console.log(`[dApp][connect] wallet API object is received`)
+      console.debug(`[dApp][connect] wallet API object is received`)
       setApi(connectedApi)
+      setSelectedWallet(walletName)
       setConnectionState(CONNECTED)
-      if (connectedApi.experimental?.onDisconnect) {
-        connectedApi.experimental.onDisconnect(setConnectionStateFalse)
-      }
       return connectedApi
     } catch (error) {
       console.error(`[dApp][connect] The error received while connecting the wallet`)
+      setSelectedWallet('')
       setConnectionState(NOT_CONNECTED)
       if (throwError) {
         throw new Error(JSON.stringify(error))
@@ -147,6 +151,8 @@ export const YoroiProvider = ({children}) => {
     availableWallets,
     setAvailableWallets,
     selectedWallet,
+    setConnectionState,
+    setConnectionStateFalse,
     setSelectedWallet,
   }
 

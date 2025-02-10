@@ -4,7 +4,6 @@ import {IN_PROGRESS} from '../utils/connectionStates'
 import WalletsModal from './walletsModal'
 
 const AccessButton = () => {
-  // add selectedWallet here
   const {api, connectionState, availableWallets, selectedWallet} = useYoroi()
   console.log(`[dApp][AccessButton] available wallets: ${availableWallets.length}`)
 
