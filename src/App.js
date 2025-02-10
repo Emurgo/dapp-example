@@ -31,7 +31,7 @@ const App = () => {
       console.debug(`[dApp][App] Checking connection works`)
       try {
         const walletObject = window.cardano[selectedWallet]
-        const conState = await walletStateWithTimeout(walletObject, 2000)
+        const conState = await walletStateWithTimeout(walletObject, 5000)
 
         if (conState) {
           setConnectionState(CONNECTED)
