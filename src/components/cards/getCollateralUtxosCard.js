@@ -6,9 +6,8 @@ import {getAmountInHex, getUtxoFromHex} from '../../utils/cslTools'
 const GetCollateralUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
   const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState('2000000')
 
-  const amountInHex = getAmountInHex(wasm, getCollateralUtxosInput)
-
   const getCollateralUtxosClick = () => {
+    const amountInHex = getCollateralUtxosInput ? getAmountInHex(wasm, getCollateralUtxosInput) : undefined;
     onWaiting(true)
     api
       ?.getCollateral(amountInHex)
