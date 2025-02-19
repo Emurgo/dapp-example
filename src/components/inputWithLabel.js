@@ -2,9 +2,11 @@ import React from 'react'
 import {CommonStyles, ModalWindowContent} from './ui-constants'
 
 const InputWithLabel = (props) => {
-  const {inputName, inputValue, onChangeFunction, helpText} = props
+  const {inputName, inputValue, onChangeFunction, helpText, type} = props
 
-  const nftInputID = inputValue.split(' ').join('')
+  const inputType = type || 'text'
+
+  const nftInputID = inputType === 'text' ? inputValue.split(' ').join('') : Math.floor(Math.random() * 100).toString()
 
   return (
     <div className="mt-3">
@@ -12,7 +14,7 @@ const InputWithLabel = (props) => {
         {inputName}
       </label>
       <input
-        type="text"
+        type={inputType}
         id={'input-' + nftInputID}
         className={CommonStyles.inputStyles}
         value={inputValue}
