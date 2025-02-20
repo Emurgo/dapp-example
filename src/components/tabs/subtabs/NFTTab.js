@@ -176,7 +176,7 @@ const NFTTab = () => {
       txBuilder.add_mint_asset_and_output_min_required_coin(
         wasmNativeScript,
         getAssetName(wasm, assetInfo.metadata.name),
-        toInt(wasm, 1),
+        toInt(wasm, '1'),
         getTransactionOutputBuilder(wasm, wasmChangeAddress),
       )
     }
