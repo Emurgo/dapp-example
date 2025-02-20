@@ -22,12 +22,20 @@ const TokenTab = () => {
   const [currentTokenDescription, setCurrentTokenDescription] = useState('')
   const [currentQuantity, setCurrentQuantity] = useState('10')
   const [currentErrorState, setCurrentErrorState] = useState(false)
+  const [signingRejected, setSigningRejected] = useState(false)
   const [tokenNameErrorState, setTokenNameErrorState] = useState(false)
   const [tokenQuantityErrorState, setTokenQuantityErrorState] = useState(false)
 
-  const handleError = () => {
-    setCurrentErrorState(true)
-    setTimeout(() => setCurrentErrorState(false), 5000)
+  const handleError = (errorObject) => {
+    if (errorObject.code === 2) {
+      setSigningRejected(true)
+    } else {
+      setCurrentErrorState(true)
+    }
+    setTimeout(() => {
+      setCurrentErrorState(false)
+      setSigningRejected(false)
+    }, 5000)
   }
 
   const handleEmptyTokenName = () => {
@@ -41,7 +49,13 @@ const TokenTab = () => {
   }
 
   const handleErrors = () => {
-    if (currentErrorState) {
+    if (signingRejected) {
+      return (
+        <div className="text-red-500 text-2xl font-bold text-center">
+          <p /> !!! Signing rejected !!!
+        </div>
+      )
+    } else if (currentErrorState) {
       return (
         <div className="text-red-500 text-2xl font-bold text-center">
           <p /> !!! The error appeared. Please check logs !!!
@@ -56,7 +70,7 @@ const TokenTab = () => {
     } else if (tokenQuantityErrorState) {
       return (
         <div className="text-red-500 text-2xl font-bold text-center">
-          <p /> !!! The token quantity should be not 0 (zero) !!!
+          <p /> !!! The token quantity is not suitable !!!
         </div>
       )
     } else {
@@ -72,11 +86,17 @@ const TokenTab = () => {
       return
     }
 
-    console.log('currentQuantity', currentQuantity);
-    console.log('typeof currentQuantity', typeof currentQuantity);
     if (currentQuantity === '0') {
       handleEmptyTokenQuantity()
-      console.error("The token quantity shouldn't be 0(zero)")
+      console.error("The token quantity isn't suitable")
+      return
+    }
+    let quantityInt = 0
+    try {
+      quantityInt = toInt(wasm, currentQuantity)
+    } catch (error) {
+      handleEmptyTokenQuantity()
+      console.error(error)
       return
     }
 
@@ -95,7 +115,7 @@ const TokenTab = () => {
     txBuilder.add_mint_asset_and_output_min_required_coin(
       wasmNativeScript,
       getAssetName(wasm, clearTokenName),
-      toInt(wasm, currentQuantity),
+      quantityInt,
       getTransactionOutputBuilder(wasm, wasmChangeAddress),
     )
 
@@ -123,7 +143,7 @@ const TokenTab = () => {
       const txId = await api.submitTx(transactionHex)
       console.debug(`[dApp][Tokens_Tab][mint] Transaction successfully submitted: ${txId}`)
     } catch (error) {
-      handleError()
+      handleError(error)
       console.error(error)
     }
   }
