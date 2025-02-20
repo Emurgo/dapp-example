@@ -74,7 +74,7 @@ const TokenTab = () => {
         </div>
       )
     } else {
-      return (<></>)
+      return <></>
     }
   }
 
@@ -106,42 +106,42 @@ const TokenTab = () => {
     console.debug(`[dApp][Tokens_Tab][mint] changeAddress -> ${changeAddress}`)
 
     const wasmChangeAddress = getAddressFromBytes(wasm, changeAddress)
-    const usedAddresses = await api?.getUsedAddresses()
-    const usedAddress = getAddressFromBytes(wasm, usedAddresses[0])
-    const pubkeyHash = getPubKeyHash(wasm, usedAddress)
-    const wasmNativeScript = getNativeScript(wasm, pubkeyHash)
-
-    // magic should happen here
-    txBuilder.add_mint_asset_and_output_min_required_coin(
-      wasmNativeScript,
-      getAssetName(wasm, clearTokenName),
-      quantityInt,
-      getTransactionOutputBuilder(wasm, wasmChangeAddress),
-    )
-
-    console.debug(`[dApp][Tokens_Tab][mint] getting UTxOs`)
-    const hexInputUtxos = await api?.getUtxos()
-
-    console.debug(`[dApp][Tokens_Tab][mint] preparing wasmUTxOs`)
-    const wasmUtxos = wasm.TransactionUnspentOutputs.new()
-    for (const hexInputUtxo of hexInputUtxos) {
-      const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexInputUtxo))
-      wasmUtxos.add(wasmUtxo)
-    }
-
-    console.debug(`[dApp][Tokens_Tab][mint] adding inputs`)
-    txBuilder.add_inputs_from(wasmUtxos, wasm.CoinSelectionStrategyCIP2.LargestFirstMultiAsset)
-    txBuilder.add_required_signer(pubkeyHash)
-    txBuilder.add_change_if_needed(wasmChangeAddress)
-
-    const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes())
-    console.debug(`[dApp][Tokens_Tab][mint] signing the tx`)
-
     try {
+      const usedAddresses = await api?.getUsedAddresses()
+      const usedAddress = getAddressFromBytes(wasm, usedAddresses[0])
+      const pubkeyHash = getPubKeyHash(wasm, usedAddress)
+      const wasmNativeScript = getNativeScript(wasm, pubkeyHash)
+
+      // magic should happen here
+      txBuilder.add_mint_asset_and_output_min_required_coin(
+        wasmNativeScript,
+        getAssetName(wasm, clearTokenName),
+        quantityInt,
+        getTransactionOutputBuilder(wasm, wasmChangeAddress),
+      )
+
+      console.debug(`[dApp][Tokens_Tab][mint] getting UTxOs`)
+      const hexInputUtxos = await api?.getUtxos()
+
+      console.debug(`[dApp][Tokens_Tab][mint] preparing wasmUTxOs`)
+      const wasmUtxos = wasm.TransactionUnspentOutputs.new()
+      for (const hexInputUtxo of hexInputUtxos) {
+        const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexInputUtxo))
+        wasmUtxos.add(wasmUtxo)
+      }
+
+      console.debug(`[dApp][Tokens_Tab][mint] adding inputs`)
+      txBuilder.add_inputs_from(wasmUtxos, wasm.CoinSelectionStrategyCIP2.LargestFirstMultiAsset)
+      txBuilder.add_required_signer(pubkeyHash)
+      txBuilder.add_change_if_needed(wasmChangeAddress)
+
+      const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes())
+      console.debug(`[dApp][Tokens_Tab][mint] signing the tx`)
+
       const transactionHex = await api?.signTx({tx: unsignedTransactionHex, returnTx: true})
       console.debug(`[dApp][Tokens_Tab][mint] TransactionHex: ${transactionHex}`)
       const txId = await api.submitTx(transactionHex)
-      console.debug(`[dApp][Tokens_Tab][mint] Transaction successfully submitted: ${txId}`)
+      console.log(`[dApp][Tokens_Tab][mint] Transaction successfully submitted: ${txId}`)
     } catch (error) {
       handleError(error)
       console.error(error)
