@@ -2,7 +2,7 @@ import {protocolParams} from './networkConfig'
 import {hexToBytes, bytesToHex, wasmMultiassetToJSONs} from './utils'
 import {Buffer} from 'buffer'
 
-export const toInt = (wasm, number) => wasm.Int.new_i32(number)
+export const toInt = (wasm, numberInStr) => wasm.Int.from_str(numberInStr)
 
 export const strToBigNum = (wasm, numberIsStr) => wasm.BigNum.from_str(numberIsStr)
 
@@ -17,12 +17,7 @@ export const getTxBuilder = (wasm) => {
       )
       .pool_deposit(strToBigNum(wasm, protocolParams.poolDeposit))
       .key_deposit(strToBigNum(wasm, protocolParams.keyDeposit))
-      .coins_per_utxo_byte(
-        strToBigNum(
-          wasm,
-          Math.floor(parseFloat(protocolParams.coinsPerUtxoWord) / 8).toString(10)
-        )
-      )
+      .coins_per_utxo_byte(strToBigNum(wasm, Math.floor(parseFloat(protocolParams.coinsPerUtxoWord) / 8).toString(10)))
       .max_value_size(protocolParams.maxValueSize)
       .max_tx_size(protocolParams.maxTxSize)
       .ex_unit_prices(
@@ -86,7 +81,7 @@ export const getAddressFromBech32 = (wasm, bech32Value) => wasm.Address.from_bec
 
 export const getCslValue = (wasm, hexValue) => wasm.Value.from_bytes(hexToBytes(hexValue))
 
-export const getAmountInHex = (wasm, amount) => wasm.Value.new(wasm.BigNum.from_str(amount)).to_hex();
+export const getAmountInHex = (wasm, amount) => wasm.Value.new(wasm.BigNum.from_str(amount)).to_hex()
 
 export const getUtxoFromHex = (wasm, hexUtxo) => {
   const utxo = {}
