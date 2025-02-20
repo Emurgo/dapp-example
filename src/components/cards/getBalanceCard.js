@@ -3,7 +3,7 @@ import {wasmMultiassetToJSONs} from '../../utils/utils'
 import ApiCard from './apiCard'
 import {getCslValue} from '../../utils/cslTools'
 
-const GetBalanceCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
+const GetBalanceCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const getBalanceClick = () => {
     onWaiting(true)
     api
@@ -11,7 +11,7 @@ const GetBalanceCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
       .then((hexBalance) => {
         onWaiting(false)
         onRawResponse(hexBalance)
-        const cslValue = getCslValue(wasm, hexBalance)
+        const cslValue = getCslValue(hexBalance)
         const adaValue = cslValue.coin().to_str()
         const assetValue = wasmMultiassetToJSONs(cslValue.multiasset())
         onResponse({lovelaces: adaValue, assets: assetValue})

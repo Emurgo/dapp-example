@@ -9,13 +9,13 @@ import VotePanel from '../../cards/govActions/votePanel'
 import RegisterStakeKeyPanel from '../../cards/govActions/regStakeKeyPanel'
 import UnregisterStakeKeyPanel from '../../cards/govActions/unregStakeKeyPanel'
 
-const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters}) => {
+const GovBasicFunctionsTab = ({api, onWaiting, onError, getters, setters}) => {
   const handleInputCreds = (input) => {
     try {
-      return getCslCredentialFromHex(wasm, input)
+      return getCslCredentialFromHex(input)
     } catch (err1) {
       try {
-        return getCslCredentialFromBech32(wasm, input)
+        return getCslCredentialFromBech32(input)
       } catch (err2) {
         onWaiting(false)
         console.error(
@@ -29,7 +29,6 @@ const GovBasicFunctionsTab = ({api, wasm, onWaiting, onError, getters, setters})
 
   const panelsProps = {
     api,
-    wasm,
     onWaiting,
     onError,
     getters,

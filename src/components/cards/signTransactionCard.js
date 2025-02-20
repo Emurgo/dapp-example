@@ -9,29 +9,30 @@ import {
   getTxBuilder,
   getTransactionOutput,
   getCslUtxos,
+  getAddressFromBech32,
 } from '../../utils/cslTools'
 import ApiCardWithModal from './apiCardWithModal'
 import {CommonStyles, ModalWindowContent} from '../ui-constants'
 
-const SignTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
+const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const defaultValue = {amount: '2000000', address: ''}
   const [signTransactionInput, setSignTransactionInput] = useState('')
 
   const buildTransaction = async (buildTransactionInput) => {
-    const txBuilder = getTxBuilder(wasm)
+    const txBuilder = getTxBuilder()
 
     const changeAddress = await api?.getChangeAddress()
-    const wasmChangeAddress = getAddressFromBytes(wasm, changeAddress)
+    const wasmChangeAddress = getAddressFromBytes(changeAddress)
     const wasmOutputAddress = buildTransactionInput.address
-      ? wasm.Address.from_bech32(buildTransactionInput.address)
+      ? getAddressFromBech32(buildTransactionInput.address)
       : wasmChangeAddress
-    const wasmOutput = getTransactionOutput(wasm, wasmOutputAddress, buildTransactionInput)
+    const wasmOutput = getTransactionOutput(wasmOutputAddress, buildTransactionInput)
     txBuilder.add_output(wasmOutput)
 
     const hexUtxos = await api?.getUtxos()
 
-    const cslUtxos = getCslUtxos(wasm, hexUtxos)
-    txBuilder.add_inputs_from(cslUtxos, getLargestFirstMultiAsset(wasm))
+    const cslUtxos = getCslUtxos(hexUtxos)
+    txBuilder.add_inputs_from(cslUtxos, getLargestFirstMultiAsset())
     txBuilder.add_change_if_needed(wasmChangeAddress)
 
     const wasmUnsignedTransaction = txBuilder.build_tx()
@@ -50,9 +51,9 @@ const SignTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) 
       .then((witnessHex) => {
         onWaiting(false)
         onRawResponse(witnessHex)
-        const wasmUnsignedTransaction = getTransactionFromBytes(wasm, txHex)
-        const wasmWitnessSet = getTransactionWitnessSetFromBytes(wasm, witnessHex)
-        const wasmSignedTransaction = getSignedTransaction(wasm, wasmUnsignedTransaction, wasmWitnessSet)
+        const wasmUnsignedTransaction = getTransactionFromBytes(txHex)
+        const wasmWitnessSet = getTransactionWitnessSetFromBytes(witnessHex)
+        const wasmSignedTransaction = getSignedTransaction(wasmUnsignedTransaction, wasmWitnessSet)
         onResponse(bytesToHex(wasmSignedTransaction.to_bytes()), false)
       })
       .catch((e) => {

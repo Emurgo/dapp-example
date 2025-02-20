@@ -10,7 +10,7 @@ import {
 import {getRandomHex} from '../../../utils/helpFunctions'
 
 const DRepUpdatePanel = (props) => {
-  const {wasm, onWaiting, onError, getters, setters, handleInputCreds} = props
+  const {onWaiting, onError, getters, setters, handleInputCreds} = props
 
   const {handleAddingCertInTx, setDRepIdInputValue} = setters
   const {dRepIdInputValue, getCertBuilder} = getters
@@ -20,18 +20,18 @@ const DRepUpdatePanel = (props) => {
 
   const buildDRepUpdateCert = () => {
     onWaiting(true)
-    const certBuilder = getCertBuilder(wasm)
+    const certBuilder = getCertBuilder()
     try {
       const dRepCred = handleInputCreds(dRepIdInputValue)
       let dRepUpdateCert = null
       if (metadataURL.length > 0) {
         const dataHash = metadataHash.length > 0 ? metadataHash : getRandomHex(32)
-        const anchor = getAnchor(wasm, metadataURL, dataHash)
-        dRepUpdateCert = getDRepUpdateWithAnchorCert(wasm, dRepCred, anchor)
+        const anchor = getAnchor(metadataURL, dataHash)
+        dRepUpdateCert = getDRepUpdateWithAnchorCert(dRepCred, anchor)
       } else {
-        dRepUpdateCert = getDRepUpdateCert(wasm, dRepCred)
+        dRepUpdateCert = getDRepUpdateCert(dRepCred)
       }
-      certBuilder.add(getCertOfNewDRepUpdate(wasm, dRepUpdateCert))
+      certBuilder.add(getCertOfNewDRepUpdate(dRepUpdateCert))
       handleAddingCertInTx(certBuilder)
       onWaiting(false)
     } catch (error) {

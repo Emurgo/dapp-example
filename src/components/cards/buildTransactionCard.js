@@ -6,16 +6,17 @@ import {
   getTxBuilder,
   getTransactionOutput,
   getCslUtxos,
+  getAddressFromBech32,
 } from '../../utils/cslTools'
 import ApiCardWithModal from './apiCardWithModal'
 import {ModalWindowContent, CommonStyles} from '../ui-constants'
 import CheckboxWithLabel from '../checkboxWithLabel'
 
-const BuildTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
+const BuildTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [buildTransactionInput, setBuildTransactionInput] = useState({amount: '2000000', address: '', sendAll: false})
 
   const buildTransactionClick = async () => {
-    const txBuilder = getTxBuilder(wasm)
+    const txBuilder = getTxBuilder()
 
     try {
       onWaiting(true)
@@ -28,14 +29,14 @@ const BuildTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting})
         }
       } else {
         const changeAddress = await api?.getChangeAddress()
-        wasmChangeAddress = getAddressFromBytes(wasm, changeAddress)
+        wasmChangeAddress = getAddressFromBytes(changeAddress)
       }
       const wasmOutputAddress = buildTransactionInput.address
-        ? wasm.Address.from_bech32(buildTransactionInput.address)
+        ? getAddressFromBech32(buildTransactionInput.address)
         : wasmChangeAddress
 
       const hexUtxos = await api?.getUtxos()
-      const wasmUtxos = getCslUtxos(wasm, hexUtxos)
+      const wasmUtxos = getCslUtxos(hexUtxos)
 
       if (isSendAll) {
         for (let i = 0; i < wasmUtxos.len(); i++) {
@@ -51,10 +52,10 @@ const BuildTransactionCard = ({api, wasm, onRawResponse, onResponse, onWaiting})
         // Sending everything to the receiver
         txBuilder.add_change_if_needed(wasmOutputAddress)
       } else {
-        const wasmOutput = getTransactionOutput(wasm, wasmOutputAddress, buildTransactionInput)
+        const wasmOutput = getTransactionOutput(wasmOutputAddress, buildTransactionInput)
         txBuilder.add_output(wasmOutput)
 
-        txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset(wasm))
+        txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset())
         txBuilder.add_change_if_needed(wasmChangeAddress)
       }
 

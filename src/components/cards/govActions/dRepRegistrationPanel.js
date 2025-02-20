@@ -5,7 +5,7 @@ import {getAnchor, getCertOfNewDRepReg, getDRepRegCert, getDRepRegWithAnchorCert
 import {bytesToHex} from '../../../utils/utils'
 
 const DRepRegistrationPanel = (props) => {
-  const {wasm, onWaiting, onError, getters, setters, handleInputCreds} = props
+  const {onWaiting, onError, getters, setters, handleInputCreds} = props
 
   const {handleAddingCertInTx, setDRepIdInputValue} = setters
   const {dRepIdInputValue, getCertBuilder} = getters
@@ -16,7 +16,7 @@ const DRepRegistrationPanel = (props) => {
 
   const buildDRepRegistrationCert = () => {
     onWaiting(true)
-    const certBuilder = getCertBuilder(wasm)
+    const certBuilder = getCertBuilder()
     try {
       const dRepCred = handleInputCreds(dRepIdInputValue)
       let dRepRegCert = null
@@ -25,12 +25,12 @@ const DRepRegistrationPanel = (props) => {
           metadataHash.length > 0
             ? metadataHash
             : bytesToHex(new TextEncoder().encode('{"testField": "_test__message_"}'))
-        const anchor = getAnchor(wasm, metadataURL, dataHash)
-        dRepRegCert = getDRepRegWithAnchorCert(wasm, dRepCred, depositAmount, anchor)
+        const anchor = getAnchor(metadataURL, dataHash)
+        dRepRegCert = getDRepRegWithAnchorCert(dRepCred, depositAmount, anchor)
       } else {
-        dRepRegCert = getDRepRegCert(wasm, dRepCred, depositAmount)
+        dRepRegCert = getDRepRegCert(dRepCred, depositAmount)
       }
-      certBuilder.add(getCertOfNewDRepReg(wasm, dRepRegCert))
+      certBuilder.add(getCertOfNewDRepReg(dRepRegCert))
       handleAddingCertInTx(certBuilder)
       onWaiting(false)
     } catch (error) {

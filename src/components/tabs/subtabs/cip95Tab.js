@@ -1,13 +1,11 @@
 import React, {useState} from 'react'
 import useYoroi from '../../../hooks/yoroiProvider'
-import useWasm from '../../../hooks/useWasm'
 import ResponsesPart from './responsesPart'
 import {CONNECTED} from '../../../utils/connectionStates'
 import Cip95OfficialPart from './cip95OfficialPart'
 
 const Cip95Tab = () => {
   const {api, connectionState} = useYoroi()
-  const wasm = useWasm()
   const [currentText, setCurrentText] = useState('')
   const [rawCurrentText, setRawCurrentText] = useState('')
   const [waiterState, setWaiterState] = useState(false)
@@ -23,7 +21,6 @@ const Cip95Tab = () => {
           <div className="mb-3">
             <Cip95OfficialPart
               api={api}
-              wasm={wasm}
               setRawCurrentText={setRawCurrentText}
               setResponse={setResponse}
               setWaiterState={setWaiterState}

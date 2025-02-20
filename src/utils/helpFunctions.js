@@ -2,16 +2,16 @@ import {getCslValue, getUtxoFromHex, getBech32AddressFromHex} from './cslTools'
 
 export const getBalance = async (api, wasm) => {
   const hexBalance = await api.getBalance()
-  const cslValue = getCslValue(wasm, hexBalance)
+  const cslValue = getCslValue(hexBalance)
   const adaValue = cslValue.coin().to_str()
   return adaValue
 }
 
-export const getUTxOs = async (api, wasm, amountLovelaces, requestParam = {page: 0, limit: 20}) => {
+export const getUTxOs = async (api, amountLovelaces, requestParam = {page: 0, limit: 20}) => {
   const utxos = []
   const hexUtxos = await api.getUtxos(amountLovelaces, requestParam)
   for (const hexUtxo of hexUtxos) {
-    const utxo = getUtxoFromHex(wasm, hexUtxo)
+    const utxo = getUtxoFromHex(hexUtxo)
     utxos.push(utxo)
   }
   return utxos
@@ -19,14 +19,14 @@ export const getUTxOs = async (api, wasm, amountLovelaces, requestParam = {page:
 
 export const getChangeAddress = async (api, wasm) => {
   const hexAddress = await api.getChangeAddress()
-  return getBech32AddressFromHex(wasm, hexAddress)
+  return getBech32AddressFromHex(hexAddress)
 }
 
 export const getRewardAddress = async (api, wasm) => {
   const hexAddresses = await api.getRewardAddresses()
   const addresses = []
   for (const hexAddr of hexAddresses) {
-    addresses.push(getBech32AddressFromHex(wasm, hexAddr))
+    addresses.push(getBech32AddressFromHex(hexAddr))
   }
   return addresses[0]
 }
@@ -70,7 +70,7 @@ export const getUsedAddress = async (api, wasm) => {
   const hexAddresses = await api.getUsedAddresses(requestParam)
   const addresses = []
   for (const hexAddr of hexAddresses) {
-    addresses.push(getBech32AddressFromHex(wasm, hexAddr))
+    addresses.push(getBech32AddressFromHex(hexAddr))
   }
   return addresses[0]
 }
@@ -79,7 +79,7 @@ export const getUnusedAddress = async (api, wasm) => {
   const hexAddresses = await api.getUnusedAddresses()
   const addresses = []
   for (const hexAddr of hexAddresses) {
-    addresses.push(getBech32AddressFromHex(wasm, hexAddr))
+    addresses.push(getBech32AddressFromHex(hexAddr))
   }
   return addresses[0]
 }

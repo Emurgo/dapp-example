@@ -1,10 +1,11 @@
 import {useState} from 'react'
 import useYoroi from '../../../hooks/yoroiProvider'
-import useWasm from '../../../hooks/useWasm'
-import {hexToBytes, bytesToHex} from '../../../utils/utils'
+import {bytesToHex} from '../../../utils/utils'
 import {
   getAddressFromBytes,
   getAssetName,
+  getCslUtxos,
+  getLargestFirstMultiAsset,
   getNativeScript,
   getPubKeyHash,
   getTransactionOutputBuilder,
@@ -16,7 +17,6 @@ import InputWithLabel from '../../inputWithLabel'
 
 const TokenTab = () => {
   const {api, connectionState} = useYoroi()
-  const wasm = useWasm()
   const [currentTokenName, setCurrentTokenName] = useState('')
   const [currentTokenTicker, setCurrentTokenTicker] = useState('')
   const [currentTokenDescription, setCurrentTokenDescription] = useState('')
@@ -93,45 +93,41 @@ const TokenTab = () => {
     }
     let quantityInt = 0
     try {
-      quantityInt = toInt(wasm, currentQuantity)
+      quantityInt = toInt(currentQuantity)
     } catch (error) {
       handleEmptyTokenQuantity()
       console.error(error)
       return
     }
 
-    const txBuilder = getTxBuilder(wasm)
+    const txBuilder = getTxBuilder()
 
     const changeAddress = await api?.getChangeAddress()
     console.debug(`[dApp][Tokens_Tab][mint] changeAddress -> ${changeAddress}`)
 
-    const wasmChangeAddress = getAddressFromBytes(wasm, changeAddress)
+    const wasmChangeAddress = getAddressFromBytes(changeAddress)
     try {
       const usedAddresses = await api?.getUsedAddresses()
-      const usedAddress = getAddressFromBytes(wasm, usedAddresses[0])
-      const pubkeyHash = getPubKeyHash(wasm, usedAddress)
-      const wasmNativeScript = getNativeScript(wasm, pubkeyHash)
+      const usedAddress = getAddressFromBytes(usedAddresses[0])
+      const pubkeyHash = getPubKeyHash(usedAddress)
+      const wasmNativeScript = getNativeScript(pubkeyHash)
 
       // magic should happen here
       txBuilder.add_mint_asset_and_output_min_required_coin(
         wasmNativeScript,
-        getAssetName(wasm, clearTokenName),
+        getAssetName(clearTokenName),
         quantityInt,
-        getTransactionOutputBuilder(wasm, wasmChangeAddress),
+        getTransactionOutputBuilder(wasmChangeAddress),
       )
 
       console.debug(`[dApp][Tokens_Tab][mint] getting UTxOs`)
       const hexInputUtxos = await api?.getUtxos()
 
       console.debug(`[dApp][Tokens_Tab][mint] preparing wasmUTxOs`)
-      const wasmUtxos = wasm.TransactionUnspentOutputs.new()
-      for (const hexInputUtxo of hexInputUtxos) {
-        const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexInputUtxo))
-        wasmUtxos.add(wasmUtxo)
-      }
+      const wasmUtxos = getCslUtxos(hexInputUtxos)
 
       console.debug(`[dApp][Tokens_Tab][mint] adding inputs`)
-      txBuilder.add_inputs_from(wasmUtxos, wasm.CoinSelectionStrategyCIP2.LargestFirstMultiAsset)
+      txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset())
       txBuilder.add_required_signer(pubkeyHash)
       txBuilder.add_change_if_needed(wasmChangeAddress)
 

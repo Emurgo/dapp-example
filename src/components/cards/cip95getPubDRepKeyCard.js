@@ -1,7 +1,8 @@
 import React from 'react'
 import ApiCard from './apiCard'
+import { getPublicKeyFromHex } from '../../utils/cslTools'
 
-const Cip95GetPubDRepKeyCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
+const Cip95GetPubDRepKeyCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const getPubDRepKeyClick = () => {
     onWaiting(true)
     api?.cip95
@@ -9,7 +10,7 @@ const Cip95GetPubDRepKeyCard = ({api, wasm, onRawResponse, onResponse, onWaiting
       .then((pubDRepKey) => {
         onWaiting(false)
         onRawResponse(pubDRepKey)
-        const dRepID = wasm.PublicKey.from_hex(pubDRepKey).hash()
+        const dRepID = getPublicKeyFromHex(pubDRepKey).hash()
         const dRepIDHex = dRepID.to_hex()
         const dRepIDBech32 = dRepID.to_bech32('drep')
         onResponse({

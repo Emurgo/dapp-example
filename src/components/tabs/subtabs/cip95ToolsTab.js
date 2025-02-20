@@ -1,6 +1,5 @@
 import React, {useState} from 'react'
 import useYoroi from '../../../hooks/yoroiProvider'
-import useWasm from '../../../hooks/useWasm'
 import {CONNECTED} from '../../../utils/connectionStates'
 import Cip95AdditionalPart from './cip95AdditionalPart'
 import GetAllInfoCard from '../../cards/getAllInfoCard'
@@ -8,7 +7,6 @@ import InfoPanel from './infoPanel'
 
 const Cip95TabTools = () => {
   const {api, connectionState} = useYoroi()
-  const wasm = useWasm()
   // Waiter label
   const [waiterState, setWaiterState] = useState(false)
   // Error label
@@ -84,7 +82,7 @@ const Cip95TabTools = () => {
         <div>
           <div className="mb-2">
             {/* Get info button should be here */}
-            <GetAllInfoCard api={api} wasm={wasm} onWaiting={setWaiterState} onError={showWarning} setters={setters} />
+            <GetAllInfoCard api={api} onWaiting={setWaiterState} onError={showWarning} setters={setters} />
           </div>
           <div className="mb-2">
             {/* info panel here */}
@@ -99,7 +97,6 @@ const Cip95TabTools = () => {
           <div>
             <Cip95AdditionalPart
               api={api}
-              wasm={wasm}
               onWaiting={setWaiterState}
               onError={showWarning}
               getters={getters}
