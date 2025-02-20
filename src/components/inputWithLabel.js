@@ -6,22 +6,22 @@ const InputWithLabel = (props) => {
 
   const inputType = type || 'text'
 
-  const nftInputID = inputType === 'text' ? inputValue.split(' ').join('') : Math.floor(Math.random() * 100).toString()
+  const inputID = inputName.split(' ').join('')
 
   return (
     <div className="mt-3">
-      <label htmlFor={'input-' + nftInputID} className={ModalWindowContent.contentLabelStyle}>
+      <label htmlFor={'input-' + inputID} className={ModalWindowContent.contentLabelStyle}>
         {inputName}
       </label>
       <input
         type={inputType}
-        id={'input-' + nftInputID}
+        id={'input-' + inputID}
         className={CommonStyles.inputStyles}
         value={inputValue}
         onChange={onChangeFunction}
       />
       {helpText ? (
-        <label htmlFor={'input-' + nftInputID} className="block mb-1 ml-1 text-sm font-light text-gray-300">
+        <label htmlFor={'input-' + inputID} className="block mb-1 ml-1 text-sm font-light text-gray-300">
           {helpText}
         </label>
       ) : (
