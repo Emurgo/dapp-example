@@ -30,18 +30,18 @@ const Cip95AdditionalPart = ({api, onWaiting, onError, getters, setters}) => {
     console.log('Votes in Tx', votesInTx)
   }
 
-  const getCertBuilder = (wasm) => {
+  const getCertBuilder = () => {
     if (certBuilder) {
       return certBuilder
     }
-    return getCertificateBuilder(wasm)
+    return getCertificateBuilder()
   }
 
-  const getVotingBuilder = (wasm) => {
+  const getVotingBuilder = () => {
     if (votingBuilder) {
       return votingBuilder
     }
-    return getCslVotingBuilder(wasm)
+    return getCslVotingBuilder()
   }
 
   const newGetters = Object.assign(getters, {
