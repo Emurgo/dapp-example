@@ -3,7 +3,7 @@ import {getBech32AddressFromHex} from '../../utils/cslTools'
 import ApiCardWithModal from './apiCardWithModal'
 import {ModalWindowContent, CommonStyles} from '../ui-constants'
 
-const GetUsedAddresses = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
+const GetUsedAddresses = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [usedAddressInput, setUsedAddressInput] = useState({page: 0, limit: 5})
 
   const getUsedAddressesClick = () => {
@@ -15,7 +15,7 @@ const GetUsedAddresses = ({api, wasm, onRawResponse, onResponse, onWaiting}) => 
         onRawResponse(hexAddresses)
         const addresses = []
         for (const hexAddr of hexAddresses) {
-          addresses.push(getBech32AddressFromHex(wasm, hexAddr))
+          addresses.push(getBech32AddressFromHex(hexAddr))
         }
         onResponse(addresses)
       })

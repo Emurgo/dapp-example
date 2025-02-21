@@ -6,7 +6,7 @@ import {protocolParams} from '../../../utils/networkConfig'
 import {getCertOfNewStakeReg, getStakeKeyRegCert, getStakeKeyRegCertWithCoin} from '../../../utils/cslTools'
 
 const RegisterStakeKeyPanel = (props) => {
-  const {wasm, onWaiting, onError, getters, setters, handleInputCreds} = props
+  const {onWaiting, onError, getters, setters, handleInputCreds} = props
 
   const {getCertBuilder} = getters
   const {handleAddingCertInTx} = setters
@@ -22,17 +22,17 @@ const RegisterStakeKeyPanel = (props) => {
 
   const buildRegStakeKey = () => {
     onWaiting(true)
-    const certBuilder = getCertBuilder(wasm)
+    const certBuilder = getCertBuilder()
     try {
       // building StakeKeyRegCert
       const stakeCred = handleInputCreds(stakeKeyHash)
       let stakeKeyRegCert
       if (useConway) {
-        stakeKeyRegCert = getStakeKeyRegCertWithCoin(wasm, stakeCred, stakeDepositAmount)
+        stakeKeyRegCert = getStakeKeyRegCertWithCoin(stakeCred, stakeDepositAmount)
       } else {
-        stakeKeyRegCert = getStakeKeyRegCert(wasm, stakeCred)
+        stakeKeyRegCert = getStakeKeyRegCert(stakeCred)
       }
-      certBuilder.add(getCertOfNewStakeReg(wasm, stakeKeyRegCert))
+      certBuilder.add(getCertOfNewStakeReg(stakeKeyRegCert))
       handleAddingCertInTx(certBuilder)
       onWaiting(false)
     } catch (error) {

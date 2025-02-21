@@ -7,7 +7,7 @@ import ConstitCommCertsTab from './constitCommCertsTab'
 import Cip95BuildSignSubmitCard from '../../cards/cip95BuildSignSubmitCard'
 import CertificatesInTxPart from './certificatesInTxPart'
 
-const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) => {
+const Cip95AdditionalPart = ({api, onWaiting, onError, getters, setters}) => {
   const [certsInTx, setCertsInTx] = useState([])
   const [votesInTx, setVotesInTx] = useState([])
   const [certBuilder, setCertBuilder] = useState(null)
@@ -30,18 +30,18 @@ const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) 
     console.log('Votes in Tx', votesInTx)
   }
 
-  const getCertBuilder = (wasm) => {
+  const getCertBuilder = () => {
     if (certBuilder) {
       return certBuilder
     }
-    return getCertificateBuilder(wasm)
+    return getCertificateBuilder()
   }
 
-  const getVotingBuilder = (wasm) => {
+  const getVotingBuilder = () => {
     if (votingBuilder) {
       return votingBuilder
     }
-    return getCslVotingBuilder(wasm)
+    return getCslVotingBuilder()
   }
 
   const newGetters = Object.assign(getters, {
@@ -66,7 +66,6 @@ const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) 
       children: (
         <GovBasicFunctionsTab
           api={api}
-          wasm={wasm}
           onWaiting={onWaiting}
           onError={onError}
           getters={newGetters}
@@ -89,7 +88,6 @@ const Cip95AdditionalPart = ({api, wasm, onWaiting, onError, getters, setters}) 
     <>
       <Cip95BuildSignSubmitCard
         api={api}
-        wasm={wasm}
         onWaiting={onWaiting}
         onError={onError}
         getters={newGetters}

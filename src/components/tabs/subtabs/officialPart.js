@@ -14,7 +14,7 @@ import IsEnabledCard from '../../cards/isEnabledCard'
 import GetNetworkIdCard from '../../cards/getNetworkIdCard'
 import GetExtensionsCard from '../../cards/getExtensionsCard'
 
-const OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState}) => {
+const OfficialPart = ({api, setRawCurrentText, setResponse, setWaiterState}) => {
   return (
     <div className="grid justify-items-stretch grid-cols-1 lg:grid-cols-2 gap-2">
       <div>
@@ -39,7 +39,6 @@ const OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState
       <div>
         <GetBalanceCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}
@@ -48,7 +47,6 @@ const OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState
       <div>
         <GetUnusedAddressesCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}
@@ -57,7 +55,6 @@ const OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState
       <div>
         <GetUsedAddresses
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}
@@ -66,7 +63,6 @@ const OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState
       <div>
         <GetChangeAddressCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}
@@ -75,7 +71,6 @@ const OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState
       <div>
         <GetRewardAddressesCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}
@@ -84,7 +79,6 @@ const OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState
       <div>
         <GetUtxosCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}
@@ -93,7 +87,6 @@ const OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState
       <div>
         <GetCollateralUtxosCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}
@@ -105,7 +98,6 @@ const OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState
       <div>
         <BuildTransactionCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}
@@ -114,7 +106,6 @@ const OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState
       <div>
         <SignTransactionCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}

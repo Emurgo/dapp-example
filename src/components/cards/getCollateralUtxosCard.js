@@ -3,11 +3,11 @@ import ApiCardWithModal from './apiCardWithModal'
 import {CommonStyles, ModalWindowContent} from '../ui-constants'
 import {getAmountInHex, getUtxoFromHex} from '../../utils/cslTools'
 
-const GetCollateralUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
+const GetCollateralUtxosCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState('2000000')
 
   const getCollateralUtxosClick = () => {
-    const amountInHex = getCollateralUtxosInput ? getAmountInHex(wasm, getCollateralUtxosInput) : undefined
+    const amountInHex = getCollateralUtxosInput ? getAmountInHex(getCollateralUtxosInput) : undefined
     onWaiting(true)
     api
       ?.getCollateral(amountInHex)
@@ -16,7 +16,7 @@ const GetCollateralUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting
         onRawResponse(hexUtxos)
         let utxos = []
         for (const hexUtxo of hexUtxos) {
-          const utxo = getUtxoFromHex(wasm, hexUtxo)
+          const utxo = getUtxoFromHex(hexUtxo)
           utxos.push(utxo)
         }
         onResponse(utxos)

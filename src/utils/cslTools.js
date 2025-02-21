@@ -1,36 +1,39 @@
 import {protocolParams} from './networkConfig'
 import {hexToBytes, bytesToHex, wasmMultiassetToJSONs} from './utils'
 import {Buffer} from 'buffer'
+import * as wasm from '@emurgo/cardano-serialization-lib-browser'
 
-export const toInt = (wasm, numberInStr) => wasm.Int.from_str(numberInStr)
+export const toInt = (numberInStr) => wasm.Int.from_str(numberInStr)
 
-export const strToBigNum = (wasm, numberIsStr) => wasm.BigNum.from_str(numberIsStr)
+export const strToBigNum = (numberIsStr) => wasm.BigNum.from_str(numberIsStr)
 
-export const getTxBuilder = (wasm) => {
+export const getSecretKey = () => wasm.Bip32PrivateKey.generate_ed25519_bip32()
+
+export const getTxBuilder = () => {
   return wasm.TransactionBuilder.new(
     wasm.TransactionBuilderConfigBuilder.new()
       .fee_algo(
         wasm.LinearFee.new(
-          strToBigNum(wasm, protocolParams.linearFee.minFeeA),
-          strToBigNum(wasm, protocolParams.linearFee.minFeeB),
+          strToBigNum(protocolParams.linearFee.minFeeA),
+          strToBigNum(protocolParams.linearFee.minFeeB),
         ),
       )
-      .pool_deposit(strToBigNum(wasm, protocolParams.poolDeposit))
-      .key_deposit(strToBigNum(wasm, protocolParams.keyDeposit))
-      .coins_per_utxo_byte(strToBigNum(wasm, Math.floor(parseFloat(protocolParams.coinsPerUtxoWord) / 8).toString(10)))
+      .pool_deposit(strToBigNum(protocolParams.poolDeposit))
+      .key_deposit(strToBigNum(protocolParams.keyDeposit))
+      .coins_per_utxo_byte(strToBigNum(Math.floor(parseFloat(protocolParams.coinsPerUtxoWord) / 8).toString(10)))
       .max_value_size(protocolParams.maxValueSize)
       .max_tx_size(protocolParams.maxTxSize)
       .ex_unit_prices(
         wasm.ExUnitPrices.new(
-          wasm.UnitInterval.new(strToBigNum(wasm, '577'), strToBigNum(wasm, '10000')),
-          wasm.UnitInterval.new(strToBigNum(wasm, '721'), strToBigNum(wasm, '10000000')),
+          wasm.UnitInterval.new(strToBigNum('577'), strToBigNum('10000')),
+          wasm.UnitInterval.new(strToBigNum('721'), strToBigNum('10000000')),
         ),
       )
       .build(),
   )
 }
 
-export const getCslUtxos = (wasm, hexUtxos) => {
+export const getCslUtxos = (hexUtxos) => {
   const wasmUtxos = wasm.TransactionUnspentOutputs.new()
   for (const hexUtxo of hexUtxos) {
     const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexUtxo))
@@ -40,50 +43,50 @@ export const getCslUtxos = (wasm, hexUtxos) => {
   return wasmUtxos
 }
 
-export const getLargestFirstMultiAsset = (wasm) => wasm.CoinSelectionStrategyCIP2.LargestFirstMultiAsset
+export const getLargestFirstMultiAsset = () => wasm.CoinSelectionStrategyCIP2.LargestFirstMultiAsset
 
-export const getTransactionOutput = (wasm, wasmOutputAddress, buildTransactionInput) => {
+export const getTransactionOutput = (wasmOutputAddress, buildTransactionInput) => {
   if (buildTransactionInput.amount) {
     return wasm.TransactionOutput.new(
       wasmOutputAddress,
-      wasm.Value.new(strToBigNum(wasm, buildTransactionInput.amount)),
+      wasm.Value.new(strToBigNum(buildTransactionInput.amount)),
     )
   }
   return wasm.TransactionOutput.new(wasmOutputAddress, wasm.Value.new(buildTransactionInput))
 }
 
-export const getAddressFromBytes = (wasm, changeAddress) => wasm.Address.from_bytes(hexToBytes(changeAddress))
+export const getAddressFromBytes = (changeAddress) => wasm.Address.from_bytes(hexToBytes(changeAddress))
 
-export const getTransactionFromBytes = (wasm, txHex) => wasm.Transaction.from_bytes(hexToBytes(txHex))
+export const getTransactionFromBytes = (txHex) => wasm.Transaction.from_bytes(hexToBytes(txHex))
 
-export const getTransactionWitnessSetNew = (wasm) => wasm.TransactionWitnessSet.new()
+export const getTransactionWitnessSetNew = () => wasm.TransactionWitnessSet.new()
 
-export const getTransactionWitnessSetFromBytes = (wasm, witnessHex) =>
+export const getTransactionWitnessSetFromBytes = (witnessHex) =>
   wasm.TransactionWitnessSet.from_bytes(hexToBytes(witnessHex))
 
-export const getSignedTransaction = (wasm, wasmUnsignedTransaction, wasmWitnessSet) =>
+export const getSignedTransaction = (wasmUnsignedTransaction, wasmWitnessSet) =>
   wasm.Transaction.new(wasmUnsignedTransaction.body(), wasmWitnessSet, wasmUnsignedTransaction.auxiliary_data())
 
-export const getPubKeyHash = (wasm, usedAddress) =>
+export const getPubKeyHash = (usedAddress) =>
   wasm.BaseAddress.from_address(usedAddress).payment_cred().to_keyhash()
 
-export const getNativeScript = (wasm, pubKeyHash) =>
+export const getNativeScript = (pubKeyHash) =>
   wasm.NativeScript.new_script_pubkey(wasm.ScriptPubkey.new(pubKeyHash))
 
-export const getTransactionOutputBuilder = (wasm, wasmChangeAddress) =>
+export const getTransactionOutputBuilder = (wasmChangeAddress) =>
   wasm.TransactionOutputBuilder.new().with_address(wasmChangeAddress).next()
 
-export const getAssetName = (wasm, assetNameString) => wasm.AssetName.new(Buffer.from(assetNameString, 'utf8'))
+export const getAssetName = (assetNameString) => wasm.AssetName.new(Buffer.from(assetNameString, 'utf8'))
 
-export const getBech32AddressFromHex = (wasm, addressHex) => wasm.Address.from_bytes(hexToBytes(addressHex)).to_bech32()
+export const getBech32AddressFromHex = (addressHex) => wasm.Address.from_bytes(hexToBytes(addressHex)).to_bech32()
 
-export const getAddressFromBech32 = (wasm, bech32Value) => wasm.Address.from_bech32(bech32Value)
+export const getAddressFromBech32 = (bech32Value) => wasm.Address.from_bech32(bech32Value)
 
-export const getCslValue = (wasm, hexValue) => wasm.Value.from_bytes(hexToBytes(hexValue))
+export const getCslValue = (hexValue) => wasm.Value.from_bytes(hexToBytes(hexValue))
 
-export const getAmountInHex = (wasm, amount) => wasm.Value.new(wasm.BigNum.from_str(amount)).to_hex()
+export const getAmountInHex = (amount) => wasm.Value.new(wasm.BigNum.from_str(amount)).to_hex()
 
-export const getUtxoFromHex = (wasm, hexUtxo) => {
+export const getUtxoFromHex = (hexUtxo) => {
   const utxo = {}
   const cslUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexUtxo))
   const output = cslUtxo.output()
@@ -97,104 +100,108 @@ export const getUtxoFromHex = (wasm, hexUtxo) => {
   return utxo
 }
 
-export const getTransactionHashFromHex = (wasm, txHex) => wasm.TransactionHash.from_hex(txHex)
+export const getTransactionHashFromHex = (txHex) => wasm.TransactionHash.from_hex(txHex)
 
-export const getCertificateBuilder = (wasm) => wasm.CertificatesBuilder.new()
+export const getCertificateBuilder = () => wasm.CertificatesBuilder.new()
 
-export const getCredential = (wasm, keyHash) => wasm.Credential.from_keyhash(keyHash)
+export const getCredential = (keyHash) => wasm.Credential.from_keyhash(keyHash)
 
-export const keyHashFromHex = (wasm, hexValue) => wasm.Ed25519KeyHash.from_hex(hexValue)
+export const getAddressFromCred = (testId, cred) => wasm.EnterpriseAddress.new(testId, cred).to_address().to_bech32()
 
-export const keyHashFromBech32 = (wasm, bech32Value) => wasm.Ed25519KeyHash.from_bech32(bech32Value)
+export const getPublicKeyFromHex = (publicKeyHex) => wasm.PublicKey.from_hex(publicKeyHex)
 
-export const getCslCredentialFromHex = (wasm, hexValue) => {
+export const keyHashFromHex = (hexValue) => wasm.Ed25519KeyHash.from_hex(hexValue)
+
+export const keyHashFromBech32 = (bech32Value) => wasm.Ed25519KeyHash.from_bech32(bech32Value)
+
+export const getCslCredentialFromHex = (hexValue) => {
   console.debug('[cslTools][getCslCredentialFromHex]::hexValue', hexValue)
-  const keyHash = keyHashFromHex(wasm, hexValue)
+  const keyHash = keyHashFromHex(hexValue)
   console.debug('[cslTools][getCslCredentialFromHex]::keyHash', keyHash)
-  const cred = getCredential(wasm, keyHash)
+  const cred = getCredential(keyHash)
   console.debug('[cslTools][getCslCredentialFromHex]::cred', cred)
   return cred
 }
 
-export const getCslCredentialFromBech32 = (wasm, bech32Value) => {
+export const getCslCredentialFromBech32 = (bech32Value) => {
   console.debug('[cslTools][getCslCredentialFromBech32]::bech32Value', bech32Value)
-  const keyHash = keyHashFromBech32(wasm, bech32Value)
+  const keyHash = keyHashFromBech32(bech32Value)
   console.debug('[cslTools][getCslCredentialFromBech32]::keyHash', keyHash)
-  const cred = getCredential(wasm, keyHash)
+  const cred = getCredential(keyHash)
   console.debug('[cslTools][getCslCredentialFromBech32]::cred', cred)
   return cred
 }
 
-export const getDRepAbstain = (wasm) => wasm.DRep.new_always_abstain()
+export const getDRepAbstain = () => wasm.DRep.new_always_abstain()
 
-export const getDRepNoConfidence = (wasm) => wasm.DRep.new_always_no_confidence()
+export const getDRepNoConfidence = () => wasm.DRep.new_always_no_confidence()
 
-export const getDRepNewKeyHash = (wasm, credHash) => wasm.DRep.new_key_hash(credHash)
+export const getDRepNewKeyHash = (credHash) => wasm.DRep.new_key_hash(credHash)
 
-export const getURL = (wasm, url) => wasm.URL.new(url)
+export const getURL = (url) => wasm.URL.new(url)
 
-export const getAnchorHash = (wasm, urlHash) => wasm.AnchorDataHash.from_hex(urlHash)
+export const getAnchorHash = (urlHash) => wasm.AnchorDataHash.from_hex(urlHash)
 
-export const getAnchor = (wasm, url, urlHash) => {
-  const anchorURL = getURL(wasm, url)
-  const anchorHash = getAnchorHash(wasm, urlHash)
+export const getAnchor = (url, urlHash) => {
+  const anchorURL = getURL(url)
+  const anchorHash = getAnchorHash(urlHash)
   return wasm.Anchor.new(anchorURL, anchorHash)
 }
 
 // Vote Delegation Certificate
-export const getVoteDelegCert = (wasm, stakeCred, dRepKeyHash) => wasm.VoteDelegation.new(stakeCred, dRepKeyHash)
+export const getVoteDelegCert = (stakeCred, dRepKeyHash) => wasm.VoteDelegation.new(stakeCred, dRepKeyHash)
 
-export const getCertOfNewVoteDelegation = (wasm, voteCert) => wasm.Certificate.new_vote_delegation(voteCert)
+export const getCertOfNewVoteDelegation = (voteCert) => wasm.Certificate.new_vote_delegation(voteCert)
 
 // DRep Registration Certificate
-export const getDRepRegCert = (wasm, dRepCred, dRepDeposit) =>
-  wasm.DrepRegistration.new(dRepCred, strToBigNum(wasm, dRepDeposit))
+export const getDRepRegCert = (dRepCred, dRepDeposit) =>
+  wasm.DRepRegistration.new(dRepCred, strToBigNum(dRepDeposit))
 
-export const getDRepRegWithAnchorCert = (wasm, dRepCred, dRepDeposit, anchor) =>
-  wasm.DrepRegistration.new_with_anchor(dRepCred, strToBigNum(wasm, dRepDeposit), anchor)
+export const getDRepRegWithAnchorCert = (dRepCred, dRepDeposit, anchor) =>
+  wasm.DRepRegistration.new_with_anchor(dRepCred, strToBigNum(dRepDeposit), anchor)
 
-export const getCertOfNewDRepReg = (wasm, dRepRegCert) => wasm.Certificate.new_drep_registration(dRepRegCert)
+export const getCertOfNewDRepReg = (dRepRegCert) => wasm.Certificate.new_drep_registration(dRepRegCert)
 
 // DRep Update Certificate
-export const getDRepUpdateCert = (wasm, dRepCred) => wasm.DrepUpdate.new(dRepCred)
+export const getDRepUpdateCert = (dRepCred) => wasm.DRepUpdate.new(dRepCred)
 
-export const getDRepUpdateWithAnchorCert = (wasm, dRepCred, anchor) => wasm.DrepUpdate.new_with_anchor(dRepCred, anchor)
+export const getDRepUpdateWithAnchorCert = (dRepCred, anchor) => wasm.DRepUpdate.new_with_anchor(dRepCred, anchor)
 
-export const getCertOfNewDRepUpdate = (wasm, dRepUpdateCert) => wasm.Certificate.new_drep_update(dRepUpdateCert)
+export const getCertOfNewDRepUpdate = (dRepUpdateCert) => wasm.Certificate.new_drep_update(dRepUpdateCert)
 
 // DRep Retirement Certificate
-export const getDRepRetirementCert = (wasm, dRepCred, dRepRefundAmount) =>
-  wasm.DrepDeregistration.new(dRepCred, strToBigNum(wasm, dRepRefundAmount))
+export const getDRepRetirementCert = (dRepCred, dRepRefundAmount) =>
+  wasm.DRepDeregistration.new(dRepCred, strToBigNum(dRepRefundAmount))
 
-export const getCertOfNewDRepRetirement = (wasm, dRepRetirementCert) =>
+export const getCertOfNewDRepRetirement = (dRepRetirementCert) =>
   wasm.Certificate.new_drep_deregistration(dRepRetirementCert)
 
 // Vote
-export const getVotingProcedureWithAnchor = (wasm, votingChoice, anchor) =>
+export const getVotingProcedureWithAnchor = (votingChoice, anchor) =>
   wasm.VotingProcedure.new_with_anchor(votingChoice, anchor)
 
-export const getCslVotingBuilder = (wasm) => wasm.VotingBuilder.new()
+export const getCslVotingBuilder = () => wasm.VotingBuilder.new()
 
-export const getGovActionId = (wasm, govActionTxHashInHex, govActionIndex) =>
-  wasm.GovernanceActionId.new(getTransactionHashFromHex(wasm, govActionTxHashInHex), govActionIndex)
+export const getGovActionId = (govActionTxHashInHex, govActionIndex) =>
+  wasm.GovernanceActionId.new(getTransactionHashFromHex(govActionTxHashInHex), govActionIndex)
 
-export const getVoter = (wasm, dRepKeyHash) => wasm.Voter.new_drep(dRepKeyHash)
+export const getVoter = (dRepKeyHash) => wasm.Voter.new_drep(dRepKeyHash)
 
-export const getVotingProcedure = (wasm, votingChoice) => wasm.VotingProcedure.new(votingChoice)
+export const getVotingProcedure = (votingChoice) => wasm.VotingProcedure.new(votingChoice)
 
 // Register Stake Key Certificate
-export const getStakeKeyRegCertWithCoin = (wasm, stakeCred, deposit) =>
-  wasm.StakeRegistration.new_with_coin(stakeCred, strToBigNum(wasm, deposit))
+export const getStakeKeyRegCertWithCoin = (stakeCred, deposit) =>
+  wasm.StakeRegistration.new_with_coin(stakeCred, strToBigNum(deposit))
 
-export const getStakeKeyRegCert = (wasm, stakeCred) => wasm.StakeRegistration.new(stakeCred)
+export const getStakeKeyRegCert = (stakeCred) => wasm.StakeRegistration.new(stakeCred)
 
-export const getCertOfNewStakeReg = (wasm, stakeKeyRegCert) => wasm.Certificate.new_stake_registration(stakeKeyRegCert)
+export const getCertOfNewStakeReg = (stakeKeyRegCert) => wasm.Certificate.new_stake_registration(stakeKeyRegCert)
 
 // Unregister Stake key Certificate
-export const getStakeKeyDeregCertWithCoin = (wasm, stakeCred, deposit) =>
-  wasm.StakeDeregistration.new_with_coin(stakeCred, strToBigNum(wasm, deposit))
+export const getStakeKeyDeregCertWithCoin = (stakeCred, deposit) =>
+  wasm.StakeDeregistration.new_with_coin(stakeCred, strToBigNum(deposit))
 
-export const getStakeKeyDeregCert = (wasm, stakeCred) => wasm.StakeDeregistration.new(stakeCred)
+export const getStakeKeyDeregCert = (stakeCred) => wasm.StakeDeregistration.new(stakeCred)
 
-export const getCertOfNewStakeDereg = (wasm, stakeKeyDeregCert) =>
+export const getCertOfNewStakeDereg = (stakeKeyDeregCert) =>
   wasm.Certificate.new_stake_deregistration(stakeKeyDeregCert)

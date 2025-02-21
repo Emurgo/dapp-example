@@ -10,7 +10,7 @@ import {
 import GovToolsPanel from '../govToolsPanel'
 
 const VoteDelegationPanel = (props) => {
-  const {wasm, onWaiting, onError, getters, setters, handleInputCreds} = props
+  const {onWaiting, onError, getters, setters, handleInputCreds} = props
   const {dRepIdBech32, dRepIdInputValue, regPubStakeKey, unregPubStakeKey, getCertBuilder} = getters
   const {handleAddingCertInTx, setDRepIdInputValue} = setters
 
@@ -22,13 +22,13 @@ const VoteDelegationPanel = (props) => {
     onWaiting(true)
 
     // build vote cert
-    const certBuilder = getCertBuilder(wasm)
+    const certBuilder = getCertBuilder()
     try {
       let targetDRep
       if (dRepIdInputValue.toUpperCase() === 'ABSTAIN') {
-        targetDRep = getDRepAbstain(wasm)
+        targetDRep = getDRepAbstain()
       } else if (dRepIdInputValue.toUpperCase() === 'NO CONFIDENCE') {
-        targetDRep = getDRepNoConfidence(wasm)
+        targetDRep = getDRepNoConfidence()
       } else {
         let tempTarget = dRepIdInputValue
         if (dRepIdInputValue.length === 0) {
@@ -36,7 +36,7 @@ const VoteDelegationPanel = (props) => {
           tempTarget = dRepIdBech32
         }
         const dRepKeyCred = handleInputCreds(tempTarget)
-        targetDRep = getDRepNewKeyHash(wasm, dRepKeyCred.to_keyhash())
+        targetDRep = getDRepNewKeyHash(dRepKeyCred.to_keyhash())
       }
 
       let pubStake = stake
@@ -49,9 +49,9 @@ const VoteDelegationPanel = (props) => {
         return null
       }
       // Create cert object
-      const voteDelegationCert = getVoteDelegCert(wasm, stakeCred, targetDRep)
+      const voteDelegationCert = getVoteDelegCert(stakeCred, targetDRep)
       // add cert to certBuilder
-      certBuilder.add(getCertOfNewVoteDelegation(wasm, voteDelegationCert))
+      certBuilder.add(getCertOfNewVoteDelegation(voteDelegationCert))
       // adding the cert to the certStorage
       handleAddingCertInTx(certBuilder)
       onWaiting(false)

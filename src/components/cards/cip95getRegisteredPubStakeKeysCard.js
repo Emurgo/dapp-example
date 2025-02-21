@@ -1,7 +1,8 @@
 import React from 'react'
 import ApiCard from './apiCard'
+import { getPublicKeyFromHex } from '../../utils/cslTools'
 
-const Cip95GetRegisteredPubStakeKeysCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
+const Cip95GetRegisteredPubStakeKeysCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const getRegisteredPubStakeKeysClick = () => {
     onWaiting(true)
     api?.cip95
@@ -14,7 +15,7 @@ const Cip95GetRegisteredPubStakeKeysCard = ({api, wasm, onRawResponse, onRespons
           onResponse('No Registered Pub Stake Keys', false)
         } else {
           const regPubStakeKey = regPubStakeKeys[0]
-          const stakeKeyHash = wasm.PublicKey.from_hex(regPubStakeKey).hash().to_hex()
+          const stakeKeyHash = getPublicKeyFromHex(regPubStakeKey).hash().to_hex()
           onResponse(stakeKeyHash)
         }
       })

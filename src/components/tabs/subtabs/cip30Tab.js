@@ -1,13 +1,11 @@
 import React, {useState} from 'react'
 import useYoroi from '../../../hooks/yoroiProvider'
-import useWasm from '../../../hooks/useWasm'
 import ResponsesPart from './responsesPart'
 import OfficialPart from './officialPart'
 import {CONNECTED} from '../../../utils/connectionStates'
 
 const Cip30Tab = () => {
   const {api, connectionState} = useYoroi()
-  const wasm = useWasm()
   const [currentText, setCurrentText] = useState('')
   const [rawCurrentText, setRawCurrentText] = useState('')
   const [waiterState, setWaiterState] = useState(false)
@@ -22,7 +20,6 @@ const Cip30Tab = () => {
         <div className="grid grid-cols-3 gap-2">
           <OfficialPart
             api={api}
-            wasm={wasm}
             setRawCurrentText={setRawCurrentText}
             setResponse={setResponse}
             setWaiterState={setWaiterState}

@@ -1,11 +1,12 @@
 import {useState} from 'react'
 import {Buffer} from 'buffer'
 import useYoroi from '../../../hooks/yoroiProvider'
-import useWasm from '../../../hooks/useWasm'
-import {hexToBytes, bytesToHex} from '../../../utils/utils'
+import {bytesToHex} from '../../../utils/utils'
 import {
   getAddressFromBytes,
   getAssetName,
+  getCslUtxos,
+  getLargestFirstMultiAsset,
   getNativeScript,
   getPubKeyHash,
   getTransactionOutputBuilder,
@@ -37,7 +38,6 @@ const NFTTab = () => {
     {label: 'Video_WMV', value: 'video/x-ms-wmv'},
   ]
   const {api, connectionState} = useYoroi()
-  const wasm = useWasm()
   const [currentNFTName, setCurrentNFTName] = useState('')
   const [currentImageUrl, setCurrentImageUrl] = useState('')
   const [currentDescription, setCurrentDescription] = useState('')
@@ -155,15 +155,15 @@ const NFTTab = () => {
   }
 
   const mint = async () => {
-    const txBuilder = getTxBuilder(wasm)
+    const txBuilder = getTxBuilder()
 
     const changeAddress = await api?.getChangeAddress()
     console.debug(`[dApp][NFT_Tab][mint] changeAddress -> ${changeAddress}`)
-    const wasmChangeAddress = getAddressFromBytes(wasm, changeAddress)
+    const wasmChangeAddress = getAddressFromBytes(changeAddress)
     const usedAddresses = await api?.getUsedAddresses()
-    const usedAddress = getAddressFromBytes(wasm, usedAddresses[0])
-    const pubkeyHash = getPubKeyHash(wasm, usedAddress)
-    const wasmNativeScript = getNativeScript(wasm, pubkeyHash)
+    const usedAddress = getAddressFromBytes(usedAddresses[0])
+    const pubkeyHash = getPubKeyHash(usedAddress)
+    const wasmNativeScript = getNativeScript(pubkeyHash)
     const scriptHashHex = wasmNativeScript.hash().to_hex()
     let metadata = {}
     metadata[scriptHashHex] = {}
@@ -172,12 +172,12 @@ const NFTTab = () => {
       metadata[scriptHashHex][assetInfo.NFTName] = assetInfo.metadata
       metadata['version'] = isV2nft ? '2.0' : '1.0'
       console.debug(`[dApp][NFT_Tab][mint] metadata -> ${JSON.stringify(metadata)}`)
-      txBuilder.add_json_metadatum(strToBigNum(wasm, '721'), JSON.stringify(metadata))
+      txBuilder.add_json_metadatum(strToBigNum('721'), JSON.stringify(metadata))
       txBuilder.add_mint_asset_and_output_min_required_coin(
         wasmNativeScript,
-        getAssetName(wasm, assetInfo.metadata.name),
-        toInt(wasm, '1'),
-        getTransactionOutputBuilder(wasm, wasmChangeAddress),
+        getAssetName(assetInfo.metadata.name),
+        toInt('1'),
+        getTransactionOutputBuilder(wasmChangeAddress),
       )
     }
 
@@ -185,14 +185,10 @@ const NFTTab = () => {
     const hexInputUtxos = await api?.getUtxos()
 
     console.debug(`[dApp][NFT_Tab][mint] preparing wasmUTxOs`)
-    const wasmUtxos = wasm.TransactionUnspentOutputs.new()
-    for (const hexInputUtxo of hexInputUtxos) {
-      const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hexInputUtxo))
-      wasmUtxos.add(wasmUtxo)
-    }
+    const wasmUtxos = getCslUtxos(hexInputUtxos)
 
     console.debug(`[dApp][NFT_Tab][mint] adding inputs`)
-    txBuilder.add_inputs_from(wasmUtxos, wasm.CoinSelectionStrategyCIP2.LargestFirstMultiAsset)
+    txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset())
     txBuilder.add_required_signer(pubkeyHash)
     txBuilder.add_change_if_needed(wasmChangeAddress)
 

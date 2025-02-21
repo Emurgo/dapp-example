@@ -12,7 +12,7 @@ import SelectWithLabel from '../../selectWithLabel'
 import {getRandomHex} from '../../../utils/helpFunctions'
 
 const VotePanel = (props) => {
-  const {wasm, onWaiting, onError, getters, setters, handleInputCreds} = props
+  const {onWaiting, onError, getters, setters, handleInputCreds} = props
   const {dRepIdInputValue, getVotingBuilder} = getters
   const {handleAddingVotesInTx, setDRepIdInputValue} = setters
 
@@ -34,22 +34,22 @@ const VotePanel = (props) => {
 
   const buildVote = () => {
     onWaiting(true)
-    const votingBuilder = getVotingBuilder(wasm)
+    const votingBuilder = getVotingBuilder()
     try {
       // Getting voter
       const dRepCreds = handleInputCreds(dRepIdInputValue)
-      const voter = getVoter(wasm, dRepCreds)
+      const voter = getVoter(dRepCreds)
       // What is being voted on
-      const govActionId = getGovActionId(wasm, voteGovActionTxHashInHex, voteGovActionIndex)
+      const govActionId = getGovActionId(voteGovActionTxHashInHex, voteGovActionIndex)
       // Voting choice
       let votingProcedure
 
       if (metadataURL.length > 0) {
         const dataHash = metadataHash.length > 0 ? metadataHash : getRandomHex(32)
-        const anchor = getAnchor(wasm, metadataURL, dataHash)
-        votingProcedure = getVotingProcedureWithAnchor(wasm, votingChoice, anchor)
+        const anchor = getAnchor(metadataURL, dataHash)
+        votingProcedure = getVotingProcedureWithAnchor(votingChoice, anchor)
       } else {
-        votingProcedure = getVotingProcedure(wasm, votingChoice)
+        votingProcedure = getVotingProcedure(votingChoice)
       }
       // Add vote to vote builder
       votingBuilder.add(voter, govActionId, votingProcedure)

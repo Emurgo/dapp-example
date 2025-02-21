@@ -4,7 +4,7 @@ import InputWithLabel from '../../inputWithLabel'
 import {getCertOfNewDRepRetirement, getDRepRetirementCert} from '../../../utils/cslTools'
 
 const DRepRetirementPanel = (props) => {
-  const {wasm, onWaiting, onError, getters, setters, handleInputCreds} = props
+  const {onWaiting, onError, getters, setters, handleInputCreds} = props
 
   const {handleAddingCertInTx, setDRepIdInputValue} = setters
   const {dRepIdInputValue, getCertBuilder} = getters
@@ -12,11 +12,11 @@ const DRepRetirementPanel = (props) => {
 
   const buildDRepRetirementCert = () => {
     onWaiting(true)
-    const certBuilder = getCertBuilder(wasm)
+    const certBuilder = getCertBuilder()
     try {
       const dRepCred = handleInputCreds(dRepIdInputValue)
-      const dRepRetirementCert = getDRepRetirementCert(wasm, dRepCred, depositRefundAmount)
-      certBuilder.add(getCertOfNewDRepRetirement(wasm, dRepRetirementCert))
+      const dRepRetirementCert = getDRepRetirementCert(dRepCred, depositRefundAmount)
+      certBuilder.add(getCertOfNewDRepRetirement(dRepRetirementCert))
       handleAddingCertInTx(certBuilder)
       onWaiting(false)
     } catch (error) {

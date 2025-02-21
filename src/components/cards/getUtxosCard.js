@@ -3,7 +3,7 @@ import ApiCardWithModal from './apiCardWithModal'
 import {ModalWindowContent, CommonStyles} from '../ui-constants'
 import {getUtxoFromHex} from '../../utils/cslTools'
 
-const GetUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
+const GetUtxosCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [getUtxosInput, setGetUtxosInput] = useState({amount: '', page: 0, limit: 10})
 
   const getUtxosClick = () => {
@@ -15,7 +15,7 @@ const GetUtxosCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
         onRawResponse(hexUtxos)
         let utxos = []
         for (const hexUtxo of hexUtxos) {
-          const utxo = getUtxoFromHex(wasm, hexUtxo)
+          const utxo = getUtxoFromHex(hexUtxo)
           utxos.push(utxo)
         }
         onResponse(utxos)

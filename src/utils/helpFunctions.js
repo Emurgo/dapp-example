@@ -1,39 +1,39 @@
-import {getCslValue, getUtxoFromHex, getBech32AddressFromHex} from './cslTools'
+import {getCslValue, getUtxoFromHex, getBech32AddressFromHex, getPublicKeyFromHex} from './cslTools'
 
-export const getBalance = async (api, wasm) => {
+export const getBalance = async (api) => {
   const hexBalance = await api.getBalance()
-  const cslValue = getCslValue(wasm, hexBalance)
+  const cslValue = getCslValue(hexBalance)
   const adaValue = cslValue.coin().to_str()
   return adaValue
 }
 
-export const getUTxOs = async (api, wasm, amountLovelaces, requestParam = {page: 0, limit: 20}) => {
+export const getUTxOs = async (api, amountLovelaces, requestParam = {page: 0, limit: 20}) => {
   const utxos = []
   const hexUtxos = await api.getUtxos(amountLovelaces, requestParam)
   for (const hexUtxo of hexUtxos) {
-    const utxo = getUtxoFromHex(wasm, hexUtxo)
+    const utxo = getUtxoFromHex(hexUtxo)
     utxos.push(utxo)
   }
   return utxos
 }
 
-export const getChangeAddress = async (api, wasm) => {
+export const getChangeAddress = async (api) => {
   const hexAddress = await api.getChangeAddress()
-  return getBech32AddressFromHex(wasm, hexAddress)
+  return getBech32AddressFromHex(hexAddress)
 }
 
-export const getRewardAddress = async (api, wasm) => {
+export const getRewardAddress = async (api) => {
   const hexAddresses = await api.getRewardAddresses()
   const addresses = []
   for (const hexAddr of hexAddresses) {
-    addresses.push(getBech32AddressFromHex(wasm, hexAddr))
+    addresses.push(getBech32AddressFromHex(hexAddr))
   }
   return addresses[0]
 }
 
-export const getPubDRepKey = async (api, wasm) => {
+export const getPubDRepKey = async (api) => {
   const pubDRepKeyHex = await api.cip95.getPubDRepKey()
-  const dRepID = wasm.PublicKey.from_hex(pubDRepKeyHex).hash()
+  const dRepID = getPublicKeyFromHex(pubDRepKeyHex).hash()
   const dRepIDHex = dRepID.to_hex()
   const dRepIDBech32 = dRepID.to_bech32('drep')
 
@@ -43,43 +43,43 @@ export const getPubDRepKey = async (api, wasm) => {
   }
 }
 
-export const getRegPubStakeKey = async (api, wasm) => {
+export const getRegPubStakeKey = async (api) => {
   const regPubStakeKeysHex = await api.cip95.getRegisteredPubStakeKeys()
   if (regPubStakeKeysHex.length < 1) {
     return regPubStakeKeysHex
   }
   const regPubStakeKeyHex = regPubStakeKeysHex[0]
-  const stakeKeyHash = wasm.PublicKey.from_hex(regPubStakeKeyHex).hash().to_hex()
+  const stakeKeyHash = getPublicKeyFromHex(regPubStakeKeyHex).hash().to_hex()
 
   return stakeKeyHash
 }
 
-export const getUnregPubStakeKey = async (api, wasm) => {
+export const getUnregPubStakeKey = async (api) => {
   const unregPubStakeKeysHex = await api.cip95.getUnregisteredPubStakeKeys()
   if (unregPubStakeKeysHex.length < 1) {
     return unregPubStakeKeysHex
   }
   const unregPubStakeKeyHex = unregPubStakeKeysHex[0]
-  const stakeKeyHash = wasm.PublicKey.from_hex(unregPubStakeKeyHex).hash().to_hex()
+  const stakeKeyHash = getPublicKeyFromHex(unregPubStakeKeyHex).hash().to_hex()
 
   return stakeKeyHash
 }
 
-export const getUsedAddress = async (api, wasm) => {
+export const getUsedAddress = async (api) => {
   const requestParam = {page: 0, limit: 1}
   const hexAddresses = await api.getUsedAddresses(requestParam)
   const addresses = []
   for (const hexAddr of hexAddresses) {
-    addresses.push(getBech32AddressFromHex(wasm, hexAddr))
+    addresses.push(getBech32AddressFromHex(hexAddr))
   }
   return addresses[0]
 }
 
-export const getUnusedAddress = async (api, wasm) => {
+export const getUnusedAddress = async (api) => {
   const hexAddresses = await api.getUnusedAddresses()
   const addresses = []
   for (const hexAddr of hexAddresses) {
-    addresses.push(getBech32AddressFromHex(wasm, hexAddr))
+    addresses.push(getBech32AddressFromHex(hexAddr))
   }
   return addresses[0]
 }

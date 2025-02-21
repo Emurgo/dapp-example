@@ -2,7 +2,7 @@ import React from 'react'
 import ApiCard from './apiCard'
 import {getBech32AddressFromHex} from '../../utils/cslTools'
 
-const GetChangeAddressCard = ({api, wasm, onRawResponse, onResponse, onWaiting}) => {
+const GetChangeAddressCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const getChangeAddressClick = () => {
     onWaiting(true)
     api
@@ -10,7 +10,7 @@ const GetChangeAddressCard = ({api, wasm, onRawResponse, onResponse, onWaiting})
       .then((hexAddress) => {
         onWaiting(false)
         onRawResponse(hexAddress)
-        onResponse(getBech32AddressFromHex(wasm, hexAddress), false)
+        onResponse(getBech32AddressFromHex(hexAddress), false)
       })
       .catch((e) => {
         onWaiting(false)

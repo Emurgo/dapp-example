@@ -4,13 +4,12 @@ import Cip95GetRegisteredPubStakeKeysCard from '../../cards/cip95getRegisteredPu
 import Cip95GetUnregisteredPubStakeKeysCard from '../../cards/cip95getUnregisteredPubStakeKeysCard'
 import Cip95SignDataCard from '../../cards/cip95SignDataCard'
 
-const Cip95OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiterState}) => {
+const Cip95OfficialPart = ({api, setRawCurrentText, setResponse, setWaiterState}) => {
   return (
     <div className="grid justify-items-stretch grid-cols-4 gap-2">
       <div>
         <Cip95GetPubDRepKeyCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}
@@ -19,7 +18,6 @@ const Cip95OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiter
       <div>
         <Cip95GetRegisteredPubStakeKeysCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}
@@ -28,7 +26,6 @@ const Cip95OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiter
       <div>
         <Cip95GetUnregisteredPubStakeKeysCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}
@@ -37,7 +34,6 @@ const Cip95OfficialPart = ({api, wasm, setRawCurrentText, setResponse, setWaiter
       <div>
         <Cip95SignDataCard
           api={api}
-          wasm={wasm}
           onRawResponse={setRawCurrentText}
           onResponse={setResponse}
           onWaiting={setWaiterState}

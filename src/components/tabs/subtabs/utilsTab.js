@@ -1,12 +1,8 @@
 import React, {useState} from 'react'
-import useYoroi from '../../../hooks/yoroiProvider'
-import useWasm from '../../../hooks/useWasm'
 import ResponsesPart from './responsesPart'
 import CreateRandomKeyCard from '../../cards/createRandomKeyCard';
 
 const UtilsTab = () => {
-  const {api} = useYoroi()
-  const wasm = useWasm()
   const [currentText, setCurrentText] = useState('')
   const [rawCurrentText, setRawCurrentText] = useState('')
   const [waiterState, setWaiterState] = useState(false)
@@ -21,7 +17,6 @@ const UtilsTab = () => {
         <div className="grid justify-items-stretch grid-cols-1 lg:grid-cols-2 gap-2">
           <div>
             <CreateRandomKeyCard
-              wasm={wasm}
               onRawResponse={setRawCurrentText}
               onResponse={setResponse}
               onWaiting={setWaiterState} />
