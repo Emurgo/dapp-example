@@ -98,6 +98,8 @@ export const YoroiProvider = ({children}) => {
           setConnectionState(NOT_CONNECTED)
           console.error(err)
         })
+    } else {
+      setConnectionState(NOT_CONNECTED);
     }
   }, [])
 
