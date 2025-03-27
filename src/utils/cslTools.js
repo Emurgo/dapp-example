@@ -185,7 +185,7 @@ export const getCslVotingBuilder = () => wasm.VotingBuilder.new()
 export const getGovActionId = (govActionTxHashInHex, govActionIndex) =>
   wasm.GovernanceActionId.new(getTransactionHashFromHex(govActionTxHashInHex), govActionIndex)
 
-export const getVoter = (dRepKeyHash) => wasm.Voter.new_drep(dRepKeyHash)
+export const getVoter = (dRepKeyHash) => wasm.Voter.new_drep_credential(dRepKeyHash)
 
 export const getVotingProcedure = (votingChoice) => wasm.VotingProcedure.new(votingChoice)
 
