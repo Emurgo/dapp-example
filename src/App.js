@@ -46,7 +46,7 @@ const App = () => {
     }
 
     if (isWalletConnected) {
-      const connectionTimer = setInterval(getConnectionState, 3000)
+      const connectionTimer = setInterval(getConnectionState, 5100)
       return () => {
         console.debug(`[dApp][App] Checking connection is stopped`)
         clearInterval(connectionTimer)
