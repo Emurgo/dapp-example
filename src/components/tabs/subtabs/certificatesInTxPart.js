@@ -4,7 +4,11 @@ import {iconCollapsed16, iconExpanded16} from '../../ui-constants'
 
 const CertificatesInTxPart = ({getters}) => {
   const {certsInTx, votesInTx} = getters
-  const amountOfCertsAndVotesInTx = () => certsInTx.length + votesInTx.length
+  let amountOfVotesInTx = 0
+  if (votesInTx) {
+    amountOfVotesInTx = JSON.parse(votesInTx).length
+  }
+  const amountOfCertsAndVotesInTx = () => certsInTx.length + amountOfVotesInTx
   const getAllInOne = () => {
     const resultArray = []
     for (const certInTx of certsInTx) {
@@ -13,11 +17,12 @@ const CertificatesInTxPart = ({getters}) => {
       const certJsonObject = JSON.parse(certInTx)
       resultArray.push([cleanCertName, certJsonObject])
     }
-    for (const voteInTx of votesInTx) {
-      const votePartWithName = voteInTx.split('\n')[1]
-      const cleanVoteName = votePartWithName.split('"')[1]
-      const voteJsonObject = JSON.parse(voteInTx)
-      resultArray.push([cleanVoteName, voteJsonObject])
+    if (votesInTx) {
+      const voteJsonObjects = JSON.parse(votesInTx)
+      console.log('voteJsonObjects', voteJsonObjects)
+      for (const voteJsonObject of voteJsonObjects) {
+        resultArray.push(['Votes', voteJsonObject])
+      }
     }
     return resultArray
   }
@@ -28,7 +33,7 @@ const CertificatesInTxPart = ({getters}) => {
 
   return (
     <ExpandablePanel
-      title={`Certificates in Tx ( ${amountOfCertsAndVotesInTx()} )`}
+      title={`Certificates and Votes in Tx ( ${amountOfCertsAndVotesInTx()} )`}
       generalPanelStyles={mainPanelStyles}
       titleStyles={mainPanelTitleStyles}
       collapsedIcon={iconCollapsed16}

@@ -9,7 +9,7 @@ import CertificatesInTxPart from './certificatesInTxPart'
 
 const Cip95AdditionalPart = ({api, onWaiting, onError, getters, setters}) => {
   const [certsInTx, setCertsInTx] = useState([])
-  const [votesInTx, setVotesInTx] = useState([])
+  const [votesInTx, setVotesInTx] = useState()
   const [certBuilder, setCertBuilder] = useState(null)
   const [votingBuilder, setVotingBuilder] = useState(null)
 
