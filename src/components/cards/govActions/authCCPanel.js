@@ -8,8 +8,11 @@ import GovToolsPanel from '../govToolsPanel'
 
 const AuthCCPanel = (props) => {
   const {onWaiting, onError, getters, setters, handleInputCreds} = props
-  const {ccColdCredValueInputValue, ccHotCredValueInputValue, getCertBuilder} = getters
-  const {handleAddingCertInTx, setCCColdCredValue, setCCHotCredValue} = setters
+  const {getCertBuilder} = getters
+  const {handleAddingCertInTx} = setters
+
+  const [ccColdInputValue, setCCColdCredInputValue] = useState('')
+  const [ccHotInputValue, setCCHotCredInputValue] = useState('')
 
   const buildCCAuthCert = () => {
     onWaiting(true)
@@ -19,18 +22,16 @@ const AuthCCPanel = (props) => {
     try {
 
       // cold credential
-      const coldCred = handleInputCreds(ccColdCredValueInputValue)
+      const coldCred = handleInputCreds(ccColdInputValue)
       if (coldCred == null) {
         return null
       }
-      setCCColdCredValue(coldCred)
       
       // hot credential
-      const hotCred = handleInputCreds(ccHotCredValueInputValue)
+      const hotCred = handleInputCreds(ccHotInputValue)
       if (hotCred == null) {
         return null
       }
-      setCCHotCredValue(hotCred)
 
       // Create cert object
       const committeeHotAuthCert = getCommitteeHotAuth(coldCred, hotCred)
@@ -57,17 +58,17 @@ const AuthCCPanel = (props) => {
       <InputWithLabel
         inputName="CC Cold Credential"
         helpText="Bech32 or Hex encoded"
-        inputValue={ccColdCredValueInputValue}
+        inputValue={ccColdInputValue}
         onChangeFunction={(event) => {
-          setCCColdCredValue(event.target.value)
+          setCCColdCredInputValue(event.target.value)
         }}
       />
       <InputWithLabel
         inputName="CC Hot Credential"
         helpText="Bech32 or Hex encoded"
-        inputValue={ccHotCredValueInputValue}
+        inputValue={ccHotInputValue}
         onChangeFunction={(event) => {
-          setCCHotCredValue(event.target.value)
+          setCCHotCredInputValue(event.target.value)
         }}
       />
     </GovToolsPanel>
