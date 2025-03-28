@@ -1,57 +1,41 @@
 import React, {useState} from 'react'
 import InputWithLabel from '../../inputWithLabel'
 import {
-  getCertOfNewVoteDelegation,
-  getDRepAbstain,
-  getDRepNewKeyHash,
-  getDRepNoConfidence,
-  getVoteDelegCert,
+  getCommitteeHotAuth,
+  getCertOfNewCommitteeHotAuth,
 } from '../../../utils/cslTools'
 import GovToolsPanel from '../govToolsPanel'
 
 const AuthCCPanel = (props) => {
   const {onWaiting, onError, getters, setters, handleInputCreds} = props
-  const {dRepIdBech32, dRepIdInputValue, regPubStakeKey, unregPubStakeKey, getCertBuilder} = getters
-  const {handleAddingCertInTx, setDRepIdInputValue} = setters
+  const {ccColdCredValueInputValue, ccHotCredValueInputValue, getCertBuilder} = getters
+  const {handleAddingCertInTx, setCCColdCredValue, setCCHotCredValue} = setters
 
-  const [stake, setStake] = useState('')
-
-  const suitableStake = regPubStakeKey.length > 0 ? regPubStakeKey : unregPubStakeKey
-
-  const buildVoteDelegationCert = () => {
+  const buildCCAuthCert = () => {
     onWaiting(true)
 
-    // build vote cert
+    // build CC auth cert
     const certBuilder = getCertBuilder()
     try {
-      let targetDRep
-      if (dRepIdInputValue.toUpperCase() === 'ABSTAIN') {
-        targetDRep = getDRepAbstain()
-      } else if (dRepIdInputValue.toUpperCase() === 'NO CONFIDENCE') {
-        targetDRep = getDRepNoConfidence()
-      } else {
-        let tempTarget = dRepIdInputValue
-        if (dRepIdInputValue.length === 0) {
-          setDRepIdInputValue(dRepIdBech32)
-          tempTarget = dRepIdBech32
-        }
-        const dRepKeyCred = handleInputCreds(tempTarget)
-        targetDRep = getDRepNewKeyHash(dRepKeyCred.to_keyhash())
-      }
 
-      let pubStake = stake
-      if (stake.length === 0) {
-        setStake(suitableStake)
-        pubStake = suitableStake
-      }
-      const stakeCred = handleInputCreds(pubStake)
-      if (stakeCred == null) {
+      // cold credential
+      const coldCred = handleInputCreds(ccColdCredValueInputValue)
+      if (coldCred == null) {
         return null
       }
+      setCCColdCredValue(coldCred)
+      
+      // hot credential
+      const hotCred = handleInputCreds(ccHotCredValueInputValue)
+      if (hotCred == null) {
+        return null
+      }
+      setCCHotCredValue(hotCred)
+
       // Create cert object
-      const voteDelegationCert = getVoteDelegCert(stakeCred, targetDRep)
+      const committeeHotAuthCert = getCommitteeHotAuth(coldCred, hotCred)
       // add cert to certBuilder
-      certBuilder.add(getCertOfNewVoteDelegation(voteDelegationCert))
+      certBuilder.add(getCertOfNewCommitteeHotAuth(committeeHotAuthCert))
       // adding the cert to the certStorage
       handleAddingCertInTx(certBuilder)
       onWaiting(false)
@@ -64,25 +48,26 @@ const AuthCCPanel = (props) => {
 
   const panelProps = {
     buttonName: 'Build Cert',
-    certLabel: 'voteDelegation',
-    clickFunction: buildVoteDelegationCert,
+    certLabel: 'ccAuth',
+    clickFunction: buildCCAuthCert,
   }
 
   return (
     <GovToolsPanel {...panelProps}>
       <InputWithLabel
-        inputName="Target of vote delegation"
-        helpText="DRep ID | abstain | no confidence"
-        inputValue={dRepIdInputValue}
+        inputName="CC Cold Credential"
+        helpText="Bech32 or Hex encoded"
+        inputValue={ccColdCredValueInputValue}
         onChangeFunction={(event) => {
-          setDRepIdInputValue(event.target.value)
+          setCCColdCredValue(event.target.value)
         }}
       />
       <InputWithLabel
-        inputName="Stake credential"
-        inputValue={stake}
+        inputName="CC Hot Credential"
+        helpText="Bech32 or Hex encoded"
+        inputValue={ccHotCredValueInputValue}
         onChangeFunction={(event) => {
-          setStake(event.target.value)
+          setCCHotCredValue(event.target.value)
         }}
       />
     </GovToolsPanel>

@@ -205,3 +205,10 @@ export const getStakeKeyDeregCert = (stakeCred) => wasm.StakeDeregistration.new(
 
 export const getCertOfNewStakeDereg = (stakeKeyDeregCert) =>
   wasm.Certificate.new_stake_deregistration(stakeKeyDeregCert)
+
+// Committee Hot Authorization Certificate
+export const getCommitteeHotAuth = (coldCred, hotCred) =>
+  wasm.CommitteeHotAuth.new(coldCred, hotCred)
+
+export const getCertOfNewCommitteeHotAuth = (committeeHotAuthCert) =>
+  wasm.Certificate.new_committee_hot_auth(committeeHotAuthCert)
