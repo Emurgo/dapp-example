@@ -79,9 +79,17 @@ const Cip95AdditionalPart = ({api, onWaiting, onError, getters, setters}) => {
       children: <GovActionsTab />,
     },
     {
-      label: 'Constitutional Commitee Certs',
+      label: 'Constitutional Committee Certs',
       value: 'ccCerts',
-      children: <ConstitCommCertsTab />,
+      children: (
+        <ConstitCommCertsTab
+          api={api}
+          onWaiting={onWaiting}
+          onError={onError}
+          getters={newGetters}
+          setters={newSetters}
+        />
+      ),
     },
   ]
   return (
