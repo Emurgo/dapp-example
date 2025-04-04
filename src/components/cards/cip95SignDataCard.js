@@ -9,7 +9,13 @@ const Cip95SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
 
   const getPayloadHex = (payload) => {
     if (payload.startsWith('0x')) {
-      return Buffer.from(payload.replace('^0x', ''), 'hex').toString('hex')
+      const reg = /^[0-9A-Fa-f]*$/g
+      const remainingPart = payload.substring(2)
+      if (reg.test(remainingPart)) {
+        return Buffer.from(remainingPart, 'hex').toString('hex')
+      } else {
+        throw new Error(`!!!ERROR!!!\nIt is not a suitable payload: "${payload}"`)
+      }
     }
 
     return Buffer.from(payload, 'utf8').toString('hex')
@@ -17,27 +23,21 @@ const Cip95SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
 
   const signDataClick = async () => {
     onWaiting(true)
-
-    const payloadHex = getPayloadHex(message)
     try {
-      api?.cip95
-        .signData(addressOrDRep, payloadHex)
-        .then((sig) => {
-          onWaiting(false)
-          onRawResponse('')
-          onResponse(sig)
-        })
-        .catch((e) => {
-          onWaiting(false)
-          onRawResponse('')
-          onResponse(e)
-          console.error(e)
-        })
-    } catch (error) {
-      onWaiting(false)
+      const payloadHex = getPayloadHex(message)
+      const signDataResponse = await api?.cip95.signData(addressOrDRep, payloadHex)
       onRawResponse('')
-      onResponse(error, false)
+      onResponse(signDataResponse)
+    } catch (error) {
+      onRawResponse('')
+      if (error.message) {
+        onResponse(error.message, false)
+      } else {
+        onResponse(error)
+      }
       console.error(error)
+    } finally {
+      onWaiting(false)
     }
   }
 
