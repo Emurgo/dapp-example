@@ -37,7 +37,7 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
 
   useEffect(() => {
     handleNetworkSelection()
-  }, [])
+  })
 
   const getAccountInfo = async () => {
     setWaitingAccountInfo(true)
@@ -122,7 +122,7 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       for (let i = 0; i < vkeysSignatures.len(); i++) {
         fixedTx.add_vkey_witness(vkeysSignatures.get(i))
       }
-      console.log('fixedTx.to_hex()', fixedTx.to_hex())
+      console.log('Withdrawal signed Tx: ', fixedTx.to_hex())
 
       const txId = await api?.submitTx(fixedTx.to_hex())
       onWaiting(false)
