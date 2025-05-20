@@ -65,7 +65,7 @@ const BuildTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       onResponse('', false)
     } catch (error) {
       onRawResponse('')
-      onRawResponse(error)
+      onResponse(error)
     } finally {
       onWaiting(false)
     }
