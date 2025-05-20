@@ -1,7 +1,6 @@
 import {
   getCslCredentialFromHex,
   getCslRewardAddress,
-  getPublicKeyFromHex,
   getTxBuilder,
   getWithdrawalsBuilder,
   strToBigNum,
@@ -28,10 +27,8 @@ export const fetchAccountInfo = async (networkType, rewardAddressHex) => {
   })
 }
 
-export const getTxBuilderWithWithdrawal = async (cardanoApi, networkType, rewardAmount) => {
+export const getTxBuilderWithWithdrawal = async (stakeKeyHash, networkType, rewardAmount) => {
   const txBuilder = getTxBuilder()
-  const pubStakeKey = await cardanoApi?.cip95.getRegisteredPubStakeKeys()
-  const stakeKeyHash = getPublicKeyFromHex(pubStakeKey[0]).hash().to_hex()
   const stakeKeyHashCredential = getCslCredentialFromHex(stakeKeyHash)
   const keyRewardAddress = getCslRewardAddress(networkType, stakeKeyHashCredential)
   const withdrawalsBuilder = getWithdrawalsBuilder()

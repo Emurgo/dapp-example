@@ -1,14 +1,20 @@
 import {
-  getCslUtxos,
   getAddressFromBytes,
+  getCertificateBuilder,
+  getCertOfNewStakeDereg,
+  getCslCredentialFromHex,
+  getCslUtxos,
   getLargestFirstMultiAsset,
   getFixedTxFromBytes,
+  getPublicKeyFromHex,
+  getStakeKeyDeregCert,
   getTransactionWitnessSetFromBytes,
 } from '../../../utils/cslTools'
 import ApiCardWithModal from '../apiCardWithModal'
 import {ModalWindowContent} from '../../ui-constants'
 import {useEffect, useState} from 'react'
 import {fetchAccountInfo, getTxBuilderWithWithdrawal} from './logic/withdraw'
+import CheckboxWithLabel from '../../checkboxWithLabel'
 
 const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [networkType, setNetworkType] = useState('preprod')
@@ -19,6 +25,7 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [stakePool, setStakePool] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [showSuccessInfo, setShowSuccessInfo] = useState(false)
+  const [undelegate, setUndelegate] = useState(false)
 
   const handleNetworkSelection = async () => {
     const walletNetworkId = await api?.getNetworkId()
@@ -77,8 +84,18 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
     try {
       onWaiting(true)
       // build withdraw
-      const txBuilderWithWithdrawal = await getTxBuilderWithWithdrawal(api, networkType, rewardAmount)
+      const pubStakeKey = await api?.cip95.getRegisteredPubStakeKeys()
+      const stakeKeyHash = getPublicKeyFromHex(pubStakeKey[0]).hash().to_hex()
+      const txBuilderWithWithdrawal = await getTxBuilderWithWithdrawal(stakeKeyHash, networkType, rewardAmount)
       const utxos = await api?.getUtxos()
+
+      if (undelegate) {
+        const certBuilder = getCertificateBuilder()
+        const stakeCred = getCslCredentialFromHex(stakeKeyHash)
+        const stakeKeyDeregCert = getStakeKeyDeregCert(stakeCred)
+        certBuilder.add(getCertOfNewStakeDereg(stakeKeyDeregCert))
+        txBuilderWithWithdrawal.set_certs_builder(certBuilder)
+      }
 
       const wasmUtxos = getCslUtxos(utxos)
       const changeAddress = await api?.getChangeAddress()
@@ -89,6 +106,7 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
 
       const fixedTx = getFixedTxFromBytes(tx.to_bytes())
       const signaturesWitnessesSet = await api.signTx(fixedTx.to_hex())
+
       const witnesses = getTransactionWitnessSetFromBytes(signaturesWitnessesSet)
       const vkeysSignatures = witnesses.vkeys()
       for (let i = 0; i < vkeysSignatures.len(); i++) {
@@ -101,6 +119,7 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       onRawResponse(txId)
       onResponse(txId, false)
     } catch (error) {
+      console.error(error)
       onRawResponse('')
       onResponse(error)
     } finally {
@@ -159,9 +178,17 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
             {errorMessage && <div className="mb-4 p-2 bg-red-900 text-white rounded">{errorMessage}</div>}
 
             {showSuccessInfo && (
-              <div className="mb-4 p-2 bg-green-900 text-white rounded">
-                <div>Pool: {stakePool}</div>
-                <div>Available reward (lovelaces): {rewardAmount}</div>
+              <div>
+                <div className="mb-4 p-2 bg-green-900 text-white rounded">
+                  <div>Pool: {stakePool}</div>
+                  <div>Available reward (lovelaces): {rewardAmount}</div>
+                </div>
+                <CheckboxWithLabel
+                  currentState={undelegate}
+                  onChangeFunc={(event) => setUndelegate(event.target.checked)}
+                  name="undelegateFromPool"
+                  labelText="Undelegate stake key"
+                />
               </div>
             )}
 
