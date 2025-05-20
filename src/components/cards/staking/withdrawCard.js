@@ -1,10 +1,4 @@
 import {
-  getTxBuilder,
-  getPublicKeyFromHex,
-  getCslCredentialFromHex,
-  getWithdrawalsBuilder,
-  strToBigNum,
-  getCslRewardAddress,
   getCslUtxos,
   getAddressFromBytes,
   getLargestFirstMultiAsset,
@@ -14,6 +8,7 @@ import {
 import ApiCardWithModal from '../apiCardWithModal'
 import {ModalWindowContent} from '../../ui-constants'
 import {useEffect, useState} from 'react'
+import {fetchAccountInfo, getTxBuilderWithWithdrawal} from './logic/withdraw'
 
 const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [networkType, setNetworkType] = useState('preprod')
@@ -43,27 +38,10 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
     setWaitingAccountInfo(true)
     setErrorMessage('')
     setShowSuccessInfo(false)
-    let backendUrl = ''
-
-    if (networkType === 'mainnet') {
-      backendUrl = 'api.yoroiwallet.com'
-    } else if (networkType === 'preview') {
-      backendUrl = 'preview-backend.emurgornd.com'
-    } else {
-      backendUrl = 'preprod-backend.yoroiwallet.com'
-    }
 
     try {
       const rewardAddressHex = (await api?.getRewardAddresses())[0]
-      const endpointUrl = `https://${backendUrl}/api/account/state`
-      const delegationInfoResponse = await fetch(endpointUrl, {
-        headers: {
-          accept: 'application/json, text/plain, */*',
-          'content-type': 'application/json',
-        },
-        body: `{"addresses":["${rewardAddressHex}"]}`,
-        method: 'POST',
-      })
+      const delegationInfoResponse = await fetchAccountInfo(networkType, rewardAddressHex)
 
       if (!delegationInfoResponse.ok) {
         setErrorMessage('Something went wrong while getting delegation info')
@@ -89,31 +67,25 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       setShowSuccessInfo(true)
     } catch (error) {
       setErrorMessage('Network error occurred while fetching account info')
+      console.error(error)
     } finally {
       setWaitingAccountInfo(false)
     }
   }
 
   const withdrawClick = async () => {
-    const txBuilder = getTxBuilder()
     try {
       onWaiting(true)
       // build withdraw
+      const txBuilderWithWithdrawal = await getTxBuilderWithWithdrawal(api, networkType, rewardAmount)
       const utxos = await api?.getUtxos()
-      const pubStakeKey = await api?.cip95.getRegisteredPubStakeKeys()
-      const stakeKeyHash = getPublicKeyFromHex(pubStakeKey[0]).hash().to_hex()
-      const stakeKeyHashCredential = getCslCredentialFromHex(stakeKeyHash)
-      const keyRewardAddress = getCslRewardAddress(networkType, stakeKeyHashCredential)
-      const withdrawalsBuilder = getWithdrawalsBuilder()
-      withdrawalsBuilder.add(keyRewardAddress, strToBigNum(rewardAmount))
-      txBuilder.set_withdrawals_builder(withdrawalsBuilder)
 
       const wasmUtxos = getCslUtxos(utxos)
       const changeAddress = await api?.getChangeAddress()
       const wasmChangeAddress = getAddressFromBytes(changeAddress)
-      txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset())
-      txBuilder.add_change_if_needed(wasmChangeAddress)
-      const tx = txBuilder.build_tx()
+      txBuilderWithWithdrawal.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset())
+      txBuilderWithWithdrawal.add_change_if_needed(wasmChangeAddress)
+      const tx = txBuilderWithWithdrawal.build_tx()
 
       const fixedTx = getFixedTxFromBytes(tx.to_bytes())
       const signaturesWitnessesSet = await api.signTx(fixedTx.to_hex())
