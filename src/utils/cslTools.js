@@ -47,10 +47,7 @@ export const getLargestFirstMultiAsset = () => wasm.CoinSelectionStrategyCIP2.La
 
 export const getTransactionOutput = (wasmOutputAddress, buildTransactionInput) => {
   if (buildTransactionInput.amount) {
-    return wasm.TransactionOutput.new(
-      wasmOutputAddress,
-      wasm.Value.new(strToBigNum(buildTransactionInput.amount)),
-    )
+    return wasm.TransactionOutput.new(wasmOutputAddress, wasm.Value.new(strToBigNum(buildTransactionInput.amount)))
   }
   return wasm.TransactionOutput.new(wasmOutputAddress, wasm.Value.new(buildTransactionInput))
 }
@@ -67,11 +64,9 @@ export const getTransactionWitnessSetFromBytes = (witnessHex) =>
 export const getSignedTransaction = (wasmUnsignedTransaction, wasmWitnessSet) =>
   wasm.Transaction.new(wasmUnsignedTransaction.body(), wasmWitnessSet, wasmUnsignedTransaction.auxiliary_data())
 
-export const getPubKeyHash = (usedAddress) =>
-  wasm.BaseAddress.from_address(usedAddress).payment_cred().to_keyhash()
+export const getPubKeyHash = (usedAddress) => wasm.BaseAddress.from_address(usedAddress).payment_cred().to_keyhash()
 
-export const getNativeScript = (pubKeyHash) =>
-  wasm.NativeScript.new_script_pubkey(wasm.ScriptPubkey.new(pubKeyHash))
+export const getNativeScript = (pubKeyHash) => wasm.NativeScript.new_script_pubkey(wasm.ScriptPubkey.new(pubKeyHash))
 
 export const getTransactionOutputBuilder = (wasmChangeAddress) =>
   wasm.TransactionOutputBuilder.new().with_address(wasmChangeAddress).next()
@@ -154,8 +149,7 @@ export const getVoteDelegCert = (stakeCred, dRepKeyHash) => wasm.VoteDelegation.
 export const getCertOfNewVoteDelegation = (voteCert) => wasm.Certificate.new_vote_delegation(voteCert)
 
 // DRep Registration Certificate
-export const getDRepRegCert = (dRepCred, dRepDeposit) =>
-  wasm.DRepRegistration.new(dRepCred, strToBigNum(dRepDeposit))
+export const getDRepRegCert = (dRepCred, dRepDeposit) => wasm.DRepRegistration.new(dRepCred, strToBigNum(dRepDeposit))
 
 export const getDRepRegWithAnchorCert = (dRepCred, dRepDeposit, anchor) =>
   wasm.DRepRegistration.new_with_anchor(dRepCred, strToBigNum(dRepDeposit), anchor)
@@ -207,8 +201,39 @@ export const getCertOfNewStakeDereg = (stakeKeyDeregCert) =>
   wasm.Certificate.new_stake_deregistration(stakeKeyDeregCert)
 
 // Committee Hot Authorization Certificate
-export const getCommitteeHotAuth = (coldCred, hotCred) =>
-  wasm.CommitteeHotAuth.new(coldCred, hotCred)
+export const getCommitteeHotAuth = (coldCred, hotCred) => wasm.CommitteeHotAuth.new(coldCred, hotCred)
 
 export const getCertOfNewCommitteeHotAuth = (committeeHotAuthCert) =>
   wasm.Certificate.new_committee_hot_auth(committeeHotAuthCert)
+
+export const getCslRewardAddressFromHex = (networkType, rewardAddressHex) => {
+  switch (networkType) {
+    case 'mainnet':
+      return wasm.RewardAddress.new(wasm.NetworkInfo.mainnet().network_id(), wasm.Credential.from_hex(rewardAddressHex))
+    case 'preview':
+      return wasm.RewardAddress.new(
+        wasm.NetworkInfo.testnet_preview().network_id(),
+        wasm.Credential.from_hex(rewardAddressHex),
+      )
+    default:
+      return wasm.RewardAddress.new(
+        wasm.NetworkInfo.testnet_preprod().network_id(),
+        wasm.Credential.from_hex(rewardAddressHex),
+      )
+  }
+}
+
+export const getCslRewardAddress = (networkType, stakeKeyHashCredential) => {
+  switch (networkType) {
+    case 'mainnet':
+      return wasm.RewardAddress.new(wasm.NetworkInfo.mainnet().network_id(), stakeKeyHashCredential)
+    case 'preview':
+      return wasm.RewardAddress.new(wasm.NetworkInfo.testnet_preview().network_id(), stakeKeyHashCredential)
+    default:
+      return wasm.RewardAddress.new(wasm.NetworkInfo.testnet_preprod().network_id(), stakeKeyHashCredential)
+  }
+}
+
+export const getWithdrawalsBuilder = () => wasm.WithdrawalsBuilder.new()
+
+export const getFixedTxFromBytes = (txBytes) => wasm.FixedTransaction.from_bytes(txBytes)

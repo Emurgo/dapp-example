@@ -102,3 +102,18 @@ export const getRandomHex = (bytes) => {
   const byteArr = randomBytes(bytes)
   return toHexString(byteArr)
 }
+
+export const top3Utxos = (utxos) => {
+  const unwrappedUtxos = []
+  for (let i = 0; i < utxos.len(); i++) {
+    const utxo = utxos.get(i)
+    unwrappedUtxos.push({
+      ada: Number(utxo.output().amount().coin().to_str()),
+      utxo: utxo,
+    })
+  }
+  unwrappedUtxos.sort((a, b) => {
+    return Number(b.ada - a.ada)
+  })
+  return unwrappedUtxos.slice(0, 3)
+}

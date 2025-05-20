@@ -10,6 +10,7 @@ import Cip95TabTools from './components/tabs/subtabs/cip95ToolsTab'
 import NFTTab from './components/tabs/subtabs/NFTTab'
 import UtilsTab from './components/tabs/subtabs/utilsTab'
 import TokenTab from './components/tabs/subtabs/tokenTab'
+import Staking from './components/tabs/subtabs/stakingTab'
 
 const App = () => {
   const {connectionState, selectedWallet, setConnectionState, setConnectionStateFalse} = useYoroi()
@@ -64,6 +65,11 @@ const App = () => {
       label: 'CIP-30',
       value: 'cip30',
       children: <Cip30Tab />,
+    },
+    {
+      label: 'Staking',
+      value: 'staking',
+      children: <Staking />,
     },
     {
       label: 'CIP-95',
