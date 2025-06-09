@@ -185,7 +185,7 @@ export const getVotingProcedure = (votingChoice) => wasm.VotingProcedure.new(vot
 
 // Register Stake Key Certificate
 export const getStakeKeyRegCertWithCoin = (stakeCred, deposit) =>
-  wasm.StakeRegistration.new_with_coin(stakeCred, strToBigNum(deposit))
+  wasm.StakeRegistration.new_with_explicit_deposit(stakeCred, strToBigNum(deposit))
 
 export const getStakeKeyRegCert = (stakeCred) => wasm.StakeRegistration.new(stakeCred)
 
@@ -193,7 +193,7 @@ export const getCertOfNewStakeReg = (stakeKeyRegCert) => wasm.Certificate.new_st
 
 // Unregister Stake key Certificate
 export const getStakeKeyDeregCertWithCoin = (stakeCred, deposit) =>
-  wasm.StakeDeregistration.new_with_coin(stakeCred, strToBigNum(deposit))
+  wasm.StakeDeregistration.new_with_explicit_refund(stakeCred, strToBigNum(deposit))
 
 export const getStakeKeyDeregCert = (stakeCred) => wasm.StakeDeregistration.new(stakeCred)
 
