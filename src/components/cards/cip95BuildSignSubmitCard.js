@@ -1,9 +1,7 @@
-import React from 'react'
 import {
   getAddressFromBech32,
   getCslUtxos,
   getLargestFirstMultiAsset,
-  getTransactionFromBytes,
   getTransactionOutput,
   getTransactionWitnessSetFromBytes,
   getTxBuilder,
@@ -23,7 +21,7 @@ const Cip95BuildSignSubmitCard = (props) => {
     console.error(errorMessage)
   }
 
-  const buildSignSubmit = () => {
+  const buildSignSubmit = async () => {
     onWaiting(true)
     try {
       // build Tx
@@ -58,33 +56,18 @@ const Cip95BuildSignSubmitCard = (props) => {
       const wasmUnsignedTransaction = txBuilder.build_tx()
       // sign Tx
       const unsignedTxHex = bytesToHex(wasmUnsignedTransaction.to_bytes())
-
-      api
-        .signTx(unsignedTxHex)
-        .then((witnessHex) => {
-          const wasmUnsignedTransaction = getTransactionFromBytes(unsignedTxHex)
-          const wasmWitnessSet = getTransactionWitnessSetFromBytes(witnessHex)
-          const wasmSignedTransaction = getSignedTransaction(wasmUnsignedTransaction, wasmWitnessSet)
-          const signedTxHex = bytesToHex(wasmSignedTransaction.to_bytes())
-
-          // submit tx
-          api
-            .submitTx(signedTxHex)
-            .then((txId) => {
-              onWaiting(false)
-              console.log('The transaction is sent:', txId)
-            })
-            .catch((e) => {
-              errorHappen(e)
-            })
-        })
-        .catch((e) => {
-          errorHappen(e)
-        })
-
-      onWaiting(false)
+      console.log('Unsigned Tx:', unsignedTxHex)
+      const witnessHex = await api?.signTx(unsignedTxHex)
+      const wasmWitnessSet = getTransactionWitnessSetFromBytes(witnessHex)
+      const wasmSignedTransaction = getSignedTransaction(wasmUnsignedTransaction, wasmWitnessSet)
+      const signedTxHex = bytesToHex(wasmSignedTransaction.to_bytes())
+      console.log('Signed Tx:', signedTxHex)
+      const txId = await api?.submitTx(signedTxHex)
+      console.log('The transaction is sent:', txId)
     } catch (e) {
       errorHappen(e)
+    } finally {
+      onWaiting(false)
     }
   }
 
