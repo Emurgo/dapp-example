@@ -1,16 +1,18 @@
-import React, {useState} from 'react'
+import {useState} from 'react'
 import InputWithLabel from '../../inputWithLabel'
 import {
+  dRepIsScript,
   getCertOfNewVoteDelegation,
   getDRepAbstain,
   getDRepNewKeyHash,
   getDRepNoConfidence,
   getVoteDelegCert,
+  keyHashFromHex,
 } from '../../../utils/cslTools'
 import GovToolsPanel from '../govToolsPanel'
 
 const VoteDelegationPanel = (props) => {
-  const {onWaiting, onError, getters, setters, handleInputCreds} = props
+  const {onWaiting, onError, getters, setters, handleInputCreds, handleDrepId} = props
   const {dRepIdBech32, dRepIdInputValue, regPubStakeKey, unregPubStakeKey, getCertBuilder} = getters
   const {handleAddingCertInTx, setDRepIdInputValue} = setters
 
@@ -35,8 +37,13 @@ const VoteDelegationPanel = (props) => {
           setDRepIdInputValue(dRepIdBech32)
           tempTarget = dRepIdBech32
         }
-        const dRepKeyCred = handleInputCreds(tempTarget)
-        targetDRep = getDRepNewKeyHash(dRepKeyCred.to_keyhash())
+        const dRepKeyCred = handleDrepId(tempTarget)
+        if (dRepKeyCred) {
+          const isScript = dRepIsScript(dRepKeyCred)
+          const drepHex = isScript ? dRepKeyCred.to_scripthash().to_hex() : dRepKeyCred.to_keyhash().to_hex()
+          const drepKeyHash = keyHashFromHex(drepHex)
+          targetDRep = getDRepNewKeyHash(drepKeyHash)
+        }
       }
 
       let pubStake = stake
@@ -49,11 +56,13 @@ const VoteDelegationPanel = (props) => {
         return null
       }
       // Create cert object
-      const voteDelegationCert = getVoteDelegCert(stakeCred, targetDRep)
-      // add cert to certBuilder
-      certBuilder.add(getCertOfNewVoteDelegation(voteDelegationCert))
-      // adding the cert to the certStorage
-      handleAddingCertInTx(certBuilder)
+      if (targetDRep) {
+        const voteDelegationCert = getVoteDelegCert(stakeCred, targetDRep)
+        // add cert to certBuilder
+        certBuilder.add(getCertOfNewVoteDelegation(voteDelegationCert))
+        // adding the cert to the certStorage
+        handleAddingCertInTx(certBuilder)
+      }
       onWaiting(false)
     } catch (error) {
       console.error(error)
