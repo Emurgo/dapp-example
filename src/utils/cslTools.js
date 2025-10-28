@@ -2,6 +2,7 @@ import {protocolParams} from './networkConfig'
 import {hexToBytes, bytesToHex, wasmMultiassetToJSONs} from './utils'
 import {Buffer} from 'buffer'
 import * as wasm from '@emurgo/cardano-serialization-lib-browser'
+import {bech32} from 'bech32'
 
 export const toInt = (numberInStr) => wasm.Int.from_str(numberInStr)
 
@@ -101,6 +102,8 @@ export const getCertificateBuilder = () => wasm.CertificatesBuilder.new()
 
 export const getCredential = (keyHash) => wasm.Credential.from_keyhash(keyHash)
 
+export const getCredentialFromScriptHash = (scriptHash) => wasm.Credential.from_scripthash(scriptHash)
+
 export const getAddressFromCred = (testId, cred) => wasm.EnterpriseAddress.new(testId, cred).to_address().to_bech32()
 
 export const getPublicKeyFromHex = (publicKeyHex) => wasm.PublicKey.from_hex(publicKeyHex)
@@ -126,6 +129,31 @@ export const getCslCredentialFromBech32 = (bech32Value) => {
   console.debug('[cslTools][getCslCredentialFromBech32]::cred', cred)
   return cred
 }
+
+export const getCslCredentialFromScriptFromBech32 = (bech32Value) => {
+  console.debug('[cslTools][getCslCredentialFromScriptFromBech32]::bech32Value', bech32Value)
+  const scriptHash = wasm.ScriptHash.from_bech32(bech32Value)
+  console.debug('[cslTools][getCslCredentialFromScriptFromBech32]::scriptHash', scriptHash)
+  const cred = getCredentialFromScriptHash(scriptHash)
+  console.debug('[cslTools][getCslCredentialFromScriptFromBech32]::cred', cred)
+  return cred
+}
+
+export const getCslCredentialFromScriptFromHex = (hexValue) => {
+  console.debug('[cslTools][getCslCredentialFromScriptFromHex]::hexValue', hexValue)
+  const scriptHash = wasm.ScriptHash.from_hex(hexValue)
+  console.debug('[cslTools][getCslCredentialFromScriptFromHex]::scriptHash', scriptHash)
+  const cred = getCredentialFromScriptHash(scriptHash)
+  console.debug('[cslTools][getCslCredentialFromScriptFromHex]::cred', cred)
+  return cred
+}
+
+/**
+ * 
+ * @param {wasm.Credential} dRepCred 
+ * @returns {boolean}
+ */
+export const dRepIsScript = (dRepCred) => dRepCred.kind() === wasm.CredKind.Script
 
 export const getDRepAbstain = () => wasm.DRep.new_always_abstain()
 
@@ -237,3 +265,16 @@ export const getCslRewardAddress = (networkType, stakeKeyHashCredential) => {
 export const getWithdrawalsBuilder = () => wasm.WithdrawalsBuilder.new()
 
 export const getFixedTxFromBytes = (txBytes) => wasm.FixedTransaction.from_bytes(txBytes)
+
+export const convertBase32ToHex = (data) => {
+  return bytesToHex(bech32.fromWords(data))
+}
+
+export const base32ToHex = (base32) => {
+  const base32Words = bech32.decodeUnsafe(base32, base32.length)
+  return convertBase32ToHex(base32Words?.words)
+}
+
+export const hexToBase32 = (hex, prefix) => {
+  return bech32.encode(prefix, bech32.toWords(hexToBytes(hex)))
+}
