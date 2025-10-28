@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import {useState} from 'react'
 import InputWithLabel from '../../inputWithLabel'
 import GovToolsPanel from '../govToolsPanel'
 import {
@@ -12,7 +12,7 @@ import SelectWithLabel from '../../selectWithLabel'
 import {getRandomHex} from '../../../utils/helpFunctions'
 
 const VotePanel = (props) => {
-  const {onWaiting, onError, getters, setters, handleInputCreds} = props
+  const {onWaiting, onError, getters, setters, handleDrepId} = props
   const {dRepIdInputValue, getVotingBuilder} = getters
   const {handleAddingVotesInTx, setDRepIdInputValue} = setters
 
@@ -37,7 +37,7 @@ const VotePanel = (props) => {
     const votingBuilder = getVotingBuilder()
     try {
       // Getting voter
-      const dRepCreds = handleInputCreds(dRepIdInputValue)
+      const dRepCreds = handleDrepId(dRepIdInputValue)
       const voter = getVoter(dRepCreds)
       // What is being voted on
       const govActionId = getGovActionId(voteGovActionTxHashInHex, voteGovActionIndex)
