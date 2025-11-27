@@ -2,7 +2,7 @@ import React from 'react'
 import {ModalWindowContent} from './ui-constants'
 
 const SelectWithLabel = (props) => {
-  const {selectName, selectArray, onChangeFunction} = props
+  const {selectName, selectArray, onChangeFunction, defaultValue} = props
   const selectID = selectName.split(' ').join('')
 
   return (
@@ -15,6 +15,7 @@ const SelectWithLabel = (props) => {
         onChange={onChangeFunction}
         name={selectID}
         id={selectID}
+        defaultValue={defaultValue}
       >
         {selectArray.map((arrayItem) => (
           <option className="border text-white" key={arrayItem.label + 'Key'} value={arrayItem.value}>
