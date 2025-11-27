@@ -117,7 +117,7 @@ const SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
         />
         <div className="mt-3">
           <label htmlFor="signMessage" className={ModalWindowContent.contentLabelStyle}>
-            Sign Data
+            Message to sign
           </label>
           <input
             type="text"
