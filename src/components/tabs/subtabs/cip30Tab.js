@@ -5,7 +5,7 @@ import OfficialPart from './officialPart'
 import {CONNECTED} from '../../../utils/connectionStates'
 
 const Cip30Tab = () => {
-  const {api, connectionState} = useYoroi()
+  const {api, connectionState, selectedWallet} = useYoroi()
   const [currentText, setCurrentText] = useState('')
   const [rawCurrentText, setRawCurrentText] = useState('')
   const [waiterState, setWaiterState] = useState(false)
@@ -23,6 +23,7 @@ const Cip30Tab = () => {
             setRawCurrentText={setRawCurrentText}
             setResponse={setResponse}
             setWaiterState={setWaiterState}
+            selectedWallet={selectedWallet}
           />
           <ResponsesPart rawCurrentText={rawCurrentText} currentText={currentText} currentWaiterState={waiterState} />
         </div>

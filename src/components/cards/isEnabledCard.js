@@ -1,11 +1,10 @@
 import React from 'react'
 import ApiCard from './apiCard'
 
-const IsEnabledCard = ({onRawResponse, onResponse, onWaiting}) => {
+const IsEnabledCard = ({onRawResponse, onResponse, onWaiting, selectedWallet}) => {
   const isDisabledClick = () => {
     onWaiting(true)
-    // use selectedWallet window.cardano[selectedWallet]
-    window.cardano.yoroi
+    window.cardano[selectedWallet]
       ?.isEnabled()
       .then((enabled) => {
         onWaiting(false)
