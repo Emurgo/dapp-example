@@ -55,7 +55,7 @@ const Cip95BuildSignSubmitCard = (props) => {
       const wasmUnsignedTransaction = txBuilder.build_tx()
       // sign Tx
       const fixedTx = getFixedTxFromBytes(wasmUnsignedTransaction.to_bytes())
-      console.log('Unsigned Tx:', fixedTx.to_hex())
+      console.log('[Cip95BuildSignSubmitCard] Unsigned Tx:', fixedTx.to_hex())
       const witnessHex = await api?.signTx(fixedTx.to_hex())
       const wasmWitnessSet = getTransactionWitnessSetFromBytes(witnessHex)
       const vkeys = wasmWitnessSet.vkeys()

@@ -120,24 +120,24 @@ const TokenTab = () => {
         getTransactionOutputBuilder(wasmChangeAddress),
       )
 
-      console.debug(`[dApp][Tokens_Tab][mint] getting UTxOs`)
+      console.debug(`[TokenTab][mint] getting UTxOs`)
       const hexInputUtxos = await api?.getUtxos()
 
-      console.debug(`[dApp][Tokens_Tab][mint] preparing wasmUTxOs`)
+      console.debug(`[TokenTab][mint] preparing wasmUTxOs`)
       const wasmUtxos = getCslUtxos(hexInputUtxos)
 
-      console.debug(`[dApp][Tokens_Tab][mint] adding inputs`)
+      console.debug(`[TokenTab][mint] adding inputs`)
       txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset())
       txBuilder.add_required_signer(pubkeyHash)
       txBuilder.add_change_if_needed(wasmChangeAddress)
 
       const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes())
-      console.debug(`[dApp][Tokens_Tab][mint] signing the tx`)
-
+      console.log('[TokenTab] Unsigned Tx:', unsignedTransactionHex)
+      console.debug(`[TokenTab][mint] signing the tx`)
       const transactionHex = await api?.signTx({tx: unsignedTransactionHex, returnTx: true})
-      console.debug(`[dApp][Tokens_Tab][mint] TransactionHex: ${transactionHex}`)
+      console.debug(`[TokenTab][mint] TransactionHex: ${transactionHex}`)
       const txId = await api.submitTx(transactionHex)
-      console.log(`[dApp][Tokens_Tab][mint] Transaction successfully submitted: ${txId}`)
+      console.log(`[TokenTab][mint] Transaction successfully submitted: ${txId}`)
     } catch (error) {
       handleError(error)
       console.error(error)

@@ -105,6 +105,7 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       const tx = txBuilderWithWithdrawal.build_tx()
 
       const fixedTx = getFixedTxFromBytes(tx.to_bytes())
+      console.log('[WithdrawCard] Unsingned Tx:', fixedTx)
       const signaturesWitnessesSet = await api.signTx(fixedTx.to_hex())
 
       const witnesses = getTransactionWitnessSetFromBytes(signaturesWitnessesSet)

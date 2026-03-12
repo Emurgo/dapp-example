@@ -74,7 +74,7 @@ const NFTTab = () => {
 
   const handleNFTsAmount = () => {
     setIsMoreThenOneNFT(!isMoreThenOneNFT)
-    console.debug(`[dApp][NFT_Tab] mint MoreThenOneNFT is set: ${!isMoreThenOneNFT}`)
+    console.debug(`[NFTTab] mint MoreThenOneNFT is set: ${!isMoreThenOneNFT}`)
     if (isMoreThenOneNFT === false) {
       setCurrentNFTsAmount(1)
     }
@@ -82,10 +82,10 @@ const NFTTab = () => {
 
   const handleNftVersionOnChange = () => {
     setIsV2nft(!isV2nft)
-    console.debug(`[dApp][NFT_Tab] V2 is set: ${!isV2nft}`)
+    console.debug(`[NFTTab] V2 is set: ${!isV2nft}`)
     setCurrentMintingInfo(emptyTokenInfo)
     setMintingTxInfo([])
-    console.debug('[dApp][NFT_Tab] cleared the metadata and the prepared minting batch info')
+    console.debug('[NFTTab] cleared the metadata and the prepared minting batch info')
   }
 
   const handleImageTypeChange = (event) => {
@@ -93,7 +93,7 @@ const NFTTab = () => {
   }
 
   const sliceBy64Char = (inputString) => {
-    console.debug(`[dApp][NFT_Tab] inputString: ${JSON.stringify(inputString)}`)
+    console.debug(`[NFTTab] inputString: ${JSON.stringify(inputString)}`)
     if (inputString.length <= 64) {
       return inputString
     }
@@ -114,7 +114,7 @@ const NFTTab = () => {
 
   const _genMeta = (nftName, nftImageUrl, nftDescription) => {
     console.debug(
-      `[dApp][NFT_Tab][_genMeta]\nnftName: ${nftName}\nnftImageUrl: ${nftImageUrl}\nnftDescription: ${nftDescription}`,
+      `[NFTTab][_genMeta]\nnftName: ${nftName}\nnftImageUrl: ${nftImageUrl}\nnftDescription: ${nftDescription}`,
     )
     const name = nftName.replace(/ /g, '_')
     const imageUrl = sliceBy64Char(nftImageUrl)
@@ -126,7 +126,7 @@ const NFTTab = () => {
     newInfo.metadata.image = imageUrl
     newInfo.metadata.files[0].src = imageUrl
     newInfo.metadata.description = description
-    console.debug(`[dApp][NFT_Tab][_genMeta] newInfo: ${JSON.stringify(newInfo, null, 2)}`)
+    console.debug(`[NFTTab][_genMeta] newInfo: ${JSON.stringify(newInfo, null, 2)}`)
 
     return newInfo
   }
@@ -142,7 +142,7 @@ const NFTTab = () => {
   }
 
   const generateSeveralMetadata = () => {
-    console.debug(`[dApp][NFT_Tab][generateSeveralMetadata] ${currentNFTsAmount} NFTs metadata will be generated`)
+    console.debug(`[NFTTab][generateSeveralMetadata] ${currentNFTsAmount} NFTs metadata will be generated`)
     const allMetadataInfo = []
     for (let index = 1; index <= currentNFTsAmount; index++) {
       const newName = currentNFTName + `_${index}`
@@ -158,7 +158,7 @@ const NFTTab = () => {
     const txBuilder = getTxBuilder()
 
     const changeAddress = await api?.getChangeAddress()
-    console.debug(`[dApp][NFT_Tab][mint] changeAddress -> ${changeAddress}`)
+    console.debug(`[NFTTab][mint] changeAddress -> ${changeAddress}`)
     const wasmChangeAddress = getAddressFromBytes(changeAddress)
     const usedAddresses = await api?.getUsedAddresses()
     const usedAddress = getAddressFromBytes(usedAddresses[0])
@@ -171,7 +171,7 @@ const NFTTab = () => {
     for (const assetInfo of mintingTxInfo) {
       metadata[scriptHashHex][assetInfo.NFTName] = assetInfo.metadata
       metadata['version'] = isV2nft ? '2.0' : '1.0'
-      console.debug(`[dApp][NFT_Tab][mint] metadata -> ${JSON.stringify(metadata)}`)
+      console.debug(`[NFTTab][mint] metadata -> ${JSON.stringify(metadata)}`)
       txBuilder.add_json_metadatum(strToBigNum('721'), JSON.stringify(metadata))
       txBuilder.add_mint_asset_and_output_min_required_coin(
         wasmNativeScript,
@@ -181,27 +181,28 @@ const NFTTab = () => {
       )
     }
 
-    console.debug(`[dApp][NFT_Tab][mint] getting UTxOs`)
+    console.debug(`[NFTTab][mint] getting UTxOs`)
     const hexInputUtxos = await api?.getUtxos()
 
-    console.debug(`[dApp][NFT_Tab][mint] preparing wasmUTxOs`)
+    console.debug(`[NFTTab][mint] preparing wasmUTxOs`)
     const wasmUtxos = getCslUtxos(hexInputUtxos)
 
-    console.debug(`[dApp][NFT_Tab][mint] adding inputs`)
+    console.debug(`[NFTTab][mint] adding inputs`)
     txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset())
     txBuilder.add_required_signer(pubkeyHash)
     txBuilder.add_change_if_needed(wasmChangeAddress)
 
     const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes())
-    console.debug(`[dApp][NFT_Tab][mint] signing the tx`)
+    console.debug(`[NFTTab][mint] signing the tx`)
+    console.log('[NFTTab] Unsigned Tx:', unsignedTransactionHex)
     api
       ?.signTx({tx: unsignedTransactionHex, returnTx: true})
       .then((transactionHex) => {
-        console.debug(`[dApp][NFT_Tab][mint] TransactionHex: ${transactionHex}`)
+        console.debug(`[NFTTab][mint] TransactionHex: ${transactionHex}`)
         api
           .submitTx(transactionHex)
           .then((txId) => {
-            console.log(`[dApp][NFT_Tab][mint] Transaction successfully submitted: ${txId}`)
+            console.log(`[NFTTab][mint] Transaction successfully submitted: ${txId}`)
           })
           .catch((err) => {
             handleError()
