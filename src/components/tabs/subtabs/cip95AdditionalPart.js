@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import {useState} from 'react'
 import {getCertificateBuilder, getCslVotingBuilder} from '../../../utils/cslTools'
 import TabsComponent from '../tabsComponent'
 import GovBasicFunctionsTab from './govBasicFunctionsTab'
@@ -101,7 +101,6 @@ const Cip95AdditionalPart = ({api, onWaiting, onError, getters, setters}) => {
         getters={newGetters}
         setters={newSetters}
       />
-      {/* Here the expandable panel with tx certificates should be */}
       <div>
         <CertificatesInTxPart getters={getters}/>
       </div>

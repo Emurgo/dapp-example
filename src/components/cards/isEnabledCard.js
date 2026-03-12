@@ -1,4 +1,3 @@
-import React from 'react'
 import ApiCard from './apiCard'
 
 const IsEnabledCard = ({onRawResponse, onResponse, onWaiting, selectedWallet}) => {

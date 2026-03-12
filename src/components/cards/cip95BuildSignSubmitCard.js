@@ -1,14 +1,13 @@
 import {
   getAddressFromBech32,
   getCslUtxos,
+  getFixedTxFromBytes,
   getLargestFirstMultiAsset,
   getTransactionOutput,
   getTransactionWitnessSetFromBytes,
   getTxBuilder,
   strToBigNum,
-  getSignedTransaction,
 } from '../../utils/cslTools'
-import {bytesToHex} from '../../utils/utils'
 
 const Cip95BuildSignSubmitCard = (props) => {
   const {api, onWaiting, onError, getters, setters} = props
@@ -55,12 +54,15 @@ const Cip95BuildSignSubmitCard = (props) => {
       txBuilder.add_change_if_needed(shelleyChangeAddress)
       const wasmUnsignedTransaction = txBuilder.build_tx()
       // sign Tx
-      const unsignedTxHex = bytesToHex(wasmUnsignedTransaction.to_bytes())
-      console.log('Unsigned Tx:', unsignedTxHex)
-      const witnessHex = await api?.signTx(unsignedTxHex)
+      const fixedTx = getFixedTxFromBytes(wasmUnsignedTransaction.to_bytes())
+      console.log('Unsigned Tx:', fixedTx.to_hex())
+      const witnessHex = await api?.signTx(fixedTx.to_hex())
       const wasmWitnessSet = getTransactionWitnessSetFromBytes(witnessHex)
-      const wasmSignedTransaction = getSignedTransaction(wasmUnsignedTransaction, wasmWitnessSet)
-      const signedTxHex = bytesToHex(wasmSignedTransaction.to_bytes())
+      const vkeys = wasmWitnessSet.vkeys()
+      for (let i = 0; i < vkeys.len(); i++) {
+        fixedTx.add_vkey_witness(vkeys.get(i))
+      }
+      const signedTxHex = fixedTx.to_hex()
       console.log('Signed Tx:', signedTxHex)
       const txId = await api?.submitTx(signedTxHex)
       console.log('The transaction is sent:', txId)
