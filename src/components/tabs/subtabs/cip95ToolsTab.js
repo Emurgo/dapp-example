@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import {useState} from 'react'
 import useYoroi from '../../../hooks/yoroiProvider'
 import {CONNECTED} from '../../../utils/connectionStates'
 import Cip95AdditionalPart from './cip95AdditionalPart'

@@ -46,6 +46,7 @@ const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
     if (!txHex) {
       txHex = await buildTransaction(defaultValue)
     }
+    console.log('[SignTransactionCard] Unsingned Tx:', txHex)
     api
       ?.signTx(txHex)
       .then((witnessHex) => {
