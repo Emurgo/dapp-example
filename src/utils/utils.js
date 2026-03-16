@@ -17,8 +17,8 @@ export function wasmMultiassetToJSONs(wasmMultiasset) {
     const assetsJSON = {}
     for (let j = 0; j < wasmAssetNames.len(); j++) {
       const wasmAssetName = wasmAssetNames.get(j)
-      const policyId = bytesToHex(wasmScriptHashes.get(i).to_bytes())
-      const name = bytesToHex(wasmAssetName.to_bytes())
+      const policyId = wasmScriptHashes.get(i).to_hex()
+      const name = wasmAssetName.name().toHex()
       assetsJSON[`${policyId}.${name}`] = wasmAssets.get(wasmAssetName).to_str()
     }
     assetValue.push(assetsJSON)

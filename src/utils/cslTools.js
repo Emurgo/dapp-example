@@ -78,7 +78,7 @@ export const getBech32AddressFromHex = (addressHex) => wasm.Address.from_bytes(h
 
 export const getAddressFromBech32 = (bech32Value) => wasm.Address.from_bech32(bech32Value)
 
-export const getCslValue = (hexValue) => wasm.Value.from_bytes(hexToBytes(hexValue))
+export const getCslValue = (hexValue) => wasm.Value.from_hex(hexValue)
 
 export const getAmountInHex = (amount) => wasm.Value.new(wasm.BigNum.from_str(amount)).to_hex()
 
