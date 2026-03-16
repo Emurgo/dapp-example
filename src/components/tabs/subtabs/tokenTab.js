@@ -178,14 +178,14 @@ const TokenTab = () => {
                     inputName="Token Ticker"
                     inputValue={currentTokenTicker}
                     onChangeFunction={(event) => {
-                      setCurrentTokenDescription(event.target.value)
+                      setCurrentTokenTicker(event.target.value)
                     }}
                   />
                   <InputWithLabel
                     inputName="Token Description"
                     inputValue={currentTokenDescription}
                     onChangeFunction={(event) => {
-                      setCurrentTokenTicker(event.target.value)
+                      setCurrentTokenDescription(event.target.value)
                     }}
                   />
                   <InputWithLabel
