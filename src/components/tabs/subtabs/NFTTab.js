@@ -1,15 +1,16 @@
 import {useState} from 'react'
 import {Buffer} from 'buffer'
 import useYoroi from '../../../hooks/yoroiProvider'
-import {bytesToHex} from '../../../utils/utils'
 import {
   getAddressFromBytes,
   getAssetName,
   getCslUtxos,
+  getFixedTxFromBytes,
   getLargestFirstMultiAsset,
   getNativeScript,
   getPubKeyHash,
   getTransactionOutputBuilder,
+  getTransactionWitnessSetFromBytes,
   getTxBuilder,
   strToBigNum,
   toInt,
@@ -155,64 +156,62 @@ const NFTTab = () => {
   }
 
   const mint = async () => {
-    const txBuilder = getTxBuilder()
+    try {
+      const txBuilder = getTxBuilder()
 
-    const changeAddress = await api?.getChangeAddress()
-    console.debug(`[NFTTab][mint] changeAddress -> ${changeAddress}`)
-    const wasmChangeAddress = getAddressFromBytes(changeAddress)
-    const usedAddresses = await api?.getUsedAddresses()
-    const usedAddress = getAddressFromBytes(usedAddresses[0])
-    const pubkeyHash = getPubKeyHash(usedAddress)
-    const wasmNativeScript = getNativeScript(pubkeyHash)
-    const scriptHashHex = wasmNativeScript.hash().to_hex()
-    let metadata = {}
-    metadata[scriptHashHex] = {}
+      const changeAddress = await api?.getChangeAddress()
+      console.debug(`[NFTTab][mint] changeAddress -> ${changeAddress}`)
+      const wasmChangeAddress = getAddressFromBytes(changeAddress)
+      const usedAddresses = await api?.getUsedAddresses()
+      const usedAddress = getAddressFromBytes(usedAddresses[0])
+      const pubkeyHash = getPubKeyHash(usedAddress)
+      const wasmNativeScript = getNativeScript(pubkeyHash)
+      const scriptHashHex = wasmNativeScript.hash().to_hex()
+      let metadata = {}
+      metadata[scriptHashHex] = {}
 
-    for (const assetInfo of mintingTxInfo) {
-      metadata[scriptHashHex][assetInfo.NFTName] = assetInfo.metadata
-      metadata['version'] = isV2nft ? '2.0' : '1.0'
-      console.debug(`[NFTTab][mint] metadata -> ${JSON.stringify(metadata)}`)
-      txBuilder.add_json_metadatum(strToBigNum('721'), JSON.stringify(metadata))
-      txBuilder.add_mint_asset_and_output_min_required_coin(
-        wasmNativeScript,
-        getAssetName(assetInfo.metadata.name),
-        toInt('1'),
-        getTransactionOutputBuilder(wasmChangeAddress),
-      )
+      for (const assetInfo of mintingTxInfo) {
+        metadata[scriptHashHex][assetInfo.NFTName] = assetInfo.metadata
+        metadata['version'] = isV2nft ? '2.0' : '1.0'
+        console.debug(`[NFTTab][mint] metadata -> ${JSON.stringify(metadata)}`)
+        txBuilder.add_json_metadatum(strToBigNum('721'), JSON.stringify(metadata))
+        txBuilder.add_mint_asset_and_output_min_required_coin(
+          wasmNativeScript,
+          getAssetName(assetInfo.metadata.name),
+          toInt('1'),
+          getTransactionOutputBuilder(wasmChangeAddress),
+        )
+      }
+
+      console.debug(`[NFTTab][mint] getting UTxOs`)
+      const hexInputUtxos = await api?.getUtxos()
+
+      console.debug(`[NFTTab][mint] preparing wasmUTxOs`)
+      const wasmUtxos = getCslUtxos(hexInputUtxos)
+
+      console.debug(`[NFTTab][mint] adding inputs`)
+      txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset())
+      txBuilder.add_required_signer(pubkeyHash)
+      txBuilder.add_change_if_needed(wasmChangeAddress)
+
+      const wasmUnsignedTransaction = txBuilder.build_tx()
+      const fixedTx = getFixedTxFromBytes(wasmUnsignedTransaction.to_bytes())
+      console.log('[NFTTab][mint] Unsigned Tx:', fixedTx.to_hex())
+      console.debug(`[NFTTab][mint] signing the tx`)
+      const witnessHex = await api?.signTx(fixedTx.to_hex())
+      const wasmWitnessSet = getTransactionWitnessSetFromBytes(witnessHex)
+      const vkeys = wasmWitnessSet.vkeys()
+      for (let i = 0; i < vkeys.len(); i++) {
+        fixedTx.add_vkey_witness(vkeys.get(i))
+      }
+      const signedTxHex = fixedTx.to_hex()
+      console.log('[NFTTab][mint] Signed Tx:', signedTxHex)
+      const txId = await api?.submitTx(signedTxHex)
+      console.log(`[NFTTab][mint] Transaction successfully submitted: ${txId}`)
+    } catch (error) {
+      handleError()
+      console.error(error)
     }
-
-    console.debug(`[NFTTab][mint] getting UTxOs`)
-    const hexInputUtxos = await api?.getUtxos()
-
-    console.debug(`[NFTTab][mint] preparing wasmUTxOs`)
-    const wasmUtxos = getCslUtxos(hexInputUtxos)
-
-    console.debug(`[NFTTab][mint] adding inputs`)
-    txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset())
-    txBuilder.add_required_signer(pubkeyHash)
-    txBuilder.add_change_if_needed(wasmChangeAddress)
-
-    const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes())
-    console.debug(`[NFTTab][mint] signing the tx`)
-    console.log('[NFTTab] Unsigned Tx:', unsignedTransactionHex)
-    api
-      ?.signTx({tx: unsignedTransactionHex, returnTx: true})
-      .then((transactionHex) => {
-        console.debug(`[NFTTab][mint] TransactionHex: ${transactionHex}`)
-        api
-          .submitTx(transactionHex)
-          .then((txId) => {
-            console.log(`[NFTTab][mint] Transaction successfully submitted: ${txId}`)
-          })
-          .catch((err) => {
-            handleError()
-            console.error(err)
-          })
-      })
-      .catch((err) => {
-        handleError()
-        console.error(err)
-      })
   }
 
   return (

@@ -1,14 +1,15 @@
 import {useState} from 'react'
 import useYoroi from '../../../hooks/yoroiProvider'
-import {bytesToHex} from '../../../utils/utils'
 import {
   getAddressFromBytes,
   getAssetName,
   getCslUtxos,
+  getFixedTxFromBytes,
   getLargestFirstMultiAsset,
   getNativeScript,
   getPubKeyHash,
   getTransactionOutputBuilder,
+  getTransactionWitnessSetFromBytes,
   getTxBuilder,
   toInt,
 } from '../../../utils/cslTools'
@@ -130,13 +131,20 @@ const TokenTab = () => {
       txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset())
       txBuilder.add_required_signer(pubkeyHash)
       txBuilder.add_change_if_needed(wasmChangeAddress)
-
-      const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes())
-      console.log('[TokenTab] Unsigned Tx:', unsignedTransactionHex)
+      
+      const wasmUnsignedTransaction = txBuilder.build_tx()
+      const fixedTx = getFixedTxFromBytes(wasmUnsignedTransaction.to_bytes())
+      console.log('[TokenTab] Unsigned Tx:', fixedTx.to_hex())
       console.debug(`[TokenTab][mint] signing the tx`)
-      const transactionHex = await api?.signTx({tx: unsignedTransactionHex, returnTx: true})
-      console.debug(`[TokenTab][mint] TransactionHex: ${transactionHex}`)
-      const txId = await api.submitTx(transactionHex)
+      const witnessHex = await api?.signTx(fixedTx.to_hex())
+      const wasmWitnessSet = getTransactionWitnessSetFromBytes(witnessHex)
+      const vkeys = wasmWitnessSet.vkeys()
+      for (let i = 0; i < vkeys.len(); i++) {
+        fixedTx.add_vkey_witness(vkeys.get(i))
+      }
+      const signedTxHex = fixedTx.to_hex()
+      console.log('[TokenTab][mint] Signed Tx:', signedTxHex)
+      const txId = await api?.submitTx(signedTxHex)
       console.log(`[TokenTab][mint] Transaction successfully submitted: ${txId}`)
     } catch (error) {
       handleError(error)
