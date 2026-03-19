@@ -1,18 +1,18 @@
 import React, {useState, useEffect, useCallback} from 'react'
-import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_ETHEREUM} from '../utils/connectionStates'
+import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_PROVIDER} from '../utils/connectionStates'
 
 const EthereumContext = React.createContext(null)
 
 export const EthereumProvider = ({children}) => {
   console.debug('[dApp][EthereumProvider] is called')
   const [accounts, setAccounts] = useState([])
-  const [connectionState, setConnectionState] = useState(NO_ETHEREUM)
+  const [connectionState, setConnectionState] = useState(NO_PROVIDER)
   const [chainId, setChainId] = useState(null)
 
   useEffect(() => {
     if (!window.ethereum) {
       console.warn('[dApp] No Ethereum wallet found')
-      setConnectionState(NO_ETHEREUM)
+      setConnectionState(NO_PROVIDER)
       return
     }
     setConnectionState(NOT_CONNECTED)
@@ -64,12 +64,33 @@ export const EthereumProvider = ({children}) => {
     setConnectionState(NOT_CONNECTED)
   }, [])
 
+  const getAccounts = useCallback(() => accounts, [accounts])
+
+  const getBalance = useCallback(async (address) => {
+    if (!window.ethereum) return '0'
+    return await window.ethereum.request({method: 'eth_getBalance', params: [address, 'latest']})
+  }, [])
+
+  const sendTransaction = useCallback(async (tx) => {
+    if (!window.ethereum) throw new Error('No Ethereum wallet')
+    return await window.ethereum.request({method: 'eth_sendTransaction', params: [tx]})
+  }, [])
+
+  const signMessage = useCallback(async (message) => {
+    if (!window.ethereum || accounts.length === 0) throw new Error('Not connected')
+    return await window.ethereum.request({method: 'personal_sign', params: [message, accounts[0]]})
+  }, [accounts])
+
   const values = {
     accounts,
     connectionState,
     chainId,
     connect,
     disconnect,
+    getAccounts,
+    getBalance,
+    sendTransaction,
+    signMessage,
   }
 
   return <EthereumContext.Provider value={values}>{children}</EthereumContext.Provider>

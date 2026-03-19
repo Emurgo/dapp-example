@@ -1,6 +1,6 @@
 import React from 'react'
 import useEthereum from '../hooks/ethereumProvider'
-import {IN_PROGRESS, NO_ETHEREUM} from '../utils/connectionStates'
+import {IN_PROGRESS, NO_PROVIDER} from '../utils/connectionStates'
 import {shortAddress} from '../utils/ethereumUtils'
 
 const EthereumAccessButton = () => {
@@ -37,10 +37,10 @@ const EthereumAccessButton = () => {
       <div className="grid justify-items-center py-3">
         <button
           className="rounded-md bg-purple-600 hover:bg-purple-400 active:bg-purple-800 py-5 px-5 disabled:opacity-50 text-white font-semibold"
-          disabled={connectionState === NO_ETHEREUM}
+          disabled={connectionState === NO_PROVIDER}
           onClick={connect}
         >
-          {connectionState === NO_ETHEREUM ? 'No Ethereum Wallet Found' : 'Connect Ethereum Wallet'}
+          {connectionState === NO_PROVIDER ? 'No Ethereum Wallet Found' : 'Connect Ethereum Wallet'}
         </button>
       </div>
     </div>

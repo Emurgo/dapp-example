@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_CARDANO} from '../utils/connectionStates'
+import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_PROVIDER} from '../utils/connectionStates'
 
 const YoroiContext = React.createContext(null)
 const reservedKeys = [
@@ -25,7 +25,7 @@ const reservedKeys = [
 export const YoroiProvider = ({children}) => {
   console.debug('[dApp][YoroiProvider] is called')
   const [api, setApi] = useState(null)
-  const [connectionState, setConnectionState] = useState(NO_CARDANO)
+  const [connectionState, setConnectionState] = useState(NO_PROVIDER)
   const [availableWallets, setAvailableWallets] = useState([])
   const [selectedWallet, setSelectedWallet] = useState('')
 
@@ -49,7 +49,7 @@ export const YoroiProvider = ({children}) => {
   useEffect(() => {
     if (!window.cardano) {
       console.warn('[dApp] There are no cardano wallets are installed')
-      setConnectionState(NO_CARDANO)
+      setConnectionState(NO_PROVIDER)
       return
     }
 
@@ -146,9 +146,41 @@ export const YoroiProvider = ({children}) => {
     }
   }
 
+  const disconnect = () => {
+    setApi(null)
+    setSelectedWallet('')
+    setConnectionState(NOT_CONNECTED)
+  }
+
+  const getAccounts = async () => {
+    if (!api) return []
+    return await api.getUsedAddresses()
+  }
+
+  const getBalance = async () => {
+    if (!api) return '0'
+    return await api.getBalance()
+  }
+
+  const sendTransaction = async (tx) => {
+    if (!api) throw new Error('Not connected')
+    const signedTx = await api.signTx(tx)
+    return await api.submitTx(signedTx)
+  }
+
+  const signMessage = async (address, payload) => {
+    if (!api) throw new Error('Not connected')
+    return await api.signData(address, payload)
+  }
+
   const values = {
     api,
     connect,
+    disconnect,
+    getAccounts,
+    getBalance,
+    sendTransaction,
+    signMessage,
     connectionState,
     availableWallets,
     setAvailableWallets,

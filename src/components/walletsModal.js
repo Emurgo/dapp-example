@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import Popup from 'reactjs-popup'
 import useYoroi from '../hooks/yoroiProvider'
-import {NO_CARDANO} from '../utils/connectionStates'
+import {NO_PROVIDER} from '../utils/connectionStates'
 
 const WalletsModal = () => {
   const {connect, availableWallets, setSelectedWallet, connectionState} = useYoroi()
@@ -23,7 +23,7 @@ const WalletsModal = () => {
   const buttonProps = {
     className:
       'rounded-md border-black-300 bg-blue-500 hover:bg-blue-300 active:bg-blue-700 py-5 px-5 disabled:opacity-50',
-    disabled: connectionState === NO_CARDANO ? 'disabled' : '',
+    disabled: connectionState === NO_PROVIDER ? 'disabled' : '',
   }
 
   return (

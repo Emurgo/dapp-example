@@ -1,13 +1,13 @@
 import React from 'react'
 import useEthereum from '../../hooks/ethereumProvider'
-import {CONNECTED, NO_ETHEREUM} from '../../utils/connectionStates'
+import {CONNECTED, NO_PROVIDER} from '../../utils/connectionStates'
 
 const EthereumMainTab = () => {
   const {connectionState} = useEthereum()
 
   const message = () => {
     if (connectionState === CONNECTED) return null
-    if (connectionState === NO_ETHEREUM) {
+    if (connectionState === NO_PROVIDER) {
       return <label>No Ethereum wallet found. Please install a compatible Ethereum wallet.</label>
     }
     return <label>Ethereum wallet is not connected</label>

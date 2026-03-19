@@ -5,6 +5,7 @@ import App from './App'
 import {YoroiProvider} from './hooks/yoroiProvider'
 import {NetworkProvider} from './hooks/networkProvider'
 import {EthereumProvider} from './hooks/ethereumProvider'
+import {BitcoinProvider} from './hooks/bitcoinProvider'
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
@@ -13,11 +14,13 @@ root.render(
     <NetworkProvider>
       <YoroiProvider>
         <EthereumProvider>
+          <BitcoinProvider>
           <BrowserRouter>
             <Routes>
               <Route path="/*" element={<App />} />
             </Routes>
           </BrowserRouter>
+          </BitcoinProvider>
         </EthereumProvider>
       </YoroiProvider>
     </NetworkProvider>
