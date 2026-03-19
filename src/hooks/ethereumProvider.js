@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react'
+import React, {useState, useEffect, useCallback, useMemo} from 'react'
 import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_PROVIDER} from '../utils/connectionStates'
 
 const EthereumContext = React.createContext(null)
@@ -81,7 +81,16 @@ export const EthereumProvider = ({children}) => {
     return await window.ethereum.request({method: 'personal_sign', params: [message, accounts[0]]})
   }, [accounts])
 
-  const values = {
+  const switchNetwork = useCallback(async (targetChainId) => {
+    if (!window.ethereum) throw new Error('No Ethereum wallet')
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{chainId: targetChainId}],
+    })
+    // chainChanged event fires automatically → existing listener updates chainId
+  }, [])
+
+  const values = useMemo(() => ({
     accounts,
     connectionState,
     chainId,
@@ -91,7 +100,8 @@ export const EthereumProvider = ({children}) => {
     getBalance,
     sendTransaction,
     signMessage,
-  }
+    switchNetwork,
+  }), [accounts, connectionState, chainId, connect, disconnect, getAccounts, getBalance, sendTransaction, signMessage, switchNetwork])
 
   return <EthereumContext.Provider value={values}>{children}</EthereumContext.Provider>
 }
