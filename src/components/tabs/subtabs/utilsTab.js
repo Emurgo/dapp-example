@@ -13,7 +13,7 @@ const UtilsTab = () => {
 
   return (
     <div className="py-5 px-5 text-gray-300">
-      <div className="grid grid-cols-3 gap-2">
+      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-2">
         <div className="grid justify-items-stretch grid-cols-1 lg:grid-cols-2 gap-2">
           <div>
             <CreateRandomKeyCard

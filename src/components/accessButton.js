@@ -22,15 +22,11 @@ const AccessButton = () => {
     <div className="mx-auto bg-gray-900">
       <div className="grid justify-items-center py-3">
         {api ? (
-          <div className="grid grid-cols-4">
-            <div className="grid justify-items-end py-5">
-              <img src={getWalletIcon()} alt="wallet icon" width="72" />
-            </div>
-            <div className="col-span-3 text-xl font-bold tracking-tight text-white text-center ml-1">
-              <div className="py-5">
-                <div>Connected To {getWalletName()}</div>
-                <div className="py-1">anonymous wallet</div>
-              </div>
+          <div className="flex items-center justify-center gap-3 py-5">
+            <img src={getWalletIcon()} alt="wallet icon" className="w-10 sm:w-14 lg:w-16" />
+            <div className="text-base sm:text-xl font-bold tracking-tight text-white text-center">
+              <div>Connected To {getWalletName()}</div>
+              <div className="py-1 text-sm sm:text-base">anonymous wallet</div>
             </div>
           </div>
         ) : connectionState === IN_PROGRESS ? (

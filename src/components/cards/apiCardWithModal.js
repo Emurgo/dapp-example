@@ -15,8 +15,7 @@ export const ApiCardWithModal = (props) => {
   const nested = false
 
   const contentStyle = {
-    width: '33.33%',
-    minWidth: '320px',
+    width: 'min(90vw, 480px)',
     maxHeight: '90vh',
     overflowY: 'auto',
     border: 'none',
@@ -40,7 +39,7 @@ export const ApiCardWithModal = (props) => {
           {/* close button and modal window title */}
           <div className="flex bg-blue-900">
             <div className="flex flex-auto justify-left">
-              <div className="pl-1 bg-transparent text-white float-left text-2xl m-2 font-semibold outline-none focus:outline-none">
+              <div className="pl-1 bg-transparent text-white float-left text-xl sm:text-2xl m-2 font-semibold outline-none focus:outline-none">
                 {buttonLabel}
               </div>
             </div>
