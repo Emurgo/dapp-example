@@ -1,5 +1,20 @@
 /* global BigInt */
 
+export const CHAIN_IDS = Object.freeze({
+  MAINNET: '0x1',
+  SEPOLIA: '0xaa36a7',
+  HOLESKY: '0x4268',
+})
+
+export const chainName = (chainId) => {
+  switch (chainId) {
+    case CHAIN_IDS.MAINNET: return 'Mainnet'
+    case CHAIN_IDS.SEPOLIA: return 'Sepolia'
+    case CHAIN_IDS.HOLESKY: return 'Holesky'
+    default: return chainId ?? 'Unknown'
+  }
+}
+
 /**
  * Convert hex Wei string (e.g. "0x1a") to ETH string
  */

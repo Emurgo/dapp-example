@@ -3,8 +3,10 @@ import AccessButton from './components/accessButton'
 import MainTab from './components/tabs/mainTab'
 import TabsComponent from './components/tabs/tabsComponent'
 import useYoroi from './hooks/yoroiProvider'
-import useNetwork, {NETWORK_CARDANO} from './hooks/networkProvider'
-import {CONNECTED, NO_CARDANO} from './utils/connectionStates'
+import useNetwork, {NETWORK_CARDANO, NETWORK_ETHEREUM} from './hooks/networkProvider'
+import BitcoinAccessButton from './components/bitcoinAccessButton'
+import BitcoinMainTab from './components/tabs/bitcoinMainTab'
+import {CONNECTED, NO_PROVIDER} from './utils/connectionStates'
 import NetworkToggle from './components/networkToggle'
 import EthereumAccessButton from './components/ethereumAccessButton'
 import EthereumMainTab from './components/tabs/ethereumMainTab'
@@ -23,7 +25,7 @@ const App = () => {
   const {connectionState, selectedWallet, setConnectionState, setConnectionStateFalse} = useYoroi()
   const {activeNetwork} = useNetwork()
   const isWalletConnected = connectionState === CONNECTED
-  const isNotCardanoWallet = connectionState === NO_CARDANO
+  const isNoProvider = connectionState === NO_PROVIDER
 
   const walletStateWithTimeout = async (walletObject, timeout = 2000) => {
     const timeoutPromise = new Promise((_, reject) => {
@@ -65,7 +67,7 @@ const App = () => {
 
   const mainTabProps = {
     isWalletConnected,
-    isNotCardanoWallet,
+    isNoProvider,
   }
 
   const cardanoTabsData = [
@@ -124,22 +126,37 @@ const App = () => {
     },
   ]
 
-  return (
-    <div className="min-h-screen bg-gray-800">
-      <NetworkToggle />
-      {activeNetwork === NETWORK_CARDANO ? (
+  const renderNetwork = () => {
+    if (activeNetwork === NETWORK_CARDANO) {
+      return (
         <>
           <AccessButton />
           <MainTab {...mainTabProps} />
           <TabsComponent tabsData={cardanoTabsData} />
         </>
-      ) : (
+      )
+    }
+    if (activeNetwork === NETWORK_ETHEREUM) {
+      return (
         <>
           <EthereumAccessButton />
           <EthereumMainTab />
           <TabsComponent tabsData={ethereumTabsData} />
         </>
-      )}
+      )
+    }
+    return (
+      <>
+        <BitcoinAccessButton />
+        <BitcoinMainTab />
+      </>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-800">
+      <NetworkToggle />
+      {renderNetwork()}
     </div>
   )
 }

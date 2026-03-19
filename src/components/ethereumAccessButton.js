@@ -1,10 +1,10 @@
 import React from 'react'
 import useEthereum from '../hooks/ethereumProvider'
-import {IN_PROGRESS, NO_ETHEREUM} from '../utils/connectionStates'
-import {shortAddress} from '../utils/ethereumUtils'
+import {IN_PROGRESS, NO_PROVIDER} from '../utils/connectionStates'
+import {shortAddress, chainName} from '../utils/ethereumUtils'
 
 const EthereumAccessButton = () => {
-  const {accounts, connectionState, connect} = useEthereum()
+  const {accounts, connectionState, connect, chainId} = useEthereum()
   const isConnected = accounts.length > 0
 
   if (isConnected) {
@@ -15,6 +15,13 @@ const EthereumAccessButton = () => {
             <div className="py-5">
               <div>Connected to Ethereum Wallet</div>
               <div className="py-1 text-purple-400">{shortAddress(accounts[0])}</div>
+              {chainId && (
+                <div className="py-1">
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-purple-900 text-purple-300 border border-purple-700">
+                    {chainName(chainId)}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -37,10 +44,10 @@ const EthereumAccessButton = () => {
       <div className="grid justify-items-center py-3">
         <button
           className="rounded-md bg-purple-600 hover:bg-purple-400 active:bg-purple-800 py-5 px-5 disabled:opacity-50 text-white font-semibold"
-          disabled={connectionState === NO_ETHEREUM}
+          disabled={connectionState === NO_PROVIDER}
           onClick={connect}
         >
-          {connectionState === NO_ETHEREUM ? 'No Ethereum Wallet Found' : 'Connect Ethereum Wallet'}
+          {connectionState === NO_PROVIDER ? 'No Ethereum Wallet Found' : 'Connect Ethereum Wallet'}
         </button>
       </div>
     </div>

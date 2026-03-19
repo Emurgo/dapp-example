@@ -1,9 +1,9 @@
 const MainTab = (props) => {
-  const {isWalletConnected, isNotCardanoWallet} = props
+  const {isWalletConnected, isNoProvider} = props
 
   const walletConnectionMessage = () => {
     if (!isWalletConnected) {
-      if (isNotCardanoWallet) {
+      if (isNoProvider) {
         return (
           <div className="text-m font-bold tracking-tight text-white">
             <label>Cardano wallet is not found</label>
