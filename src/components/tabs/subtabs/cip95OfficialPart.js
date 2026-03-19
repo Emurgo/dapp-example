@@ -6,7 +6,7 @@ import Cip95SignDataCard from '../../cards/cip95SignDataCard'
 
 const Cip95OfficialPart = ({api, setRawCurrentText, setResponse, setWaiterState}) => {
   return (
-    <div className="grid justify-items-stretch grid-cols-4 gap-2">
+    <div className="grid justify-items-stretch grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
       <div>
         <Cip95GetPubDRepKeyCard
           api={api}

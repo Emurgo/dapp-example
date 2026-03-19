@@ -39,36 +39,19 @@ const ResponsesPart = ({rawCurrentText, currentText, currentWaiterState}) => {
   }
 
   return (
-    <div className="col-span-2 block p-5 min-w-full rounded-lg border shadow-md bg-gray-900 border-gray-700">
+    <div className="col-span-2 block p-3 sm:p-5 min-w-full rounded-lg border shadow-md bg-gray-900 border-gray-700">
       <div className="grid grid-rows-4 gap-2 h-full">
         <div>
           <div className="grid grid-rows-3 h-full">
-            <div className="grid grid-cols-3">
-              <div className="grid justify-items-start content-end">
-                <span className="text-l font-bold text-white">Raw response:</span>
-              </div>
-              <div className="grid justify-items-center content-end">
-                <label className="text-white font-medium">
+            <div className="flex flex-wrap items-end justify-between gap-1">
+              <span className="text-sm sm:text-base font-bold text-white">Raw response:</span>
+              <div className="flex items-center gap-2">
+                <label className="text-white font-medium text-sm">
                   {currentWaiterState ? 'Waiting for the response...' : ''}
                 </label>
-                <label className="text-green-600 font-medium">{isMessageDisplayedRaw ? 'Copied!' : ''}</label>
-              </div>
-              <div className="grid justify-items-end content-end">
+                <label className="text-green-600 font-medium text-sm">{isMessageDisplayedRaw ? 'Copied!' : ''}</label>
                 <button
-                  className="
-                                    text-white
-                                    font-medium
-                                    rounded-lg
-                                    text-sm
-                                    px-5
-                                    py-2.5
-                                    text-center
-                                    bg-orange-700
-                                    hover:bg-orange-800
-                                    focus:ring-orange-900
-                                    active:ring-orange-600
-                                    disabled:opacity-50
-                                    "
+                  className="text-white font-medium rounded-lg text-sm px-3 sm:px-5 py-2.5 text-center bg-orange-700 hover:bg-orange-800 focus:ring-orange-900 active:ring-orange-600 disabled:opacity-50"
                   onClick={copyRawToClipboard}
                 >
                   Copy
@@ -87,32 +70,15 @@ const ResponsesPart = ({rawCurrentText, currentText, currentWaiterState}) => {
         </div>
         <div className="row-span-3">
           <div className="grid grid-rows-5 h-full">
-            <div className="grid grid-cols-3">
-              <div className="grid justify-items-start content-end">
-                <span className="text-l font-bold text-white">Processed response:</span>
-              </div>
-              <div className="grid justify-items-center content-end">
-                <label className="text-white font-medium">
+            <div className="flex flex-wrap items-end justify-between gap-1">
+              <span className="text-sm sm:text-base font-bold text-white">Processed response:</span>
+              <div className="flex items-center gap-2">
+                <label className="text-white font-medium text-sm">
                   {currentWaiterState ? 'Waiting for the response...' : ''}
                 </label>
-                <label className="text-green-600 font-medium">{isMessageDisplayed ? 'Copied!' : ''}</label>
-              </div>
-              <div className="grid justify-items-end content-end">
+                <label className="text-green-600 font-medium text-sm">{isMessageDisplayed ? 'Copied!' : ''}</label>
                 <button
-                  className="
-                                    text-white
-                                    font-medium
-                                    rounded-lg
-                                    text-sm
-                                    px-5
-                                    py-2.5
-                                    text-center
-                                    bg-orange-700
-                                    hover:bg-orange-800
-                                    focus:ring-orange-900
-                                    active:ring-orange-600
-                                    disabled:opacity-50
-                                    "
+                  className="text-white font-medium rounded-lg text-sm px-3 sm:px-5 py-2.5 text-center bg-orange-700 hover:bg-orange-800 focus:ring-orange-900 active:ring-orange-600 disabled:opacity-50"
                   onClick={copyToClipboard}
                 >
                   Copy

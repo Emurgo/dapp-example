@@ -67,6 +67,7 @@ const NFTTab = () => {
   const [isMoreThenOneNFT, setIsMoreThenOneNFT] = useState(false)
   const [currentErrorState, setCurrentErrorState] = useState(false)
   const [currentNFTsAmount, setCurrentNFTsAmount] = useState(1)
+  const [isMetadataOpen, setIsMetadataOpen] = useState(false)
 
   const handleError = () => {
     setCurrentErrorState(true)
@@ -220,29 +221,30 @@ const NFTTab = () => {
         <>
           <div className="grid justify-items-center py-5 px-5">
             <div className="block p-6 min-w-full rounded-lg border shadow-md bg-gray-800 border-gray-700">
-              <div className="text-white text-center">
-                <p />
-                Note: Currently the functionality of this is extremely limited, it is really only here to mint really
-                basic NFTs for testing.
-                <p />
-                The minting policy is hardcoded to basically just use the pubkeyhash of your first used address, so all
-                the NFTs you mint here will have the same policy id.
-                <p />
-                They're not even really NFTs, cuz you can mint multiple of them. This is a work in progress and will
-                have more functionalities in the future.
-              </div>
-              {currentErrorState ? (
-                <div className="text-red-500 text-2xl font-bold text-center">
-                  <p /> !!! The error appeared. Please check logs !!!
+              <details>
+                <summary className="cursor-pointer text-white font-bold select-none">Note</summary>
+                <div className="text-white text-center mt-2">
+                  <p />
+                  Note: Currently the functionality of this is extremely limited, it is really only here to mint really
+                  basic NFTs for testing.
+                  <p />
+                  The minting policy is hardcoded to basically just use the pubkeyhash of your first used address, so all
+                  the NFTs you mint here will have the same policy id.
+                  <p />
+                  They're not even really NFTs, cuz you can mint multiple of them. This is a work in progress and will
+                  have more functionalities in the future.
                 </div>
-              ) : (
-                <></>
+              </details>
+              {currentErrorState && (
+                <div className="text-red-500 text-2xl font-bold text-center mt-2">
+                  !!! The error appeared. Please check logs !!!
+                </div>
               )}
             </div>
           </div>
           <div className="grid justify-items-center py-5 px-5">
             <div className="block p-6 min-w-full rounded-lg border shadow-md bg-gray-800 border-gray-700">
-              <div className="flex pb-5">
+              <div className="flex flex-col lg:flex-row pb-5">
                 <div className="flex-1">
                   {/* Inputs */}
                   <InputWithLabel
@@ -316,22 +318,32 @@ const NFTTab = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="mb-6 h-full">
-                    <label htmlFor="metadataJson" className="block mb-2 text-sm font-medium text-gray-300">
-                      Metadata JSON
-                    </label>
-                    <textarea
-                      className="flex-1 w-full h-full rounded bg-gray-900 text-white px-2 readonly"
-                      id="metadataJson"
-                      readOnly
-                      value={JSON.stringify(currentMintingInfo, null, 4)}
-                    ></textarea>
+                <div className="flex-1 lg:ml-4">
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <label htmlFor="metadataJson" className="block text-sm font-medium text-gray-300">
+                        Metadata JSON
+                      </label>
+                      <button
+                        className="lg:hidden text-sm text-orange-400 hover:text-orange-300"
+                        onClick={() => setIsMetadataOpen(!isMetadataOpen)}
+                      >
+                        {isMetadataOpen ? 'Hide' : 'Show'}
+                      </button>
+                    </div>
+                    <div className={`${isMetadataOpen ? '' : 'hidden'} lg:block`}>
+                      <textarea
+                        className="w-full min-h-48 rounded bg-gray-900 text-white px-2 readonly"
+                        id="metadataJson"
+                        readOnly
+                        value={JSON.stringify(currentMintingInfo, null, 4)}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
               {/* Buttons */}
-              <div className="flex pt-7">
+              <div className="flex flex-col lg:flex-row pt-7">
                 <div className="flex-1">
                   <div>
                     {isMoreThenOneNFT ? (

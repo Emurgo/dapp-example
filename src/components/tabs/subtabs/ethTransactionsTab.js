@@ -1,11 +1,11 @@
-import {useState} from 'react'
-import useYoroi from '../../../hooks/yoroiProvider'
-import {CONNECTED} from '../../../utils/connectionStates'
+import React, {useState} from 'react'
+import useEthereum from '../../../hooks/ethereumProvider'
 import ResponsesPart from './responsesPart'
-import WithdrawCard from '../../cards/staking/withdrawCard'
+import SendEthTransactionCard from '../../cards/ethereum/sendEthTransactionCard'
+import {CONNECTED} from '../../../utils/connectionStates'
 
-const Staking = () => {
-  const {api, connectionState} = useYoroi()
+const EthTransactionsTab = () => {
+  const {accounts, connectionState} = useEthereum()
   const [currentText, setCurrentText] = useState('')
   const [rawCurrentText, setRawCurrentText] = useState('')
   const [waiterState, setWaiterState] = useState(false)
@@ -13,23 +13,22 @@ const Staking = () => {
   const setResponse = (response, stringifyIt = true) => {
     setCurrentText(stringifyIt ? JSON.stringify(response, undefined, 2) : response)
   }
+
   return (
     <div className="py-5 px-5 text-gray-300">
       {connectionState === CONNECTED ? (
-        <div>
-          <div className="grid justify-items-stretch grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-2">
+          <div className="grid justify-items-stretch grid-cols-1 md:grid-cols-2 gap-2">
             <div>
-              <WithdrawCard
-                api={api}
+              <SendEthTransactionCard
+                accounts={accounts}
                 onRawResponse={setRawCurrentText}
                 onResponse={setResponse}
                 onWaiting={setWaiterState}
               />
             </div>
           </div>
-          <div>
-            <ResponsesPart rawCurrentText={rawCurrentText} currentText={currentText} currentWaiterState={waiterState} />
-          </div>
+          <ResponsesPart rawCurrentText={rawCurrentText} currentText={currentText} currentWaiterState={waiterState} />
         </div>
       ) : (
         <div></div>
@@ -38,4 +37,4 @@ const Staking = () => {
   )
 }
 
-export default Staking
+export default EthTransactionsTab

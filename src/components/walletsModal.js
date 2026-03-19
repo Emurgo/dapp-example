@@ -33,7 +33,7 @@ const WalletsModal = () => {
           {/* close button and modal window title */}
           <div className="flex bg-blue-900">
             <div className="flex flex-auto justify-center">
-              <div className="pl-1 bg-transparent text-white float-left text-2xl font-semibold outline-none focus:outline-none">
+              <div className="pl-1 bg-transparent text-white float-left text-lg sm:text-2xl font-semibold outline-none focus:outline-none">
                 Select Wallet
               </div>
             </div>
@@ -48,7 +48,7 @@ const WalletsModal = () => {
           </div>
           {/* wallet buttons */}
           <div className="text-white my-2 px-2">Please, select one of presented wallets to continue</div>
-          <div className="grid justify-items-center grid-cols-3 gap-2 my-2 px-1">
+          <div className="grid justify-items-center grid-cols-2 sm:grid-cols-3 gap-2 my-2 px-1">
             {availableWallets.map((walletInfo) => (
               <div className="text-white" key={walletInfo.walletObjKey.toLowerCase()}>
                 <label>
@@ -71,7 +71,7 @@ const WalletsModal = () => {
           <div className="flex">
             <div className="flex-auto">
               <button
-                className="w-full rounded-md bg-blue-500 hover:bg-blue-300 text-xl active:bg-blue-700 py-1 px-2"
+                className="w-full rounded-md bg-blue-500 hover:bg-blue-300 text-base sm:text-xl active:bg-blue-700 py-1 px-2"
                 onClick={() => {
                   handleSelectionAndClose(close)
                 }}

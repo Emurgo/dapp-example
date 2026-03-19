@@ -6,13 +6,13 @@ const TabsComponent = ({tabsData}) => {
 
   return (
     <Tabs value={activeTab}>
-      <TabsHeader className="rounded-none border-b-2 border-gray-700 bg-transparent p-0">
+      <TabsHeader className="rounded-none border-b-2 border-gray-700 bg-transparent p-0 overflow-x-auto">
         {tabsData.map(({label, value}) => (
           <Tab
             key={value}
             value={value}
             className={
-              activeTab === value ? 'bg-orange-700 text-white rounded-t-lg' : 'text-gray-300 border-x border-gray-700'
+              activeTab === value ? 'bg-orange-700 text-white rounded-t-lg whitespace-nowrap' : 'text-gray-300 border-x border-gray-700 whitespace-nowrap'
             }
             onClick={() => setActiveTab(value)}
           >

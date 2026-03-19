@@ -16,7 +16,7 @@ import GetExtensionsCard from '../../cards/getExtensionsCard'
 
 const OfficialPart = ({api, setRawCurrentText, setResponse, setWaiterState, selectedWallet}) => {
   return (
-    <div className="grid justify-items-stretch grid-cols-1 lg:grid-cols-2 gap-2">
+    <div className="grid justify-items-stretch grid-cols-1 md:grid-cols-2 gap-2">
       <div>
         <IsEnabledCard onRawResponse={setRawCurrentText} onResponse={setResponse} onWaiting={setWaiterState} selectedWallet={selectedWallet} />
       </div>

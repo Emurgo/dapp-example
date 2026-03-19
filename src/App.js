@@ -3,7 +3,11 @@ import AccessButton from './components/accessButton'
 import MainTab from './components/tabs/mainTab'
 import TabsComponent from './components/tabs/tabsComponent'
 import useYoroi from './hooks/yoroiProvider'
+import useNetwork, {NETWORK_CARDANO} from './hooks/networkProvider'
 import {CONNECTED, NO_CARDANO} from './utils/connectionStates'
+import NetworkToggle from './components/networkToggle'
+import EthereumAccessButton from './components/ethereumAccessButton'
+import EthereumMainTab from './components/tabs/ethereumMainTab'
 import Cip30Tab from './components/tabs/subtabs/cip30Tab'
 import Cip95Tab from './components/tabs/subtabs/cip95Tab'
 import Cip95TabTools from './components/tabs/subtabs/cip95ToolsTab'
@@ -11,9 +15,13 @@ import NFTTab from './components/tabs/subtabs/NFTTab'
 import UtilsTab from './components/tabs/subtabs/utilsTab'
 import TokenTab from './components/tabs/subtabs/tokenTab'
 import Staking from './components/tabs/subtabs/stakingTab'
+import Eip1193Tab from './components/tabs/subtabs/eip1193Tab'
+import EthTransactionsTab from './components/tabs/subtabs/ethTransactionsTab'
+import Erc20Tab from './components/tabs/subtabs/erc20Tab'
 
 const App = () => {
   const {connectionState, selectedWallet, setConnectionState, setConnectionStateFalse} = useYoroi()
+  const {activeNetwork} = useNetwork()
   const isWalletConnected = connectionState === CONNECTED
   const isNotCardanoWallet = connectionState === NO_CARDANO
 
@@ -25,7 +33,7 @@ const App = () => {
     })
     const walletEnabledPromise = walletObject.isEnabled()
     const response = await Promise.race([walletEnabledPromise, timeoutPromise])
-    return response 
+    return response
   }
 
   useEffect(() => {
@@ -60,7 +68,7 @@ const App = () => {
     isNotCardanoWallet,
   }
 
-  const data = [
+  const cardanoTabsData = [
     {
       label: 'CIP-30',
       value: 'cip30',
@@ -98,11 +106,40 @@ const App = () => {
     },
   ]
 
+  const ethereumTabsData = [
+    {
+      label: 'EIP-1193',
+      value: 'eip1193',
+      children: <Eip1193Tab />,
+    },
+    {
+      label: 'Transactions',
+      value: 'ethTx',
+      children: <EthTransactionsTab />,
+    },
+    {
+      label: 'ERC-20',
+      value: 'erc20',
+      children: <Erc20Tab />,
+    },
+  ]
+
   return (
     <div className="min-h-screen bg-gray-800">
-      <AccessButton />
-      <MainTab {...mainTabProps} />
-      <TabsComponent tabsData={data} />
+      <NetworkToggle />
+      {activeNetwork === NETWORK_CARDANO ? (
+        <>
+          <AccessButton />
+          <MainTab {...mainTabProps} />
+          <TabsComponent tabsData={cardanoTabsData} />
+        </>
+      ) : (
+        <>
+          <EthereumAccessButton />
+          <EthereumMainTab />
+          <TabsComponent tabsData={ethereumTabsData} />
+        </>
+      )}
     </div>
   )
 }

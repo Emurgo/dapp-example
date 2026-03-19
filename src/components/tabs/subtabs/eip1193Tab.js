@@ -1,11 +1,11 @@
 import React, {useState} from 'react'
-import useYoroi from '../../../hooks/yoroiProvider'
+import useEthereum from '../../../hooks/ethereumProvider'
 import ResponsesPart from './responsesPart'
-import OfficialPart from './officialPart'
+import Eip1193Part from './eip1193Part'
 import {CONNECTED} from '../../../utils/connectionStates'
 
-const Cip30Tab = () => {
-  const {api, connectionState, selectedWallet} = useYoroi()
+const Eip1193Tab = () => {
+  const {accounts, connectionState} = useEthereum()
   const [currentText, setCurrentText] = useState('')
   const [rawCurrentText, setRawCurrentText] = useState('')
   const [waiterState, setWaiterState] = useState(false)
@@ -18,12 +18,11 @@ const Cip30Tab = () => {
     <div className="py-5 px-5 text-gray-300">
       {connectionState === CONNECTED ? (
         <div className="flex flex-col lg:grid lg:grid-cols-3 gap-2">
-          <OfficialPart
-            api={api}
+          <Eip1193Part
+            accounts={accounts}
             setRawCurrentText={setRawCurrentText}
             setResponse={setResponse}
             setWaiterState={setWaiterState}
-            selectedWallet={selectedWallet}
           />
           <ResponsesPart rawCurrentText={rawCurrentText} currentText={currentText} currentWaiterState={waiterState} />
         </div>
@@ -34,4 +33,4 @@ const Cip30Tab = () => {
   )
 }
 
-export default Cip30Tab
+export default Eip1193Tab
