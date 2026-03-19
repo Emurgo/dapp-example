@@ -81,15 +81,6 @@ export const EthereumProvider = ({children}) => {
     return await window.ethereum.request({method: 'personal_sign', params: [message, accounts[0]]})
   }, [accounts])
 
-  const switchNetwork = useCallback(async (targetChainId) => {
-    if (!window.ethereum) throw new Error('No Ethereum wallet')
-    await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{chainId: targetChainId}],
-    })
-    // chainChanged event fires automatically → existing listener updates chainId
-  }, [])
-
   const values = useMemo(() => ({
     accounts,
     connectionState,
@@ -100,8 +91,7 @@ export const EthereumProvider = ({children}) => {
     getBalance,
     sendTransaction,
     signMessage,
-    switchNetwork,
-  }), [accounts, connectionState, chainId, connect, disconnect, getAccounts, getBalance, sendTransaction, signMessage, switchNetwork])
+  }), [accounts, connectionState, chainId, connect, disconnect, getAccounts, getBalance, sendTransaction, signMessage])
 
   return <EthereumContext.Provider value={values}>{children}</EthereumContext.Provider>
 }
