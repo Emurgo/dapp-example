@@ -1,6 +1,6 @@
 {
   "name": "dapp-example",
-  "version": "0.2.1",
+  "version": "2.0.0",
   "private": true,
   "dependencies": {
     "@emurgo/cardano-serialization-lib-browser": "14.1.2",
