@@ -284,6 +284,17 @@ npm test
 
 ---
 
+## Agent System
+
+This project uses an agent-based workflow defined in `CLAUDE_AGENTS.md`.
+
+When performing tasks:
+- Always follow the agent pipeline
+- Default to the MASTER EXECUTION PROMPT
+- Do not skip steps unless explicitly instructed
+
+---
+
 ## Summary
 
 This project demonstrates how to build a **clean, minimal, multi-chain dApp** with:
