@@ -17,6 +17,7 @@ import NFTTab from './components/tabs/subtabs/NFTTab'
 import UtilsTab from './components/tabs/subtabs/utilsTab'
 import TokenTab from './components/tabs/subtabs/tokenTab'
 import Staking from './components/tabs/subtabs/stakingTab'
+import TestTxsTab from './components/tabs/subtabs/testTxsTab'
 import Eip1193Tab from './components/tabs/subtabs/eip1193Tab'
 import EthTransactionsTab from './components/tabs/subtabs/ethTransactionsTab'
 import Erc20Tab from './components/tabs/subtabs/erc20Tab'
@@ -105,6 +106,11 @@ const App = () => {
       label: 'Utils',
       value: 'utils',
       children: <UtilsTab />,
+    },
+    {
+      label: 'Test Txs',
+      value: 'testTxs',
+      children: <TestTxsTab />,
     },
   ]
 
