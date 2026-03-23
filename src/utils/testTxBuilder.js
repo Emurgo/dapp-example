@@ -15,7 +15,6 @@ const DREP_KEY_HASH = '5566778899aabbccddeeff0011223344556677889900aabb11223344'
 const COMMITTEE_COLD_HASH = '6677889900aabbccddeeff001122334455667788990011aabb223344'
 const COMMITTEE_HOT_HASH = '7788990011aabbccddeeff00112233445566778899002233aabb4455'
 const REQUIRED_SIGNER_HASH = '8899aabbccddeeff00112233445566778899aabbccddeeff00112233'
-const SCRIPT_HASH = 'bb00cc11dd22ee33ff44001122334455667788990011223344556677'
 const DATUM_HASH = '2222222222222222222222222222222222222222222222222222222222222222'
 const SCRIPT_DATA_HASH = 'f1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c4b5a69788796a5b4c3d2e1f00'
 const COLLATERAL_TX_HASH = '3333333333333333333333333333333333333333333333333333333333333333'
@@ -126,6 +125,13 @@ export const FEATURE_GROUPS = [
 // Credential resolution helpers
 // ---------------------------------------------------------------------------
 
+/** Canonical test native script for 'script' mode — its hash is the script credential */
+function getTestScriptNativeScript() {
+  return wasm.NativeScript.new_script_pubkey(
+    wasm.ScriptPubkey.new(wasm.Ed25519KeyHash.from_hex(PAYMENT_KEY_HASH)),
+  )
+}
+
 function resolveStakeCred(mode, walletRewardAddrHex) {
   if (mode === 'wallet' && walletRewardAddrHex) {
     const rewardAddr = wasm.RewardAddress.from_address(
@@ -134,7 +140,7 @@ function resolveStakeCred(mode, walletRewardAddrHex) {
     return rewardAddr.payment_cred()
   }
   if (mode === 'script') {
-    return wasm.Credential.from_scripthash(wasm.ScriptHash.from_hex(SCRIPT_HASH))
+    return wasm.Credential.from_scripthash(getTestScriptNativeScript().hash())
   }
   // 'key' mode (default)
   return wasm.Credential.from_keyhash(wasm.Ed25519KeyHash.from_hex(STAKE_KEY_HASH))
@@ -148,6 +154,15 @@ function resolveRewardAddr(mode, walletRewardAddrHex, networkId) {
   }
   const cred = resolveStakeCred(mode, walletRewardAddrHex)
   return wasm.RewardAddress.new(networkId, cred)
+}
+
+/** Adds a certificate using native script witness when mode is 'script' */
+function addCertToBuilder(certBuilder, cert, mode) {
+  if (mode === 'script') {
+    certBuilder.add_with_native_script(cert, wasm.NativeScriptSource.new(getTestScriptNativeScript()))
+  } else {
+    certBuilder.add(cert)
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -172,14 +187,30 @@ export function buildTestTx(enabledFeatures, credModes, walletRewardAddrHex, wal
   // Change address (destination for outputs)
   const changeAddr = wasm.Address.from_bytes(hexToBytes(walletChangeAddrHex))
 
+  // Native script used for mint/burn — defined here so the policy ID is available
+  // when constructing the fake UTXO (burn requires tokens in inputs)
+  const mintPolicyKeyHash = wasm.Ed25519KeyHash.from_hex(PAYMENT_KEY_HASH)
+  const mintNativeScript = wasm.NativeScript.new_script_pubkey(
+    wasm.ScriptPubkey.new(mintPolicyKeyHash),
+  )
+
   // Fake input UTXO: enterprise address with 10,000 ADA
+  // When burn is enabled, also include the tokens to be burned so coin selection can balance
   const paymentCred = wasm.Credential.from_keyhash(wasm.Ed25519KeyHash.from_hex(PAYMENT_KEY_HASH))
   const fakeInputAddr = wasm.EnterpriseAddress.new(networkId, paymentCred).to_address()
   const fakeInput = wasm.TransactionInput.new(wasm.TransactionHash.from_hex(FAKE_TX_HASH), 0)
-  const fakeOutput = wasm.TransactionOutput.new(
-    fakeInputAddr,
-    wasm.Value.new(strToBigNum('10000000000')),
-  )
+  const fakeValue = wasm.Value.new(strToBigNum('10000000000'))
+  if (enabledFeatures.has('burn')) {
+    const burnMultiAsset = wasm.MultiAsset.new()
+    const burnAssets = wasm.Assets.new()
+    burnAssets.insert(
+      wasm.AssetName.new(Buffer.from('4255524e', 'hex')),
+      strToBigNum('500'),
+    )
+    burnMultiAsset.insert(mintNativeScript.hash(), burnAssets)
+    fakeValue.set_multiasset(burnMultiAsset)
+  }
+  const fakeOutput = wasm.TransactionOutput.new(fakeInputAddr, fakeValue)
   const fakeUtxo = wasm.TransactionUnspentOutput.new(fakeInput, fakeOutput)
   const fakeUtxos = wasm.TransactionUnspentOutputs.new()
   fakeUtxos.add(fakeUtxo)
@@ -200,67 +231,80 @@ export function buildTestTx(enabledFeatures, credModes, walletRewardAddrHex, wal
   }
   if (enabledFeatures.has('legacyStakeDeReg')) {
     const cred = resolveStakeCred(getMode('legacyStakeDeReg'), walletRewardAddrHex)
-    certBuilder.add(wasm.Certificate.new_stake_deregistration(wasm.StakeDeregistration.new(cred)))
+    addCertToBuilder(certBuilder, wasm.Certificate.new_stake_deregistration(wasm.StakeDeregistration.new(cred)), getMode('legacyStakeDeReg'))
     hasCerts = true
   }
   if (enabledFeatures.has('stakeDelegation')) {
     const cred = resolveStakeCred(getMode('stakeDelegation'), walletRewardAddrHex)
     const poolKeyHash = wasm.Ed25519KeyHash.from_hex(POOL_KEY_HASH)
-    certBuilder.add(
+    addCertToBuilder(
+      certBuilder,
       wasm.Certificate.new_stake_delegation(wasm.StakeDelegation.new(cred, poolKeyHash)),
+      getMode('stakeDelegation'),
     )
     hasCerts = true
   }
   if (enabledFeatures.has('conwayStakeReg')) {
     const cred = resolveStakeCred(getMode('conwayStakeReg'), walletRewardAddrHex)
-    certBuilder.add(
+    addCertToBuilder(
+      certBuilder,
       wasm.Certificate.new_stake_registration(
         wasm.StakeRegistration.new_with_explicit_deposit(cred, strToBigNum('2000000')),
       ),
+      getMode('conwayStakeReg'),
     )
     hasCerts = true
   }
   if (enabledFeatures.has('conwayStakeDeReg')) {
     const cred = resolveStakeCred(getMode('conwayStakeDeReg'), walletRewardAddrHex)
-    certBuilder.add(
+    addCertToBuilder(
+      certBuilder,
       wasm.Certificate.new_stake_deregistration(
         wasm.StakeDeregistration.new_with_explicit_refund(cred, strToBigNum('2000000')),
       ),
+      getMode('conwayStakeDeReg'),
     )
     hasCerts = true
   }
   if (enabledFeatures.has('voteDelegation')) {
     const cred = resolveStakeCred(getMode('voteDelegation'), walletRewardAddrHex)
-    certBuilder.add(
+    addCertToBuilder(
+      certBuilder,
       wasm.Certificate.new_vote_delegation(
         wasm.VoteDelegation.new(cred, wasm.DRep.new_always_abstain()),
       ),
+      getMode('voteDelegation'),
     )
     hasCerts = true
   }
   if (enabledFeatures.has('stakeVoteDelegation')) {
     const cred = resolveStakeCred(getMode('stakeVoteDelegation'), walletRewardAddrHex)
     const poolKeyHash = wasm.Ed25519KeyHash.from_hex(POOL_KEY_HASH)
-    certBuilder.add(
+    addCertToBuilder(
+      certBuilder,
       wasm.Certificate.new_stake_and_vote_delegation(
         wasm.StakeAndVoteDelegation.new(cred, poolKeyHash, wasm.DRep.new_always_abstain()),
       ),
+      getMode('stakeVoteDelegation'),
     )
     hasCerts = true
   }
   if (enabledFeatures.has('stakeRegDelegation')) {
     const cred = resolveStakeCred(getMode('stakeRegDelegation'), walletRewardAddrHex)
     const poolKeyHash = wasm.Ed25519KeyHash.from_hex(POOL_KEY_HASH)
-    certBuilder.add(
+    addCertToBuilder(
+      certBuilder,
       wasm.Certificate.new_stake_registration_and_delegation(
         wasm.StakeRegistrationAndDelegation.new(cred, poolKeyHash, strToBigNum('2000000')),
       ),
+      getMode('stakeRegDelegation'),
     )
     hasCerts = true
   }
   if (enabledFeatures.has('voteRegDelegation')) {
     const cred = resolveStakeCred(getMode('voteRegDelegation'), walletRewardAddrHex)
-    certBuilder.add(
+    addCertToBuilder(
+      certBuilder,
       wasm.Certificate.new_vote_registration_and_delegation(
         wasm.VoteRegistrationAndDelegation.new(
           cred,
@@ -268,13 +312,15 @@ export function buildTestTx(enabledFeatures, credModes, walletRewardAddrHex, wal
           strToBigNum('2000000'),
         ),
       ),
+      getMode('voteRegDelegation'),
     )
     hasCerts = true
   }
   if (enabledFeatures.has('stakeVoteRegDelegation')) {
     const cred = resolveStakeCred(getMode('stakeVoteRegDelegation'), walletRewardAddrHex)
     const poolKeyHash = wasm.Ed25519KeyHash.from_hex(POOL_KEY_HASH)
-    certBuilder.add(
+    addCertToBuilder(
+      certBuilder,
       wasm.Certificate.new_stake_vote_registration_and_delegation(
         wasm.StakeVoteRegistrationAndDelegation.new(
           cred,
@@ -283,6 +329,7 @@ export function buildTestTx(enabledFeatures, credModes, walletRewardAddrHex, wal
           strToBigNum('2000000'),
         ),
       ),
+      getMode('stakeVoteRegDelegation'),
     )
     hasCerts = true
   }
@@ -332,20 +379,17 @@ export function buildTestTx(enabledFeatures, credModes, walletRewardAddrHex, wal
   // ---- Withdrawals ----
   if (enabledFeatures.has('withdrawal')) {
     const withdrawalsBuilder = wasm.WithdrawalsBuilder.new()
-    const rewardAddr = resolveRewardAddr(
-      getMode('withdrawal'),
-      walletRewardAddrHex,
-      networkId,
-    )
     if (getMode('withdrawal') === 'script') {
-      const policyKeyHash = wasm.Ed25519KeyHash.from_hex(PAYMENT_KEY_HASH)
-      const nativeScript = wasm.NativeScript.new_script_pubkey(wasm.ScriptPubkey.new(policyKeyHash))
-      withdrawalsBuilder.add_with_native_script_witness(
-        rewardAddr,
-        nativeScript,
+      const nativeScript = getTestScriptNativeScript()
+      const scriptCred = wasm.Credential.from_scripthash(nativeScript.hash())
+      const scriptRewardAddr = wasm.RewardAddress.new(networkId, scriptCred)
+      withdrawalsBuilder.add_with_native_script(
+        scriptRewardAddr,
         strToBigNum('1500000'),
+        wasm.NativeScriptSource.new(nativeScript),
       )
     } else {
+      const rewardAddr = resolveRewardAddr(getMode('withdrawal'), walletRewardAddrHex, networkId)
       withdrawalsBuilder.add(rewardAddr, strToBigNum('1500000'))
     }
     txBuilder.set_withdrawals_builder(withdrawalsBuilder)
@@ -381,16 +425,22 @@ export function buildTestTx(enabledFeatures, credModes, walletRewardAddrHex, wal
   // ---- Mint / Burn ----
   if (enabledFeatures.has('mint') || enabledFeatures.has('burn')) {
     const mintBuilder = wasm.MintBuilder.new()
-    const policyKeyHash = wasm.Ed25519KeyHash.from_hex(PAYMENT_KEY_HASH)
-    const nativeScript = wasm.NativeScript.new_script_pubkey(wasm.ScriptPubkey.new(policyKeyHash))
-    const mintWitness = wasm.MintWitness.new_native_script(nativeScript)
+    const mintWitness = wasm.MintWitness.new_native_script(
+      wasm.NativeScriptSource.new(mintNativeScript),
+    )
     if (enabledFeatures.has('mint')) {
-      const assetName = wasm.AssetName.new(Buffer.from('4d494e54', 'hex')) // 'MINT'
-      mintBuilder.add_asset(mintWitness, assetName, wasm.Int.new(strToBigNum('1000')))
+      mintBuilder.add_asset(
+        mintWitness,
+        wasm.AssetName.new(Buffer.from('4d494e54', 'hex')), // 'MINT'
+        wasm.Int.new(strToBigNum('1000')),
+      )
     }
     if (enabledFeatures.has('burn')) {
-      const assetName = wasm.AssetName.new(Buffer.from('4255524e', 'hex')) // 'BURN'
-      mintBuilder.add_asset(mintWitness, assetName, wasm.Int.new_negative(strToBigNum('500')))
+      mintBuilder.add_asset(
+        mintWitness,
+        wasm.AssetName.new(Buffer.from('4255524e', 'hex')), // 'BURN'
+        wasm.Int.new_negative(strToBigNum('500')),
+      )
     }
     txBuilder.set_mint_builder(mintBuilder)
   }
@@ -399,8 +449,8 @@ export function buildTestTx(enabledFeatures, credModes, walletRewardAddrHex, wal
   if (enabledFeatures.has('outputDatumHash')) {
     const output = wasm.TransactionOutputBuilder.new()
       .with_address(changeAddr)
-      .next()
       .with_data_hash(wasm.DataHash.from_hex(DATUM_HASH))
+      .next()
       .with_value(wasm.Value.new(strToBigNum('3000000')))
       .build()
     txBuilder.add_output(output)
@@ -409,10 +459,10 @@ export function buildTestTx(enabledFeatures, credModes, walletRewardAddrHex, wal
     const plutusData = wasm.PlutusData.from_bytes(hexToBytes(INLINE_DATUM_HEX))
     const output = wasm.TransactionOutputBuilder.new()
       .with_address(changeAddr)
-      .next()
       .with_plutus_data(plutusData)
+      .next()
       .with_value(wasm.Value.new(strToBigNum('3000000')))
-      .build_babbage()
+      .build()
     txBuilder.add_output(output)
   }
   if (enabledFeatures.has('outputRefScript')) {
@@ -421,10 +471,10 @@ export function buildTestTx(enabledFeatures, credModes, walletRewardAddrHex, wal
     const scriptRef = wasm.ScriptRef.new_native_script(nativeScript)
     const output = wasm.TransactionOutputBuilder.new()
       .with_address(changeAddr)
-      .next()
       .with_script_ref(scriptRef)
+      .next()
       .with_value(wasm.Value.new(strToBigNum('5000000')))
-      .build_babbage()
+      .build()
     txBuilder.add_output(output)
   }
 
@@ -434,14 +484,14 @@ export function buildTestTx(enabledFeatures, credModes, walletRewardAddrHex, wal
       wasm.TransactionHash.from_hex(COLLATERAL_TX_HASH),
       0,
     )
-    const collateralOutput = wasm.TransactionOutput.new(
-      changeAddr,
-      wasm.Value.new(strToBigNum('20000000')),
+    const collateralAmount = wasm.Value.new(strToBigNum('20000000'))
+    const txInputsBuilder = wasm.TxInputsBuilder.new()
+    txInputsBuilder.add_key_input(
+      wasm.Ed25519KeyHash.from_hex(PAYMENT_KEY_HASH),
+      collateralInput,
+      collateralAmount,
     )
-    const collateralUtxo = wasm.TransactionUnspentOutput.new(collateralInput, collateralOutput)
-    const collateralUtxos = wasm.TransactionUnspentOutputs.new()
-    collateralUtxos.add(collateralUtxo)
-    txBuilder.set_collateral(collateralUtxos)
+    txBuilder.set_collateral(txInputsBuilder)
   }
   if (enabledFeatures.has('collateralReturn')) {
     txBuilder.set_collateral_return(
