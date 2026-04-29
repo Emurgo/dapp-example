@@ -1,10 +1,9 @@
 import React, {useState} from 'react'
-import {bytesToHex} from '../../utils/utils'
+import {bytesToHex, hexToBytes} from '../../utils/utils'
 import {
   getAddressFromBytes,
+  getFixedTxFromBytes,
   getLargestFirstMultiAsset,
-  getSignedTransaction,
-  getTransactionFromBytes,
   getTransactionWitnessSetFromBytes,
   getTxBuilder,
   getTransactionOutput,
@@ -17,6 +16,7 @@ import {CommonStyles, ModalWindowContent} from '../ui-constants'
 const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const defaultValue = {amount: '2000000', address: ''}
   const [signTransactionInput, setSignTransactionInput] = useState('')
+  const [partialSign, setPartialSign] = useState(false)
 
   const buildTransaction = async (buildTransactionInput) => {
     const txBuilder = getTxBuilder()
@@ -48,14 +48,22 @@ const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
     }
     console.log('[SignTransactionCard] Unsingned Tx:', txHex)
     api
-      ?.signTx(txHex)
+      ?.signTx(txHex, partialSign)
       .then((witnessHex) => {
         onWaiting(false)
         onRawResponse(witnessHex)
-        const wasmUnsignedTransaction = getTransactionFromBytes(txHex)
-        const wasmWitnessSet = getTransactionWitnessSetFromBytes(witnessHex)
-        const wasmSignedTransaction = getSignedTransaction(wasmUnsignedTransaction, wasmWitnessSet)
-        onResponse(bytesToHex(wasmSignedTransaction.to_bytes()), false)
+        const signedTx = getFixedTxFromBytes(hexToBytes(txHex))
+        const walletWitnessSet = getTransactionWitnessSetFromBytes(witnessHex)
+        const walletVkeys = walletWitnessSet.vkeys()
+        if (walletVkeys) {
+          for (let i = 0; i < walletVkeys.len(); i++) {
+            signedTx.add_vkey_witness(walletVkeys.get(i))
+          }
+        }
+        onResponse(
+          JSON.stringify({signedTx: signedTx.to_hex(), witness: witnessHex}, undefined, 2),
+          false,
+        )
       })
       .catch((e) => {
         onWaiting(false)
@@ -73,7 +81,7 @@ const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
     <ApiCardWithModal {...apiProps}>
       <div className={ModalWindowContent.contentPadding}>
         <label htmlFor="txHex" className={ModalWindowContent.contentLabelStyle}>
-          Tx Hex
+          Unsigned Transaction Hex
         </label>
         <input
           type="text"
@@ -83,6 +91,31 @@ const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
           value={signTransactionInput}
           onChange={(event) => setSignTransactionInput(event.target.value)}
         />
+        <label htmlFor="partialSign" className={ModalWindowContent.contentLabelStyle}>
+          Partially Sign Transaction?
+        </label>
+        <div id="partialSign" className="flex gap-4 text-gray-300">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="partialSign"
+              value="false"
+              checked={partialSign === false}
+              onChange={() => setPartialSign(false)}
+            />
+            false
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="partialSign"
+              value="true"
+              checked={partialSign === true}
+              onChange={() => setPartialSign(true)}
+            />
+            true
+          </label>
+        </div>
       </div>
     </ApiCardWithModal>
   )
