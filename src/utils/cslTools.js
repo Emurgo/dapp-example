@@ -62,8 +62,6 @@ export const getTransactionWitnessSetNew = () => wasm.TransactionWitnessSet.new(
 export const getTransactionWitnessSetFromBytes = (witnessHex) =>
   wasm.TransactionWitnessSet.from_bytes(hexToBytes(witnessHex))
 
-export const getSignedTransaction = (wasmUnsignedTransaction, wasmWitnessSet) =>
-  wasm.Transaction.new(wasmUnsignedTransaction.body(), wasmWitnessSet, wasmUnsignedTransaction.auxiliary_data())
 
 export const getPubKeyHash = (usedAddress) => wasm.BaseAddress.from_address(usedAddress).payment_cred().to_keyhash()
 
