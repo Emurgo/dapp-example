@@ -14,6 +14,7 @@ import ApiCardWithModal from '../apiCardWithModal'
 import {ModalWindowContent} from '../../ui-constants'
 import {useEffect, useState} from 'react'
 import {fetchAccountInfo, getTxBuilderWithWithdrawal} from './logic/withdraw'
+import {firstOrThrow} from '../../../utils/helpFunctions'
 import CheckboxWithLabel from '../../checkboxWithLabel'
 
 const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
@@ -47,7 +48,7 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
     setShowSuccessInfo(false)
 
     try {
-      const rewardAddressHex = (await api?.getRewardAddresses())[0]
+      const rewardAddressHex = firstOrThrow(await api?.getRewardAddresses(), 'No reward address available from wallet')
       const delegationInfoResponse = await fetchAccountInfo(networkType, rewardAddressHex)
 
       if (!delegationInfoResponse.ok) {
@@ -85,7 +86,9 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       onWaiting(true)
       // build withdraw
       const pubStakeKey = await api?.cip95.getRegisteredPubStakeKeys()
-      const stakeKeyHash = getPublicKeyFromHex(pubStakeKey[0]).hash().to_hex()
+      const stakeKeyHash = getPublicKeyFromHex(
+        firstOrThrow(pubStakeKey, 'No registered stake key available from wallet'),
+      ).hash().to_hex()
       const txBuilderWithWithdrawal = await getTxBuilderWithWithdrawal(stakeKeyHash, networkType, rewardAmount)
       const utxos = await api?.getUtxos()
 

@@ -14,6 +14,7 @@ import {
   toInt,
 } from '../../../utils/cslTools'
 import {CONNECTED} from '../../../utils/connectionStates'
+import {firstOrThrow} from '../../../utils/helpFunctions'
 import InputWithLabel from '../../inputWithLabel'
 
 const TokenTab = () => {
@@ -109,7 +110,7 @@ const TokenTab = () => {
     const wasmChangeAddress = getAddressFromBytes(changeAddress)
     try {
       const usedAddresses = await api?.getUsedAddresses()
-      const usedAddress = getAddressFromBytes(usedAddresses[0])
+      const usedAddress = getAddressFromBytes(firstOrThrow(usedAddresses, 'No used address available from wallet'))
       const pubkeyHash = getPubKeyHash(usedAddress)
       const wasmNativeScript = getNativeScript(pubkeyHash)
 
