@@ -17,10 +17,14 @@ const SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
     }
     // Otherwise, use the reward address as default
     try {
-      const rewardHexAddress = (await api?.getRewardAddresses())[0]
+      const rewardAddresses = await api?.getRewardAddresses()
+      const rewardHexAddress = rewardAddresses?.[0]
+      if (!rewardHexAddress) {
+        throw new Error('No reward address available — enter an address manually')
+      }
       return getBech32AddressFromHex(rewardHexAddress)
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   }
 
