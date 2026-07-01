@@ -16,6 +16,7 @@ import {
   toInt,
 } from '../../../utils/cslTools'
 import {CONNECTED} from '../../../utils/connectionStates'
+import {firstOrThrow} from '../../../utils/helpFunctions'
 import SelectWithLabel from '../../selectWithLabel'
 import InputWithLabel from '../../inputWithLabel'
 
@@ -164,7 +165,7 @@ const NFTTab = () => {
       console.debug(`[NFTTab][mint] changeAddress -> ${changeAddress}`)
       const wasmChangeAddress = getAddressFromBytes(changeAddress)
       const usedAddresses = await api?.getUsedAddresses()
-      const usedAddress = getAddressFromBytes(usedAddresses[0])
+      const usedAddress = getAddressFromBytes(firstOrThrow(usedAddresses, 'No used address available from wallet'))
       const pubkeyHash = getPubKeyHash(usedAddress)
       const wasmNativeScript = getNativeScript(pubkeyHash)
       const scriptHashHex = wasmNativeScript.hash().to_hex()

@@ -1,5 +1,16 @@
 import {getCslValue, getUtxoFromHex, getBech32AddressFromHex, getPublicKeyFromHex} from './cslTools'
 
+// Returns the first element of a wallet-returned array, or throws a clear error
+// if the wallet returned nothing. Prevents `undefined` from flowing into CSL
+// byte/hex conversions, which otherwise fail with an opaque TypeError.
+export const firstOrThrow = (arr, message) => {
+  const value = arr?.[0]
+  if (value === undefined || value === null) {
+    throw new Error(message)
+  }
+  return value
+}
+
 export const getBalance = async (api) => {
   const hexBalance = await api.getBalance()
   const cslValue = getCslValue(hexBalance)
