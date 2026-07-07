@@ -24,5 +24,6 @@ yarn-error.log*
 
 # IDE
 /.idea
+/.vscode
 
 _*.md

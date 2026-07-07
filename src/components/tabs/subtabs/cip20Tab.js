@@ -10,8 +10,10 @@ import {
   getTransactionWitnessSetFromBytes,
   chunkMessageTo64Bytes,
   buildCip20Tx,
+  compareLovelaceDesc,
 } from '../../../utils/cslTools'
 import {CommonStyles} from '../../ui-constants'
+import CheckboxWithLabel from '../../checkboxWithLabel'
 
 // Reusable read-only CBOR popup with a copy button.
 const RawCborPopup = ({label, value}) => (
@@ -71,6 +73,10 @@ const Cip20Tab = () => {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
+  const [pickInputs, setPickInputs] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [pickedHexes, setPickedHexes] = useState(() => new Set())
+
   // Fetch UTxOs (and network id) when the wallet API becomes available.
   useEffect(() => {
     if (!api) return
@@ -80,8 +86,14 @@ const Cip20Tab = () => {
       try {
         const hex = (await api.getUtxos()) ?? []
         if (cancelled) return
+        const decoded = hex.map((h) => getUtxoFromHex(h))
+        decoded.sort((a, b) => compareLovelaceDesc(a.amount, b.amount))
         setHexUtxos(hex)
-        setDecodedUtxos(hex.map((h) => getUtxoFromHex(h)))
+        setDecodedUtxos(decoded)
+        // Never carry picks across a (re)fetch — the UTxO set may have changed
+        // (e.g. reconnect-in-place), so stale picks must not survive.
+        setPickedHexes(new Set())
+        setPickerOpen(false)
       } catch (e) {
         if (!cancelled) setError(String(e?.message ?? e))
       } finally {
@@ -141,19 +153,26 @@ const Cip20Tab = () => {
   // matches the displayed fields (the async counterpart to resetTx-on-edit).
   const fieldsDisabled = !hasUtxos || busy
   const canConstruct = hasUtxos && receiverValid && message.trim().length > 0 && !busy
+  // Picks still present in the CURRENT UTxO set (guards against stale picks).
+  const pickCount = decodedUtxos.filter((u) => pickedHexes.has(u.hex)).length
 
-  const handleConstruct = () => {
-    setError('')
+  const handleConstruct = (picked) => {
+    // Clear ALL prior tx state (incl. any stale signedTxHex/txId from a previous
+    // sign) before rebuilding, so nothing downstream can reference a signature
+    // that belongs to a different transaction.
+    resetTx()
     try {
       const messageLines = chunkMessageTo64Bytes(message)
-      const {txHex, details} = buildCip20Tx({hexUtxos, receiverBech32: receiver, messageLines})
+      const {txHex, details} = buildCip20Tx({
+        hexUtxos,
+        receiverBech32: receiver,
+        messageLines,
+        pickedHexUtxos: Array.isArray(picked) ? picked : undefined,
+      })
       setUnsignedTxHex(txHex)
       setTxDetails(details)
       setStep('constructed')
     } catch (e) {
-      setStep('idle')
-      setUnsignedTxHex('')
-      setTxDetails(null)
       setError(String(e?.message ?? e))
     }
   }
@@ -213,6 +232,18 @@ const Cip20Tab = () => {
             <p className="mt-2 text-orange-500">
               {loadingUtxos ? 'Loading UTxOs…' : hasUtxos ? `Found ${decodedUtxos.length} UTxOs` : 'No UTxOs found'}
             </p>
+            <CheckboxWithLabel
+              currentState={pickInputs}
+              onChangeFunc={(e) => {
+                if (busy) return
+                setPickInputs(e.target.checked)
+                setPickedHexes(new Set())
+                resetTx()
+              }}
+              name="cip20PickInputs"
+              labelText="Pick inputs"
+              disabled={!hasUtxos || busy}
+            />
           </div>
 
           {/* MAIN: form + flow */}
@@ -256,7 +287,7 @@ const Cip20Tab = () => {
                   ? 'bg-orange-700 hover:bg-orange-800 active:bg-orange-500'
                   : 'bg-gray-600 cursor-not-allowed'
               }`}
-              onClick={handleConstruct}
+              onClick={() => (pickInputs ? setPickerOpen(true) : handleConstruct())}
               disabled={!canConstruct}
             >
               Construct Transaction
@@ -310,6 +341,74 @@ const Cip20Tab = () => {
                 {txId}
               </div>
             )}
+
+            {/* Input picker (only relevant when "Pick inputs" is checked) */}
+            <Popup
+              open={pickerOpen}
+              onClose={() => setPickerOpen(false)}
+              modal
+              overlayStyle={{background: 'rgba(0,0,0,0.75)'}}
+              contentStyle={{width: 'min(90vw, 640px)', maxHeight: '90vh', overflowY: 'auto', border: 'none', padding: 0}}
+            >
+              <div className="bg-gray-900 border rounded-md border-gray-700 p-4 text-gray-300">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-semibold text-white">Select input UTxOs</span>
+                  <button
+                    className="rounded-md bg-red-500 hover:bg-red-700 active:bg-red-300 py-1 px-2 text-white"
+                    onClick={() => setPickerOpen(false)}
+                  >
+                    &times;
+                  </button>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {decodedUtxos.map((u) => {
+                    const assetCount = u.asset.reduce((n, o) => n + Object.keys(o).length, 0)
+                    return (
+                      <label
+                        key={`${u.tx_hash}:${u.tx_index}`}
+                        className="flex items-start gap-2 cursor-pointer rounded border border-gray-700 p-2 hover:bg-gray-800"
+                      >
+                        <input
+                          type="checkbox"
+                          className="mt-1"
+                          checked={pickedHexes.has(u.hex)}
+                          onChange={() =>
+                            setPickedHexes((prev) => {
+                              const next = new Set(prev)
+                              if (next.has(u.hex)) next.delete(u.hex)
+                              else next.add(u.hex)
+                              return next
+                            })
+                          }
+                        />
+                        <div className="min-w-0">
+                          <div className="font-mono text-xs break-all text-gray-300">
+                            {u.tx_hash}:{u.tx_index}
+                          </div>
+                          <div className="text-orange-500 text-sm">
+                            {Number(u.amount) / 1e6} ADA · {assetCount} asset{assetCount === 1 ? '' : 's'}
+                          </div>
+                        </div>
+                      </label>
+                    )
+                  })}
+                </div>
+                <button
+                  className={`mt-4 w-full h-11 rounded-lg text-white ${
+                    pickCount > 0
+                      ? 'bg-orange-700 hover:bg-orange-800 active:bg-orange-500'
+                      : 'bg-gray-600 cursor-not-allowed'
+                  }`}
+                  disabled={pickCount === 0}
+                  onClick={() => {
+                    setPickerOpen(false)
+                    handleConstruct(decodedUtxos.filter((u) => pickedHexes.has(u.hex)).map((u) => u.hex))
+                  }}
+                >
+                  Continue ({pickCount} selected)
+                </button>
+              </div>
+            </Popup>
           </div>
         </div>
       ) : (

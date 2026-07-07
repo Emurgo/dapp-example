@@ -93,14 +93,18 @@ export const chunkMessageTo64Bytes = (message) => {
 // locally ("Fee is less than the minimum fee") because the fee would be
 // computed without the metadata bytes.
 // Returns { txHex, details: { sizeBytes, fee, targetValue, changeValue, changeAddr, selectedCount } }.
-export const buildCip20Tx = ({hexUtxos, receiverBech32, messageLines}) => {
-  if (!hexUtxos || hexUtxos.length === 0) {
+export const buildCip20Tx = ({hexUtxos, receiverBech32, messageLines, pickedHexUtxos}) => {
+  // Manual mode: caller hand-picked a specific set of UTxOs to spend (skip coin
+  // selection, use exactly those). Otherwise auto largest-first selection.
+  const manual = Array.isArray(pickedHexUtxos) && pickedHexUtxos.length > 0
+  const sourceHex = manual ? pickedHexUtxos : hexUtxos
+  if (!sourceHex || sourceHex.length === 0) {
     throw new Error('No UTxOs available to build the transaction')
   }
 
   // Decode + sort by coin value, largest first (BigNum compare — lovelace can
   // exceed Number's safe-integer range).
-  const decoded = hexUtxos.map((hex) => {
+  const decoded = sourceHex.map((hex) => {
     const wasmUtxo = wasm.TransactionUnspentOutput.from_bytes(hexToBytes(hex))
     return {wasmUtxo, coin: wasmUtxo.output().amount().coin()}
   })
@@ -144,20 +148,26 @@ export const buildCip20Tx = ({hexUtxos, receiverBech32, messageLines}) => {
     return txBuilder.build_tx()
   }
 
-  // Coin-select largest-first NUMERICALLY: accumulate until the running total
-  // covers the output + fee headroom (or we run out of UTxOs). No string-matching
-  // on CSL errors to decide selection — that decision is a pure BigInt comparison.
-  const selected = []
-  let running = strToBigNum('0')
-  for (const u of decoded) {
-    selected.push(u)
-    running = running.checked_add(u.coin)
-    if (running.compare(NEEDED) >= 0) break
-  }
-
-  // Not enough even for the 1 ADA output — definitely insufficient.
-  if (running.compare(TARGET) < 0) {
-    throw new Error('Insufficient funds: your UTxOs do not cover the 1 ADA output.')
+  // Manual mode → use EXACTLY the picked UTxOs (a too-small pick is caught by
+  // build_tx below, via the exhaustedAll branch). Auto mode → coin-select
+  // largest-first NUMERICALLY: accumulate until the running total covers the
+  // output + fee headroom (or we run out of UTxOs). No string-matching on CSL
+  // errors to decide selection — that decision is a pure BigNum comparison.
+  let selected
+  if (manual) {
+    selected = decoded
+  } else {
+    selected = []
+    let running = strToBigNum('0')
+    for (const u of decoded) {
+      selected.push(u)
+      running = running.checked_add(u.coin)
+      if (running.compare(NEEDED) >= 0) break
+    }
+    // Not enough even for the 1 ADA output — definitely insufficient.
+    if (running.compare(TARGET) < 0) {
+      throw new Error('Insufficient funds: your UTxOs do not cover the 1 ADA output.')
+    }
   }
 
   const exhaustedAll = selected.length === decoded.length
@@ -187,20 +197,26 @@ export const buildCip20Tx = ({hexUtxos, receiverBech32, messageLines}) => {
     }
   } catch (e) {
     const msg = String(e?.message ?? e)
-    if (/maximum transaction size|exceeded/i.test(msg)) {
+    if (/maximum transaction size/i.test(msg)) {
       const found = msg.match(/Found:\s*(\d+)/)
       throw new Error(
-        `Transaction exceeds the 16 KB limit${found ? ` (${found[1]} bytes)` : ''} — shorten the message.`,
+        `Transaction exceeds the 16 KB limit${found ? ` (${found[1]} bytes)` : ''} — shorten the message or select fewer inputs.`,
       )
     }
-    // We selected every available UTxO and it still can't build (and it's not a
-    // size error) — the wallet cannot cover the output + fee.
-    if (exhaustedAll) {
+    // Relabel as friendly "insufficient funds" ONLY when we used every selected
+    // UTxO AND CSL actually reported an input shortfall. Any other failure
+    // (value-size, malformed input, unexpected) is surfaced as-is, not masked.
+    if (exhaustedAll && /insufficient|not enough/i.test(msg)) {
       throw new Error('Insufficient funds: your UTxOs do not cover the 1 ADA output plus the network fee.')
     }
-    throw e // unexpected — surface as-is
+    throw e // real/unexpected error — surface as-is
   }
 }
+
+// Descending comparator for lovelace amount strings (UI sort of decoded UTxOs).
+// Uses wasm.BigNum (not native BigInt, which trips the react-app ESLint no-undef).
+export const compareLovelaceDesc = (aStr, bStr) =>
+  wasm.BigNum.from_str(bStr).compare(wasm.BigNum.from_str(aStr))
 
 export const getAddressFromBytes = (changeAddress) => wasm.Address.from_bytes(hexToBytes(changeAddress))
 
