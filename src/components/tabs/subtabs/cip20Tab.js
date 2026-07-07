@@ -101,6 +101,7 @@ const Cip20Tab = () => {
         setTxDetails(null)
         setSignedTxHex('')
         setTxId('')
+        setError('')
       } catch (e) {
         if (!cancelled) setError(String(e?.message ?? e))
       } finally {
@@ -214,6 +215,19 @@ const Cip20Tab = () => {
       const id = await api.submitTx(signedTxHex)
       setTxId(id)
       setStep('submitted')
+      // Refresh UTxOs so a follow-up Construct doesn't target inputs we just
+      // spent. Best-effort — the wallet may not reflect the pending spend
+      // immediately. Keep the submitted result (step/txId) visible.
+      try {
+        const hex = (await api.getUtxos()) ?? []
+        const decoded = hex.map((h) => getUtxoFromHex(h))
+        decoded.sort((a, b) => compareLovelaceDesc(a.amount, b.amount))
+        setHexUtxos(hex)
+        setDecodedUtxos(decoded)
+        setPickedHexes(new Set())
+      } catch {
+        // keep last-known UTxOs if the refresh fails
+      }
     } catch (e) {
       setError(String(e?.message ?? e))
     } finally {
