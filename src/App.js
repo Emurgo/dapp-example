@@ -11,6 +11,7 @@ import NetworkToggle from './components/networkToggle'
 import EthereumAccessButton from './components/ethereumAccessButton'
 import EthereumMainTab from './components/tabs/ethereumMainTab'
 import Cip30Tab from './components/tabs/subtabs/cip30Tab'
+import Cip20Tab from './components/tabs/subtabs/cip20Tab'
 import Cip95Tab from './components/tabs/subtabs/cip95Tab'
 import Cip95TabTools from './components/tabs/subtabs/cip95ToolsTab'
 import NFTTab from './components/tabs/subtabs/NFTTab'
@@ -76,6 +77,11 @@ const App = () => {
       label: 'CIP-30',
       value: 'cip30',
       children: <Cip30Tab />,
+    },
+    {
+      label: 'CIP-20',
+      value: 'cip20',
+      children: <Cip20Tab />,
     },
     {
       label: 'Staking',
