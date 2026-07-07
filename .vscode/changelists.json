@@ -1,0 +1,15 @@
+{
+  "changelists": [
+    {
+      "name": "Default",
+      "files": [
+        ".gitignore",
+        "src/App.js",
+        "src/utils/cslTools.js",
+        "src/components/tabs/subtabs/cip20Tab.js",
+        ".vscode/changelists.json"
+      ]
+    }
+  ],
+  "active": "Default"
+}
