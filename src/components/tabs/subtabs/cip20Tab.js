@@ -159,8 +159,8 @@ const Cip20Tab = () => {
   // Lock the inputs while a sign/submit is in flight, so an edit can't slip in
   // during the async window and leave a signed/submittable tx that no longer
   // matches the displayed fields (the async counterpart to resetTx-on-edit).
-  const fieldsDisabled = !hasUtxos || busy
-  const canConstruct = hasUtxos && receiverValid && message.trim().length > 0 && !busy
+  const fieldsDisabled = !hasUtxos || busy || loadingUtxos
+  const canConstruct = hasUtxos && receiverValid && message.trim().length > 0 && !busy && !loadingUtxos
   // Picks still present in the CURRENT UTxO set (guards against stale picks).
   const pickCount = decodedUtxos.filter((u) => pickedHexes.has(u.hex)).length
 
@@ -263,7 +263,7 @@ const Cip20Tab = () => {
               }}
               name="cip20PickInputs"
               labelText="Pick inputs"
-              disabled={!hasUtxos || busy}
+              disabled={fieldsDisabled}
             />
           </div>
 
