@@ -90,10 +90,17 @@ const Cip20Tab = () => {
         decoded.sort((a, b) => compareLovelaceDesc(a.amount, b.amount))
         setHexUtxos(hex)
         setDecodedUtxos(decoded)
-        // Never carry picks across a (re)fetch — the UTxO set may have changed
-        // (e.g. reconnect-in-place), so stale picks must not survive.
+        // A changed UTxO set (e.g. reconnect-in-place) invalidates picks AND any
+        // pending constructed/signed tx — force a fresh Construct so we never
+        // sign/submit against stale inputs (inlined rather than resetTx() to keep
+        // it out of the effect deps).
         setPickedHexes(new Set())
         setPickerOpen(false)
+        setStep('idle')
+        setUnsignedTxHex('')
+        setTxDetails(null)
+        setSignedTxHex('')
+        setTxId('')
       } catch (e) {
         if (!cancelled) setError(String(e?.message ?? e))
       } finally {
@@ -372,14 +379,17 @@ const Cip20Tab = () => {
                           type="checkbox"
                           className="mt-1"
                           checked={pickedHexes.has(u.hex)}
-                          onChange={() =>
+                          onChange={() => {
                             setPickedHexes((prev) => {
                               const next = new Set(prev)
                               if (next.has(u.hex)) next.delete(u.hex)
                               else next.add(u.hex)
                               return next
                             })
-                          }
+                            // A pick change invalidates any pending constructed/signed
+                            // tx (same rule as receiver/message edits and refetch).
+                            resetTx()
+                          }}
                         />
                         <div className="min-w-0">
                           <div className="font-mono text-xs break-all text-gray-300">
