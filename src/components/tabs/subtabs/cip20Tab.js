@@ -45,7 +45,7 @@ const RawCborPopup = ({label, value}) => (
         />
         <button
           className="mt-2 rounded-lg bg-orange-700 hover:bg-orange-800 active:bg-orange-500 px-4 py-2 text-white"
-          onClick={() => navigator.clipboard.writeText(value)}
+          onClick={() => navigator.clipboard?.writeText(value).catch(() => {})}
         >
           Copy
         </button>
