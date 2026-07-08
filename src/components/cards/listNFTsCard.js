@@ -1,24 +1,10 @@
-import logger from '../../utils/logger'
 import React from 'react'
 import ApiCard from './apiCard'
+import runApiCall from '../../utils/runApiCall'
 
 const ListNFTsCard = ({api, onRawResponse, onResponse, onWaiting}) => {
-  const listNFTsClick = () => {
-    onWaiting(true)
-    api?.experimental
-      .listNFTs()
-      .then((response) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(response)
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        logger.log(e)
-      })
-  }
+  const listNFTsClick = () =>
+    runApiCall(() => api.experimental.listNFTs(), {onRawResponse, onResponse, onWaiting}, {rawText: () => ''})
 
   const apiProps = {
     apiName: 'listNFTs',

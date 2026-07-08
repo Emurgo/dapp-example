@@ -1,33 +1,18 @@
-import logger from '../../utils/logger'
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
 import {ModalWindowContent, CommonStyles} from '../ui-constants'
 import {getUtxoFromHex} from '../../utils/cslTools'
+import runApiCall from '../../utils/runApiCall'
 
 const GetUtxosCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [getUtxosInput, setGetUtxosInput] = useState({amount: '', page: 0, limit: 10})
 
-  const getUtxosClick = () => {
-    onWaiting(true)
-    api
-      ?.getUtxos(getUtxosInput.amount, {page: getUtxosInput.page, limit: getUtxosInput.limit})
-      .then((hexUtxos) => {
-        onWaiting(false)
-        onRawResponse(hexUtxos)
-        let utxos = []
-        for (const hexUtxo of hexUtxos) {
-          const utxo = getUtxoFromHex(hexUtxo)
-          utxos.push(utxo)
-        }
-        onResponse(utxos)
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        logger.log(e)
-      })
-  }
+  const getUtxosClick = () =>
+    runApiCall(
+      () => api.getUtxos(getUtxosInput.amount, {page: getUtxosInput.page, limit: getUtxosInput.limit}),
+      {onRawResponse, onResponse, onWaiting},
+      {parse: (hexUtxos) => hexUtxos.map(getUtxoFromHex)},
+    )
 
   const apiProps = {
     buttonLabel: 'getUtxos',

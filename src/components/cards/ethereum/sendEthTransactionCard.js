@@ -1,39 +1,27 @@
-import logger from '../../../utils/logger'
 import React, {useState} from 'react'
 import ApiCardWithModal from '../apiCardWithModal'
 import {ModalWindowContent, CommonStyles} from '../../ui-constants'
 import {ethToHexWei} from '../../../utils/ethereumUtils'
+import runApiCall from '../../../utils/runApiCall'
 
 const SendEthTransactionCard = ({accounts, onRawResponse, onResponse, onWaiting}) => {
   const [toAddress, setToAddress] = useState('')
   const [amount, setAmount] = useState('')
 
-  const sendTxClick = async () => {
+  const sendTxClick = () => {
     if (!accounts || accounts.length === 0) {
       onResponse('No account connected')
       return
     }
-    onWaiting(true)
-    try {
-      const txHash = await window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [
-          {
-            from: accounts[0],
-            to: toAddress,
-            value: ethToHexWei(amount),
-          },
-        ],
-      })
-      onRawResponse(txHash)
-      onResponse({txHash, from: accounts[0], to: toAddress, amountEth: amount})
-    } catch (e) {
-      onRawResponse('')
-      onResponse(e)
-      logger.error(e)
-    } finally {
-      onWaiting(false)
-    }
+    return runApiCall(
+      () =>
+        window.ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [{from: accounts[0], to: toAddress, value: ethToHexWei(amount)}],
+        }),
+      {onRawResponse, onResponse, onWaiting},
+      {parse: (txHash) => ({txHash, from: accounts[0], to: toAddress, amountEth: amount})},
+    )
   }
 
   const isValid = toAddress.startsWith('0x') && toAddress.length === 42 && amount && parseFloat(amount) > 0

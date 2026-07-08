@@ -1,31 +1,21 @@
-import logger from '../../../utils/logger'
 import React, {useState} from 'react'
 import ApiCardWithModal from '../apiCardWithModal'
 import {ModalWindowContent, CommonStyles} from '../../ui-constants'
+import runApiCall from '../../../utils/runApiCall'
 
 const SignEthMessageCard = ({accounts, onRawResponse, onResponse, onWaiting}) => {
   const [message, setMessage] = useState('')
 
-  const signMessageClick = async () => {
+  const signMessageClick = () => {
     if (!accounts || accounts.length === 0) {
       onResponse('No account connected')
       return
     }
-    onWaiting(true)
-    try {
-      const signature = await window.ethereum.request({
-        method: 'personal_sign',
-        params: [message, accounts[0]],
-      })
-      onRawResponse(signature)
-      onResponse({account: accounts[0], message, signature})
-    } catch (e) {
-      onRawResponse('')
-      onResponse(e)
-      logger.error(e)
-    } finally {
-      onWaiting(false)
-    }
+    return runApiCall(
+      () => window.ethereum.request({method: 'personal_sign', params: [message, accounts[0]]}),
+      {onRawResponse, onResponse, onWaiting},
+      {parse: (signature) => ({account: accounts[0], message, signature})},
+    )
   }
 
   return (

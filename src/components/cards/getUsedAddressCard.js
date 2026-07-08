@@ -1,32 +1,16 @@
-import logger from '../../utils/logger'
 import React, {useState} from 'react'
 import {getBech32AddressFromHex} from '../../utils/cslTools'
 import ApiCardWithModal from './apiCardWithModal'
 import {ModalWindowContent, CommonStyles} from '../ui-constants'
+import runApiCall from '../../utils/runApiCall'
 
 const GetUsedAddresses = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [usedAddressInput, setUsedAddressInput] = useState({page: 0, limit: 5})
 
-  const getUsedAddressesClick = () => {
-    onWaiting(true)
-    api
-      ?.getUsedAddresses(usedAddressInput)
-      .then((hexAddresses) => {
-        onWaiting(false)
-        onRawResponse(hexAddresses)
-        const addresses = []
-        for (const hexAddr of hexAddresses) {
-          addresses.push(getBech32AddressFromHex(hexAddr))
-        }
-        onResponse(addresses)
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        logger.log(e)
-      })
-  }
+  const getUsedAddressesClick = () =>
+    runApiCall(() => api.getUsedAddresses(usedAddressInput), {onRawResponse, onResponse, onWaiting}, {
+      parse: (hexAddresses) => hexAddresses.map(getBech32AddressFromHex),
+    })
 
   const apiProps = {
     buttonLabel: 'getUsedAddresses',

@@ -1,29 +1,20 @@
-import logger from '../../utils/logger'
 import React from 'react'
 import {wasmMultiassetToJSONs} from '../../utils/utils'
 import ApiCard from './apiCard'
 import {getCslValue} from '../../utils/cslTools'
+import runApiCall from '../../utils/runApiCall'
 
 const GetBalanceCard = ({api, onRawResponse, onResponse, onWaiting}) => {
-  const getBalanceClick = () => {
-    onWaiting(true)
-    api
-      ?.getBalance()
-      .then((hexBalance) => {
-        onWaiting(false)
-        onRawResponse(hexBalance)
+  const getBalanceClick = () =>
+    runApiCall(() => api.getBalance(), {onRawResponse, onResponse, onWaiting}, {
+      parse: (hexBalance) => {
         const cslValue = getCslValue(hexBalance)
-        const adaValue = cslValue.coin().to_str()
-        const assetValue = wasmMultiassetToJSONs(cslValue.multiasset())
-        onResponse({lovelaces: adaValue, assets: assetValue})
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        logger.log(e)
-      })
-  }
+        return {
+          lovelaces: cslValue.coin().to_str(),
+          assets: wasmMultiassetToJSONs(cslValue.multiasset()),
+        }
+      },
+    })
 
   const apiProps = {
     apiName: 'getBalance',

@@ -1,33 +1,17 @@
-import logger from '../../utils/logger'
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
 import {CommonStyles, ModalWindowContent} from '../ui-constants'
 import {getAmountInHex, getUtxoFromHex} from '../../utils/cslTools'
+import runApiCall from '../../utils/runApiCall'
 
 const GetCollateralUtxosCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState('2000000')
 
   const getCollateralUtxosClick = () => {
     const amountInHex = getCollateralUtxosInput ? getAmountInHex(getCollateralUtxosInput) : undefined
-    onWaiting(true)
-    api
-      ?.getCollateral(amountInHex)
-      .then((hexUtxos) => {
-        onWaiting(false)
-        onRawResponse(hexUtxos)
-        let utxos = []
-        for (const hexUtxo of hexUtxos) {
-          const utxo = getUtxoFromHex(hexUtxo)
-          utxos.push(utxo)
-        }
-        onResponse(utxos)
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        logger.log(e)
-      })
+    return runApiCall(() => api.getCollateral(amountInHex), {onRawResponse, onResponse, onWaiting}, {
+      parse: (hexUtxos) => hexUtxos.map(getUtxoFromHex),
+    })
   }
 
   const apiProps = {

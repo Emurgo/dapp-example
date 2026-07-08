@@ -1,27 +1,13 @@
-import logger from '../../utils/logger'
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
 import {CommonStyles, ModalWindowContent} from '../ui-constants'
+import runApiCall from '../../utils/runApiCall'
 
 const SubmitTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [submitTransactionInput, setSubmitTransactionInput] = useState('')
 
-  const submitTransactionClick = () => {
-    onWaiting(true)
-    api
-      ?.submitTx(submitTransactionInput)
-      .then((txId) => {
-        onWaiting(false)
-        onRawResponse(txId)
-        onResponse(txId, false)
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        logger.log(e)
-      })
-  }
+  const submitTransactionClick = () =>
+    runApiCall(() => api.submitTx(submitTransactionInput), {onRawResponse, onResponse, onWaiting}, {stringify: false})
 
   const apiProps = {
     buttonLabel: 'submitTx',

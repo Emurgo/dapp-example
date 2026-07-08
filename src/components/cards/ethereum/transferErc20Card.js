@@ -1,42 +1,29 @@
-import logger from '../../../utils/logger'
 /* global BigInt */
 import React, {useState} from 'react'
 import ApiCardWithModal from '../apiCardWithModal'
 import {ModalWindowContent, CommonStyles} from '../../ui-constants'
 import {transferData} from '../../../utils/ethereumUtils'
+import runApiCall from '../../../utils/runApiCall'
 
 const TransferErc20Card = ({accounts, onRawResponse, onResponse, onWaiting}) => {
   const [contractAddress, setContractAddress] = useState('')
   const [toAddress, setToAddress] = useState('')
   const [amount, setAmount] = useState('')
 
-  const transferClick = async () => {
+  const transferClick = () => {
     if (!accounts || accounts.length === 0) {
       onResponse('No account connected')
       return
     }
-    onWaiting(true)
-    try {
-      const amountWei = BigInt(amount).toString()
-      const txHash = await window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [
-          {
-            from: accounts[0],
-            to: contractAddress,
-            data: transferData(toAddress, amountWei),
-          },
-        ],
-      })
-      onRawResponse(txHash)
-      onResponse({txHash, contract: contractAddress, from: accounts[0], to: toAddress, amount})
-    } catch (e) {
-      onRawResponse('')
-      onResponse(e)
-      logger.error(e)
-    } finally {
-      onWaiting(false)
-    }
+    return runApiCall(
+      () =>
+        window.ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [{from: accounts[0], to: contractAddress, data: transferData(toAddress, BigInt(amount).toString())}],
+        }),
+      {onRawResponse, onResponse, onWaiting},
+      {parse: (txHash) => ({txHash, contract: contractAddress, from: accounts[0], to: toAddress, amount})},
+    )
   }
 
   const isValid =

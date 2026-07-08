@@ -1,32 +1,17 @@
-import logger from '../../utils/logger'
 import React from 'react'
 import ApiCard from './apiCard'
 import { getPublicKeyFromHex } from '../../utils/cslTools'
+import runApiCall from '../../utils/runApiCall'
 
 const Cip95GetUnregisteredPubStakeKeysCard = ({api, onRawResponse, onResponse, onWaiting}) => {
-  const getUnregisteredPubStakeKeysClick = () => {
-    onWaiting(true)
-    api?.cip95
-      .getUnregisteredPubStakeKeys()
-      .then((unregPubStakeKeys) => {
-        logger.log('unregPubStakeKeys: ', unregPubStakeKeys)
-        onWaiting(false)
-        onRawResponse(unregPubStakeKeys)
-        if (unregPubStakeKeys.length < 1) {
-          onResponse('No Unregistered Pub Stake Keys', false)
-        } else {
-          const unregPubStakeKey = unregPubStakeKeys[0]
-          const stakeKeyHash = getPublicKeyFromHex(unregPubStakeKey).hash().to_hex()
-          onResponse(stakeKeyHash, false)
-        }
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        logger.log(e)
-      })
-  }
+  const getUnregisteredPubStakeKeysClick = () =>
+    runApiCall(() => api.cip95.getUnregisteredPubStakeKeys(), {onRawResponse, onResponse, onWaiting}, {
+      parse: (unregPubStakeKeys) =>
+        unregPubStakeKeys.length < 1
+          ? 'No Unregistered Pub Stake Keys'
+          : getPublicKeyFromHex(unregPubStakeKeys[0]).hash().to_hex(),
+      stringify: false,
+    })
 
   const apiProps = {
     apiName: 'getUnregisteredPubStakeKeys',
