@@ -1,4 +1,5 @@
-import React, {useState} from 'react'
+import React from 'react'
+import useResponseState from '../../../hooks/useResponseState'
 import useCardano from '../../../hooks/cardanoProvider'
 import ResponsesPart from './responsesPart'
 import {CONNECTED} from '../../../utils/connectionStates'
@@ -6,13 +7,7 @@ import Cip95OfficialPart from './cip95OfficialPart'
 
 const Cip95Tab = () => {
   const {api, connectionState} = useCardano()
-  const [currentText, setCurrentText] = useState('')
-  const [rawCurrentText, setRawCurrentText] = useState('')
-  const [waiterState, setWaiterState] = useState(false)
-
-  const setResponse = (response, stringifyIt = true) => {
-    setCurrentText(stringifyIt ? JSON.stringify(response, undefined, 2) : response)
-  }
+  const {currentText, rawCurrentText, waiterState, setRawCurrentText, setWaiterState, setResponse} = useResponseState()
 
   return (
     <div className="py-5 px-5 text-gray-300">
