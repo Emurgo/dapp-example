@@ -1,6 +1,7 @@
 import logger from '../utils/logger'
 import React, {useState, useEffect, useCallback, useMemo} from 'react'
 import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_PROVIDER} from '../utils/connectionStates'
+import useToast from './toastProvider'
 
 const CardanoContext = React.createContext(null)
 const reservedKeys = [
@@ -25,6 +26,7 @@ const reservedKeys = [
 
 export const CardanoProvider = ({children}) => {
   logger.debug('[dApp][CardanoProvider] is called')
+  const {showToast} = useToast()
   const [api, setApi] = useState(null)
   const [connectionState, setConnectionState] = useState(NO_PROVIDER)
   const [availableWallets, setAvailableWallets] = useState([])
@@ -82,13 +84,18 @@ export const CardanoProvider = ({children}) => {
       logger.error(`[dApp][connect] The error received while connecting the wallet`)
       setSelectedWallet('')
       setConnectionState(NOT_CONNECTED)
+      // Surface user-initiated connection failures; stay quiet on the silent
+      // background reconnect so page load doesn't pop a toast.
+      if (!silent) {
+        showToast(`Failed to connect wallet "${walletName}": ${error?.info ?? error?.message ?? JSON.stringify(error)}`)
+      }
       if (throwError) {
         throw new Error(JSON.stringify(error))
       } else {
         logger.error(`[dApp][connect] ${JSON.stringify(error)}`)
       }
     }
-  }, [])
+  }, [showToast])
 
   useEffect(() => {
     if (!window.cardano) {

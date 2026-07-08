@@ -1,11 +1,13 @@
 import logger from '../utils/logger'
 import React, {useState, useEffect, useCallback, useMemo} from 'react'
 import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_PROVIDER} from '../utils/connectionStates'
+import useToast from './toastProvider'
 
 const EthereumContext = React.createContext(null)
 
 export const EthereumProvider = ({children}) => {
   logger.debug('[dApp][EthereumProvider] is called')
+  const {showToast} = useToast()
   const [accounts, setAccounts] = useState([])
   const [connectionState, setConnectionState] = useState(NO_PROVIDER)
   const [chainId, setChainId] = useState(null)
@@ -57,8 +59,9 @@ export const EthereumProvider = ({children}) => {
     } catch (err) {
       logger.error('[dApp][EthereumProvider] connect error', err)
       setConnectionState(NOT_CONNECTED)
+      showToast(`Failed to connect Ethereum wallet: ${err?.message ?? JSON.stringify(err)}`)
     }
-  }, [])
+  }, [showToast])
 
   const disconnect = useCallback(() => {
     setAccounts([])
