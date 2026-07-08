@@ -12,7 +12,9 @@ const TabsComponent = ({tabsData}) => {
             key={value}
             value={value}
             className={
-              activeTab === value ? 'bg-orange-700 text-white rounded-t-lg whitespace-nowrap' : 'text-gray-300 border-x border-gray-700 whitespace-nowrap'
+              activeTab === value
+                ? 'bg-orange-700 text-white rounded-t-lg whitespace-nowrap'
+                : 'text-gray-300 border-x border-gray-700 whitespace-nowrap'
             }
             onClick={() => setActiveTab(value)}
           >

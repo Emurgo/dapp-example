@@ -1,7 +1,7 @@
 import logger from '../../utils/logger'
 import React from 'react'
 import ApiCard from './apiCard'
-import { getPublicKeyFromHex } from '../../utils/cslTools'
+import {getPublicKeyFromHex} from '../../utils/cslTools'
 
 const Cip95GetRegisteredPubStakeKeysCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const getRegisteredPubStakeKeysClick = () => {

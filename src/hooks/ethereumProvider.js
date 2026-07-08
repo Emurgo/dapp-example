@@ -80,22 +80,28 @@ export const EthereumProvider = ({children}) => {
     return await window.ethereum.request({method: 'eth_sendTransaction', params: [tx]})
   }, [])
 
-  const signMessage = useCallback(async (message) => {
-    if (!window.ethereum || accounts.length === 0) throw new Error('Not connected')
-    return await window.ethereum.request({method: 'personal_sign', params: [message, accounts[0]]})
-  }, [accounts])
+  const signMessage = useCallback(
+    async (message) => {
+      if (!window.ethereum || accounts.length === 0) throw new Error('Not connected')
+      return await window.ethereum.request({method: 'personal_sign', params: [message, accounts[0]]})
+    },
+    [accounts],
+  )
 
-  const values = useMemo(() => ({
-    accounts,
-    connectionState,
-    chainId,
-    connect,
-    disconnect,
-    getAccounts,
-    getBalance,
-    sendTransaction,
-    signMessage,
-  }), [accounts, connectionState, chainId, connect, disconnect, getAccounts, getBalance, sendTransaction, signMessage])
+  const values = useMemo(
+    () => ({
+      accounts,
+      connectionState,
+      chainId,
+      connect,
+      disconnect,
+      getAccounts,
+      getBalance,
+      sendTransaction,
+      signMessage,
+    }),
+    [accounts, connectionState, chainId, connect, disconnect, getAccounts, getBalance, sendTransaction, signMessage],
+  )
 
   return <EthereumContext.Provider value={values}>{children}</EthereumContext.Provider>
 }

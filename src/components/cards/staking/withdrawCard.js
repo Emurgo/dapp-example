@@ -89,7 +89,9 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       const pubStakeKey = await api?.cip95.getRegisteredPubStakeKeys()
       const stakeKeyHash = getPublicKeyFromHex(
         firstOrThrow(pubStakeKey, 'No registered stake key available from wallet'),
-      ).hash().to_hex()
+      )
+        .hash()
+        .to_hex()
       const txBuilderWithWithdrawal = await getTxBuilderWithWithdrawal(stakeKeyHash, networkType, rewardAmount)
       const utxos = await api?.getUtxos()
 

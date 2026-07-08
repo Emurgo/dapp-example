@@ -369,7 +369,13 @@ const Cip20Tab = () => {
               onClose={() => setPickerOpen(false)}
               modal
               overlayStyle={{background: 'rgba(0,0,0,0.75)'}}
-              contentStyle={{width: 'min(90vw, 640px)', maxHeight: '90vh', overflowY: 'auto', border: 'none', padding: 0}}
+              contentStyle={{
+                width: 'min(90vw, 640px)',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                border: 'none',
+                padding: 0,
+              }}
             >
               <div className="bg-gray-900 border rounded-md border-gray-700 p-4 text-gray-300">
                 <div className="flex items-center justify-between mb-3">

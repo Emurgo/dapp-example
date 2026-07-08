@@ -133,7 +133,7 @@ const TokenTab = () => {
       txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset())
       txBuilder.add_required_signer(pubkeyHash)
       txBuilder.add_change_if_needed(wasmChangeAddress)
-      
+
       const wasmUnsignedTransaction = txBuilder.build_tx()
       const fixedTx = getFixedTxFromBytes(wasmUnsignedTransaction.to_bytes())
       logger.log('[TokenTab] Unsigned Tx:', fixedTx.to_hex())

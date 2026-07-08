@@ -10,9 +10,13 @@ const GetCollateralUtxosCard = ({api, onRawResponse, onResponse, onWaiting}) => 
 
   const getCollateralUtxosClick = () => {
     const amountInHex = getCollateralUtxosInput ? getAmountInHex(getCollateralUtxosInput) : undefined
-    return runApiCall(() => api.getCollateral(amountInHex), {onRawResponse, onResponse, onWaiting}, {
-      parse: hexArrayToUtxos,
-    })
+    return runApiCall(
+      () => api.getCollateral(amountInHex),
+      {onRawResponse, onResponse, onWaiting},
+      {
+        parse: hexArrayToUtxos,
+      },
+    )
   }
 
   const apiProps = {

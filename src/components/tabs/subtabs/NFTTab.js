@@ -230,8 +230,8 @@ const NFTTab = () => {
                   Note: Currently the functionality of this is extremely limited, it is really only here to mint really
                   basic NFTs for testing.
                   <p />
-                  The minting policy is hardcoded to basically just use the pubkeyhash of your first used address, so all
-                  the NFTs you mint here will have the same policy id.
+                  The minting policy is hardcoded to basically just use the pubkeyhash of your first used address, so
+                  all the NFTs you mint here will have the same policy id.
                   <p />
                   They're not even really NFTs, cuz you can mint multiple of them. This is a work in progress and will
                   have more functionalities in the future.

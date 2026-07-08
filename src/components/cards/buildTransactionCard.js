@@ -43,11 +43,7 @@ const BuildTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
         for (let i = 0; i < wasmUtxos.len(); i++) {
           const wasmUtxo = wasmUtxos.get(i)
           const output = wasmUtxo.output()
-          txBuilder.add_regular_input(
-            output.address(),
-            wasmUtxo.input(),
-            output.amount(),
-          )
+          txBuilder.add_regular_input(output.address(), wasmUtxo.input(), output.amount())
         }
 
         // Sending everything to the receiver
@@ -107,7 +103,9 @@ const BuildTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
         <InputWithLabel
           inputName="Receiver address"
           inputValue={buildTransactionInput.address}
-          onChangeFunction={(event) => setBuildTransactionInput({...buildTransactionInput, address: event.target.value})}
+          onChangeFunction={(event) =>
+            setBuildTransactionInput({...buildTransactionInput, address: event.target.value})
+          }
         />
       </div>
     </ApiCardWithModal>

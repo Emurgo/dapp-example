@@ -56,46 +56,51 @@ export const CardanoProvider = ({children}) => {
    * @param {boolean} throwError - Throw an error which possibly can be while connecting to the wallet
    * @returns {Promise<any>}
    */
-  const connect = useCallback(async (walletName, requestIdentification, silent, throwError = false) => {
-    setConnectionState(IN_PROGRESS)
-    setApi(null)
-    logger.debug(`[dApp][connect] is called`)
+  const connect = useCallback(
+    async (walletName, requestIdentification, silent, throwError = false) => {
+      setConnectionState(IN_PROGRESS)
+      setApi(null)
+      logger.debug(`[dApp][connect] is called`)
 
-    if (!window.cardano) {
-      logger.error('There are no cardano wallets are installed')
-      setConnectionState(NOT_CONNECTED)
-      return
-    }
-
-    logger.log(`[dApp][connect] connecting the wallet "${walletName}"`)
-    logger.debug(`[dApp][connect] {requestIdentification: ${requestIdentification}, onlySilent: ${silent}}`)
-
-    try {
-      const connectedApi = await window.cardano[walletName].enable({
-        requestIdentification,
-        onlySilent: silent,
-      })
-      logger.debug(`[dApp][connect] wallet API object is received`)
-      setApi(connectedApi)
-      setSelectedWallet(walletName)
-      setConnectionState(CONNECTED)
-      return connectedApi
-    } catch (error) {
-      logger.error(`[dApp][connect] The error received while connecting the wallet`)
-      setSelectedWallet('')
-      setConnectionState(NOT_CONNECTED)
-      // Surface user-initiated connection failures; stay quiet on the silent
-      // background reconnect so page load doesn't pop a toast.
-      if (!silent) {
-        showToast(`Failed to connect wallet "${walletName}": ${error?.info ?? error?.message ?? JSON.stringify(error)}`)
+      if (!window.cardano) {
+        logger.error('There are no cardano wallets are installed')
+        setConnectionState(NOT_CONNECTED)
+        return
       }
-      if (throwError) {
-        throw new Error(JSON.stringify(error))
-      } else {
-        logger.error(`[dApp][connect] ${JSON.stringify(error)}`)
+
+      logger.log(`[dApp][connect] connecting the wallet "${walletName}"`)
+      logger.debug(`[dApp][connect] {requestIdentification: ${requestIdentification}, onlySilent: ${silent}}`)
+
+      try {
+        const connectedApi = await window.cardano[walletName].enable({
+          requestIdentification,
+          onlySilent: silent,
+        })
+        logger.debug(`[dApp][connect] wallet API object is received`)
+        setApi(connectedApi)
+        setSelectedWallet(walletName)
+        setConnectionState(CONNECTED)
+        return connectedApi
+      } catch (error) {
+        logger.error(`[dApp][connect] The error received while connecting the wallet`)
+        setSelectedWallet('')
+        setConnectionState(NOT_CONNECTED)
+        // Surface user-initiated connection failures; stay quiet on the silent
+        // background reconnect so page load doesn't pop a toast.
+        if (!silent) {
+          showToast(
+            `Failed to connect wallet "${walletName}": ${error?.info ?? error?.message ?? JSON.stringify(error)}`,
+          )
+        }
+        if (throwError) {
+          throw new Error(JSON.stringify(error))
+        } else {
+          logger.error(`[dApp][connect] ${JSON.stringify(error)}`)
+        }
       }
-    }
-  }, [showToast])
+    },
+    [showToast],
+  )
 
   useEffect(() => {
     if (!window.cardano) {
@@ -105,9 +110,9 @@ export const CardanoProvider = ({children}) => {
     }
 
     /**
-   * @param {string} walletName - A wallet name as it is presented in the Cardano object
-   * @returns {Promise<void>}
-   */
+     * @param {string} walletName - A wallet name as it is presented in the Cardano object
+     * @returns {Promise<void>}
+     */
     const tryConnectSilent = async (walletName) => {
       let connectResult = null
       logger.debug(`[dApp][tryConnectSilent] is called`)
@@ -150,7 +155,7 @@ export const CardanoProvider = ({children}) => {
           logger.error(err)
         })
     } else {
-      setConnectionState(NOT_CONNECTED);
+      setConnectionState(NOT_CONNECTED)
     }
   }, [connect])
 
@@ -170,33 +175,54 @@ export const CardanoProvider = ({children}) => {
     return await api.getBalance()
   }, [api])
 
-  const sendTransaction = useCallback(async (tx) => {
-    if (!api) throw new Error('Not connected')
-    const signedTx = await api.signTx(tx)
-    return await api.submitTx(signedTx)
-  }, [api])
+  const sendTransaction = useCallback(
+    async (tx) => {
+      if (!api) throw new Error('Not connected')
+      const signedTx = await api.signTx(tx)
+      return await api.submitTx(signedTx)
+    },
+    [api],
+  )
 
-  const signMessage = useCallback(async (address, payload) => {
-    if (!api) throw new Error('Not connected')
-    return await api.signData(address, payload)
-  }, [api])
+  const signMessage = useCallback(
+    async (address, payload) => {
+      if (!api) throw new Error('Not connected')
+      return await api.signData(address, payload)
+    },
+    [api],
+  )
 
-  const values = useMemo(() => ({
-    api,
-    connect,
-    disconnect,
-    getAccounts,
-    getBalance,
-    sendTransaction,
-    signMessage,
-    connectionState,
-    availableWallets,
-    setAvailableWallets,
-    selectedWallet,
-    setConnectionState,
-    setConnectionStateFalse,
-    setSelectedWallet,
-  }), [api, connect, disconnect, getAccounts, getBalance, sendTransaction, signMessage, connectionState, availableWallets, selectedWallet, setConnectionStateFalse])
+  const values = useMemo(
+    () => ({
+      api,
+      connect,
+      disconnect,
+      getAccounts,
+      getBalance,
+      sendTransaction,
+      signMessage,
+      connectionState,
+      availableWallets,
+      setAvailableWallets,
+      selectedWallet,
+      setConnectionState,
+      setConnectionStateFalse,
+      setSelectedWallet,
+    }),
+    [
+      api,
+      connect,
+      disconnect,
+      getAccounts,
+      getBalance,
+      sendTransaction,
+      signMessage,
+      connectionState,
+      availableWallets,
+      selectedWallet,
+      setConnectionStateFalse,
+    ],
+  )
 
   return <CardanoContext.Provider value={values}>{children}</CardanoContext.Provider>
 }

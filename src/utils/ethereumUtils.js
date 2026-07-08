@@ -8,10 +8,14 @@ export const CHAIN_IDS = Object.freeze({
 
 export const chainName = (chainId) => {
   switch (chainId) {
-    case CHAIN_IDS.MAINNET: return 'Mainnet'
-    case CHAIN_IDS.SEPOLIA: return 'Sepolia'
-    case CHAIN_IDS.HOLESKY: return 'Holesky'
-    default: return chainId ?? 'Unknown'
+    case CHAIN_IDS.MAINNET:
+      return 'Mainnet'
+    case CHAIN_IDS.SEPOLIA:
+      return 'Sepolia'
+    case CHAIN_IDS.HOLESKY:
+      return 'Holesky'
+    default:
+      return chainId ?? 'Unknown'
   }
 }
 
@@ -38,21 +42,17 @@ export const ethToHexWei = (ethStr) => {
 /**
  * Format an address for display (0x1234...abcd)
  */
-export const shortAddress = (addr) =>
-  addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : ''
+export const shortAddress = (addr) => (addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '')
 
 /**
  * ERC-20 balanceOf(address) ABI encoding
  * selector: keccak256('balanceOf(address)')[0..3] = 0x70a08231
  */
-export const balanceOfData = (addr) =>
-  '0x70a08231' + addr.slice(2).toLowerCase().padStart(64, '0')
+export const balanceOfData = (addr) => '0x70a08231' + addr.slice(2).toLowerCase().padStart(64, '0')
 
 /**
  * ERC-20 transfer(address,uint256) ABI encoding
  * selector: keccak256('transfer(address,uint256)')[0..3] = 0xa9059cbb
  */
 export const transferData = (to, amountWei) =>
-  '0xa9059cbb' +
-  to.slice(2).toLowerCase().padStart(64, '0') +
-  BigInt(amountWei).toString(16).padStart(64, '0')
+  '0xa9059cbb' + to.slice(2).toLowerCase().padStart(64, '0') + BigInt(amountWei).toString(16).padStart(64, '0')

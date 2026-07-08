@@ -216,8 +216,7 @@ export const buildCip20Tx = ({hexUtxos, receiverBech32, messageLines, pickedHexU
 
 // Descending comparator for lovelace amount strings (UI sort of decoded UTxOs).
 // Uses wasm.BigNum (not native BigInt, which trips the react-app ESLint no-undef).
-export const compareLovelaceDesc = (aStr, bStr) =>
-  wasm.BigNum.from_str(bStr).compare(wasm.BigNum.from_str(aStr))
+export const compareLovelaceDesc = (aStr, bStr) => wasm.BigNum.from_str(bStr).compare(wasm.BigNum.from_str(aStr))
 
 export const getAddressFromBytes = (changeAddress) => wasm.Address.from_bytes(hexToBytes(changeAddress))
 
@@ -227,7 +226,6 @@ export const getTransactionWitnessSetNew = () => wasm.TransactionWitnessSet.new(
 
 export const getTransactionWitnessSetFromBytes = (witnessHex) =>
   wasm.TransactionWitnessSet.from_bytes(hexToBytes(witnessHex))
-
 
 export const getPubKeyHash = (usedAddress) => wasm.BaseAddress.from_address(usedAddress).payment_cred().to_keyhash()
 
@@ -311,9 +309,7 @@ export const parseCredential = (input) => {
     try {
       return getCslCredentialFromBech32(input)
     } catch (err2) {
-      throw new Error(
-        `Invalid credential — not valid Hex or Bech32: ${JSON.stringify(err1)}, ${JSON.stringify(err2)}`,
-      )
+      throw new Error(`Invalid credential — not valid Hex or Bech32: ${JSON.stringify(err1)}, ${JSON.stringify(err2)}`)
     }
   }
 }
@@ -337,8 +333,8 @@ export const getCslCredentialFromScriptFromHex = (hexValue) => {
 }
 
 /**
- * 
- * @param {wasm.Credential} dRepCred 
+ *
+ * @param {wasm.Credential} dRepCred
  * @returns {boolean}
  */
 export const dRepIsScript = (dRepCred) => dRepCred.kind() === wasm.CredKind.Script

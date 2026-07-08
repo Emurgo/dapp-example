@@ -62,10 +62,7 @@ const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
             signedTx.add_vkey_witness(walletVkeys.get(i))
           }
         }
-        onResponse(
-          JSON.stringify({signedTx: signedTx.to_hex(), witness: witnessHex}, undefined, 2),
-          false,
-        )
+        onResponse(JSON.stringify({signedTx: signedTx.to_hex(), witness: witnessHex}, undefined, 2), false)
       })
       .catch((e) => {
         onWaiting(false)

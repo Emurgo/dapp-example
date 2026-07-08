@@ -1,9 +1,6 @@
 import React, {useState} from 'react'
 import InputWithLabel from '../../inputWithLabel'
-import {
-  getCommitteeHotAuth,
-  getCertOfNewCommitteeHotAuth,
-} from '../../../utils/cslTools'
+import {getCommitteeHotAuth, getCertOfNewCommitteeHotAuth} from '../../../utils/cslTools'
 import GovToolsPanel from '../govToolsPanel'
 import buildCert from '../../../utils/buildCert'
 

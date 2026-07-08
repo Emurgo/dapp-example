@@ -1,10 +1,9 @@
 import React from 'react'
 import ApiCard from './apiCard'
-import { getAddressFromCred, getCredential, getSecretKey } from '../../utils/cslTools'
+import {getAddressFromCred, getCredential, getSecretKey} from '../../utils/cslTools'
 import runApiCall from '../../utils/runApiCall'
 
 const CreateRandomKeyPart = ({onRawResponse, onResponse, onWaiting}) => {
-
   const clickFunction = () =>
     runApiCall(
       async () => {
@@ -24,10 +23,7 @@ const CreateRandomKeyPart = ({onRawResponse, onResponse, onWaiting}) => {
       {rawText: () => ''},
     )
 
-  return <ApiCard
-    apiName="Random Key"
-    clickFunction={clickFunction}
-  />
+  return <ApiCard apiName="Random Key" clickFunction={clickFunction} />
 }
 
 export default CreateRandomKeyPart

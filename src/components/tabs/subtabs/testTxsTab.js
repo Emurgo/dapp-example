@@ -11,8 +11,7 @@ import {buildTestTx, FEATURE_GROUPS, CREDENTIAL_FEATURES} from '../../../utils/t
 const CRED_MODE_LABELS = {wallet: 'W', key: 'K', script: 'S'}
 const CRED_MODE_ORDER = ['wallet', 'key', 'script']
 
-const defaultCredModes = () =>
-  Object.fromEntries([...CREDENTIAL_FEATURES].map((f) => [f, 'key']))
+const defaultCredModes = () => Object.fromEntries([...CREDENTIAL_FEATURES].map((f) => [f, 'key']))
 
 const TestTxsTab = () => {
   const {api, connectionState} = useCardano()
@@ -93,13 +92,7 @@ const TestTxsTab = () => {
     }
     setWaiterState(true)
     try {
-      const {txHex} = buildTestTx(
-        enabledFeatures,
-        credModes,
-        walletRewardAddrHex,
-        walletChangeAddrHex,
-        networkId,
-      )
+      const {txHex} = buildTestTx(enabledFeatures, credModes, walletRewardAddrHex, walletChangeAddrHex, networkId)
       const witnessHex = await api.signTx(txHex, true)
       setRawCurrentText(witnessHex)
       setCurrentText(witnessHex)
@@ -121,13 +114,17 @@ const TestTxsTab = () => {
               <p className="font-semibold text-gray-200 text-sm mb-1">Credential mode (W / K / S)</p>
               <p className="text-gray-400 text-xs mb-2">
                 {'Shown next to cert/withdrawal features when enabled. Click to cycle: '}
-                <span className="text-orange-400 font-bold">W</span>{' = wallet stake addr  '}
-                <span className="text-orange-400 font-bold">K</span>{' = fake key hash  '}
-                <span className="text-orange-400 font-bold">S</span>{' = fake script hash'}
+                <span className="text-orange-400 font-bold">W</span>
+                {' = wallet stake addr  '}
+                <span className="text-orange-400 font-bold">K</span>
+                {' = fake key hash  '}
+                <span className="text-orange-400 font-bold">S</span>
+                {' = fake script hash'}
               </p>
               {walletRewardAddrHex ? (
                 <p className="text-gray-300 font-mono text-xs break-all">
-                  <span className="text-gray-400">Wallet stake: </span>{walletRewardAddrHex}
+                  <span className="text-gray-400">Wallet stake: </span>
+                  {walletRewardAddrHex}
                 </p>
               ) : (
                 <p className="text-gray-500 text-xs">Wallet stake address: not loaded</p>
@@ -151,7 +148,7 @@ const TestTxsTab = () => {
                     {group.features.map((feat) => {
                       const isCredFeat = CREDENTIAL_FEATURES.has(feat.key)
                       const isEnabled = enabledFeatures.has(feat.key)
-                      const mode = isCredFeat ? credModes[feat.key] ?? 'key' : null
+                      const mode = isCredFeat ? (credModes[feat.key] ?? 'key') : null
                       return (
                         <div key={feat.key} className="flex items-center justify-between">
                           <CheckboxWithLabel
@@ -195,11 +192,7 @@ const TestTxsTab = () => {
             </div>
           </div>
 
-          <ResponsesPart
-            rawCurrentText={rawCurrentText}
-            currentText={currentText}
-            currentWaiterState={waiterState}
-          />
+          <ResponsesPart rawCurrentText={rawCurrentText} currentText={currentText} currentWaiterState={waiterState} />
         </div>
       ) : (
         <div />

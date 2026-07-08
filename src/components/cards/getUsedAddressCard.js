@@ -8,9 +8,13 @@ const GetUsedAddresses = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [usedAddressInput, setUsedAddressInput] = useState({page: 0, limit: 5})
 
   const getUsedAddressesClick = () =>
-    runApiCall(() => api.getUsedAddresses(usedAddressInput), {onRawResponse, onResponse, onWaiting}, {
-      parse: hexArrayToBech32Addresses,
-    })
+    runApiCall(
+      () => api.getUsedAddresses(usedAddressInput),
+      {onRawResponse, onResponse, onWaiting},
+      {
+        parse: hexArrayToBech32Addresses,
+      },
+    )
 
   const apiProps = {
     buttonLabel: 'getUsedAddresses',

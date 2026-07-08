@@ -57,21 +57,21 @@ const SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
     try {
       const address = await getAddress()
       const payloadHex = getPayloadHex(message, encodingType)
-      
+
       // Log the inputs for debugging
-      logger.log('SignData inputs:', { address, payloadHex, originalMessage: message, encodingType })
-      
+      logger.log('SignData inputs:', {address, payloadHex, originalMessage: message, encodingType})
+
       const signDataResponse = await api?.signData(address, payloadHex)
-      
+
       // Show raw response with inputs for debugging
       const debugInfo = {
         inputs: {
           address,
           payloadHex,
           originalMessage: message,
-          encodingType
+          encodingType,
         },
-        response: signDataResponse
+        response: signDataResponse,
       }
       const rawResponseString = JSON.stringify(debugInfo, null, 2)
       onRawResponse(rawResponseString)

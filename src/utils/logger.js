@@ -16,8 +16,7 @@
 //   dappLogs.reset()   // forget the override, fall back to the build default
 const STORAGE_KEY = 'dapp:debug'
 
-const buildDefault =
-  process.env.NODE_ENV === 'development' || process.env.REACT_APP_DEBUG === 'true'
+const buildDefault = process.env.NODE_ENV === 'development' || process.env.REACT_APP_DEBUG === 'true'
 
 const readOverride = () => {
   try {

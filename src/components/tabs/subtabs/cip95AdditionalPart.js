@@ -103,7 +103,7 @@ const Cip95AdditionalPart = ({api, onWaiting, onError, getters, setters}) => {
         setters={newSetters}
       />
       <div>
-        <CertificatesInTxPart getters={getters}/>
+        <CertificatesInTxPart getters={getters} />
       </div>
       <div className="block rounded-lg border mt-5 bg-gray-900 border-gray-700">
         <TabsComponent tabsData={data} />

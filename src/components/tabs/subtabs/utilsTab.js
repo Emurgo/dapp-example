@@ -1,7 +1,7 @@
 import React from 'react'
 import useResponseState from '../../../hooks/useResponseState'
 import ResponsesPart from './responsesPart'
-import CreateRandomKeyCard from '../../cards/createRandomKeyCard';
+import CreateRandomKeyCard from '../../cards/createRandomKeyCard'
 
 const UtilsTab = () => {
   const {currentText, rawCurrentText, waiterState, setRawCurrentText, setWaiterState, setResponse} = useResponseState()
@@ -14,7 +14,8 @@ const UtilsTab = () => {
             <CreateRandomKeyCard
               onRawResponse={setRawCurrentText}
               onResponse={setResponse}
-              onWaiting={setWaiterState} />
+              onWaiting={setWaiterState}
+            />
           </div>
         </div>
         <ResponsesPart rawCurrentText={rawCurrentText} currentText={currentText} currentWaiterState={waiterState} />

@@ -30,8 +30,8 @@ export const ApiCardWithModal = (props) => {
   }
 
   return (
-    <Popup 
-      trigger={<button {...buttonProps}>{buttonLabel}</button>} 
+    <Popup
+      trigger={<button {...buttonProps}>{buttonLabel}</button>}
       {...{modal, nested, overlayStyle}}
       contentStyle={contentStyle}
     >
@@ -54,16 +54,14 @@ export const ApiCardWithModal = (props) => {
             </div>
           </div>
           {/* content section */}
-          <div className="py-5 flex-grow overflow-y-auto">
-            {children}
-          </div>
+          <div className="py-5 flex-grow overflow-y-auto">{children}</div>
           {/* end of content section*/}
           {/* confirmation button */}
           <div className="flex">
             <div className="flex-auto mb-2 mt-3 mx-2">
               <button
                 className={`w-full py-1 rounded-md text-xl text-white font-semibold ${
-                  btnDisabled === true 
+                  btnDisabled === true
                     ? 'bg-gray-500 cursor-not-allowed'
                     : 'bg-orange-700 hover:bg-orange-800 active:bg-orange-500'
                 }`}

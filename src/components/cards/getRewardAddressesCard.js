@@ -5,9 +5,13 @@ import runApiCall from '../../utils/runApiCall'
 
 const GetRewardAddressesCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const getRewardAddressesClick = () =>
-    runApiCall(() => api.getRewardAddresses(), {onRawResponse, onResponse, onWaiting}, {
-      parse: hexArrayToBech32Addresses,
-    })
+    runApiCall(
+      () => api.getRewardAddresses(),
+      {onRawResponse, onResponse, onWaiting},
+      {
+        parse: hexArrayToBech32Addresses,
+      },
+    )
 
   const apiProps = {
     apiName: 'getRewardAddresses',
