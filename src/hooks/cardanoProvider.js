@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useCallback, useMemo} from 'react'
 import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_PROVIDER} from '../utils/connectionStates'
 
 const CardanoContext = React.createContext(null)
@@ -29,10 +29,10 @@ export const CardanoProvider = ({children}) => {
   const [availableWallets, setAvailableWallets] = useState([])
   const [selectedWallet, setSelectedWallet] = useState('')
 
-  const setConnectionStateFalse = () => {
+  const setConnectionStateFalse = useCallback(() => {
     setConnectionState(NOT_CONNECTED)
     setApi(null)
-  }
+  }, [])
 
   const getAvailableWallets = () => {
     // We need to filter like this because of the Nami wallet.
@@ -45,6 +45,49 @@ export const CardanoProvider = ({children}) => {
       }
     })
   }
+
+  /**
+   * @param {string} walletName - A wallet name as it is presented in the Cardano object
+   * @param {boolean} requestIdentification - Request connection with or without required authentication
+   * @param {boolean} silent - Request connection with or without showing the connection pop-up
+   * @param {boolean} throwError - Throw an error which possibly can be while connecting to the wallet
+   * @returns {Promise<any>}
+   */
+  const connect = useCallback(async (walletName, requestIdentification, silent, throwError = false) => {
+    setConnectionState(IN_PROGRESS)
+    setApi(null)
+    console.debug(`[dApp][connect] is called`)
+
+    if (!window.cardano) {
+      console.error('There are no cardano wallets are installed')
+      setConnectionState(NOT_CONNECTED)
+      return
+    }
+
+    console.log(`[dApp][connect] connecting the wallet "${walletName}"`)
+    console.debug(`[dApp][connect] {requestIdentification: ${requestIdentification}, onlySilent: ${silent}}`)
+
+    try {
+      const connectedApi = await window.cardano[walletName].enable({
+        requestIdentification,
+        onlySilent: silent,
+      })
+      console.debug(`[dApp][connect] wallet API object is received`)
+      setApi(connectedApi)
+      setSelectedWallet(walletName)
+      setConnectionState(CONNECTED)
+      return connectedApi
+    } catch (error) {
+      console.error(`[dApp][connect] The error received while connecting the wallet`)
+      setSelectedWallet('')
+      setConnectionState(NOT_CONNECTED)
+      if (throwError) {
+        throw new Error(JSON.stringify(error))
+      } else {
+        console.error(`[dApp][connect] ${JSON.stringify(error)}`)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (!window.cardano) {
@@ -101,79 +144,36 @@ export const CardanoProvider = ({children}) => {
     } else {
       setConnectionState(NOT_CONNECTED);
     }
-  }, [])
+  }, [connect])
 
-  /**
-   * @param {string} walletName - A wallet name as it is presented in the Cardano object
-   * @param {boolean} requestIdentification - Request connection with or without required authentication
-   * @param {boolean} silent - Request connection with or without showing the connection pop-up
-   * @param {boolean} throwError - Throw an error which possibly can be while connecting to the wallet
-   * @returns {Promise<any>}
-   */
-  const connect = async (walletName, requestIdentification, silent, throwError = false) => {
-    setConnectionState(IN_PROGRESS)
-    setApi(null)
-    console.debug(`[dApp][connect] is called`)
-
-    if (!window.cardano) {
-      console.error('There are no cardano wallets are installed')
-      setConnectionState(NOT_CONNECTED)
-      return
-    }
-
-    console.log(`[dApp][connect] connecting the wallet "${walletName}"`)
-    console.debug(`[dApp][connect] {requestIdentification: ${requestIdentification}, onlySilent: ${silent}}`)
-
-    try {
-      const connectedApi = await window.cardano[walletName].enable({
-        requestIdentification,
-        onlySilent: silent,
-      })
-      console.debug(`[dApp][connect] wallet API object is received`)
-      setApi(connectedApi)
-      setSelectedWallet(walletName)
-      setConnectionState(CONNECTED)
-      return connectedApi
-    } catch (error) {
-      console.error(`[dApp][connect] The error received while connecting the wallet`)
-      setSelectedWallet('')
-      setConnectionState(NOT_CONNECTED)
-      if (throwError) {
-        throw new Error(JSON.stringify(error))
-      } else {
-        console.error(`[dApp][connect] ${JSON.stringify(error)}`)
-      }
-    }
-  }
-
-  const disconnect = () => {
+  const disconnect = useCallback(() => {
     setApi(null)
     setSelectedWallet('')
     setConnectionState(NOT_CONNECTED)
-  }
+  }, [])
 
-  const getAccounts = async () => {
+  const getAccounts = useCallback(async () => {
     if (!api) return []
     return await api.getUsedAddresses()
-  }
+  }, [api])
 
-  const getBalance = async () => {
+  const getBalance = useCallback(async () => {
     if (!api) return '0'
     return await api.getBalance()
-  }
+  }, [api])
 
-  const sendTransaction = async (tx) => {
+  const sendTransaction = useCallback(async (tx) => {
     if (!api) throw new Error('Not connected')
     const signedTx = await api.signTx(tx)
     return await api.submitTx(signedTx)
-  }
+  }, [api])
 
-  const signMessage = async (address, payload) => {
+  const signMessage = useCallback(async (address, payload) => {
     if (!api) throw new Error('Not connected')
     return await api.signData(address, payload)
-  }
+  }, [api])
 
-  const values = {
+  const values = useMemo(() => ({
     api,
     connect,
     disconnect,
@@ -188,7 +188,7 @@ export const CardanoProvider = ({children}) => {
     setConnectionState,
     setConnectionStateFalse,
     setSelectedWallet,
-  }
+  }), [api, connect, disconnect, getAccounts, getBalance, sendTransaction, signMessage, connectionState, availableWallets, selectedWallet, setConnectionStateFalse])
 
   return <CardanoContext.Provider value={values}>{children}</CardanoContext.Provider>
 }

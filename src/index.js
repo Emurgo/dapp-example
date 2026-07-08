@@ -15,11 +15,11 @@ root.render(
       <CardanoProvider>
         <EthereumProvider>
           <BitcoinProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/*" element={<App />} />
-            </Routes>
-          </BrowserRouter>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/*" element={<App />} />
+              </Routes>
+            </BrowserRouter>
           </BitcoinProvider>
         </EthereumProvider>
       </CardanoProvider>
