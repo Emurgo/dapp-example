@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import ApiCardWithModal from '../apiCardWithModal'
-import {ModalWindowContent, CommonStyles} from '../../ui-constants'
+import {ModalWindowContent} from '../../ui-constants'
+import InputWithLabel from '../../inputWithLabel'
 import runApiCall from '../../../utils/runApiCall'
 
 const SignEthMessageCard = ({accounts, onRawResponse, onResponse, onWaiting}) => {
@@ -21,16 +22,12 @@ const SignEthMessageCard = ({accounts, onRawResponse, onResponse, onWaiting}) =>
   return (
     <ApiCardWithModal buttonLabel="personal_sign" clickFunction={signMessageClick} btnDisabled={!message}>
       <div className={ModalWindowContent.contentPadding}>
-        <label htmlFor="ethSignMessage" className={ModalWindowContent.contentLabelStyle}>
-          Message to sign
-        </label>
-        <input
-          type="text"
-          id="ethSignMessage"
-          className={CommonStyles.inputStyles}
+        <InputWithLabel
+          inputName="Message to sign"
+          inputValue={message}
+          onChangeFunction={(e) => setMessage(e.target.value)}
           placeholder="Hello, Ethereum!"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          wrapperClassName=""
         />
       </div>
     </ApiCardWithModal>

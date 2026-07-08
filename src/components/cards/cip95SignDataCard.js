@@ -2,7 +2,8 @@ import logger from '../../utils/logger'
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
 import {Buffer} from 'buffer'
-import {CommonStyles, ModalWindowContent} from '../ui-constants'
+import {ModalWindowContent} from '../ui-constants'
+import InputWithLabel from '../inputWithLabel'
 
 const Cip95SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [message, setMessage] = useState('')
@@ -50,32 +51,17 @@ const Cip95SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   return (
     <ApiCardWithModal {...apiProps}>
       <div className={ModalWindowContent.contentPadding}>
-        <div>
-          <label htmlFor="addressOrDRepID" className={ModalWindowContent.contentLabelStyle}>
-            Address or DRepID (HEX)
-          </label>
-          <input
-            type="text"
-            id="addressOrDRepID"
-            className={CommonStyles.inputStyles}
-            placeholder=""
-            value={addressOrDRep}
-            onChange={(event) => setAddressOrDRep(event.target.value)}
-          />
-        </div>
-        <div className="mt-3">
-          <label htmlFor="signMessage" className={ModalWindowContent.contentLabelStyle}>
-            Message
-          </label>
-          <input
-            type="text"
-            id="signMessage"
-            className={CommonStyles.inputStyles}
-            placeholder=""
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-          />
-        </div>
+        <InputWithLabel
+          inputName="Address or DRepID (HEX)"
+          inputValue={addressOrDRep}
+          onChangeFunction={(event) => setAddressOrDRep(event.target.value)}
+          wrapperClassName=""
+        />
+        <InputWithLabel
+          inputName="Message"
+          inputValue={message}
+          onChangeFunction={(event) => setMessage(event.target.value)}
+        />
       </div>
     </ApiCardWithModal>
   )

@@ -12,7 +12,8 @@ import {
   getAddressFromBech32,
 } from '../../utils/cslTools'
 import ApiCardWithModal from './apiCardWithModal'
-import {CommonStyles, ModalWindowContent} from '../ui-constants'
+import {ModalWindowContent} from '../ui-constants'
+import InputWithLabel from '../inputWithLabel'
 
 const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const defaultValue = {amount: '2000000', address: ''}
@@ -81,16 +82,11 @@ const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   return (
     <ApiCardWithModal {...apiProps}>
       <div className={ModalWindowContent.contentPadding}>
-        <label htmlFor="txHex" className={ModalWindowContent.contentLabelStyle}>
-          Unsigned Transaction Hex
-        </label>
-        <input
-          type="text"
-          id="txHex"
-          className={CommonStyles.inputStyles}
-          placeholder=""
-          value={signTransactionInput}
-          onChange={(event) => setSignTransactionInput(event.target.value)}
+        <InputWithLabel
+          inputName="Unsigned Transaction Hex"
+          inputValue={signTransactionInput}
+          onChangeFunction={(event) => setSignTransactionInput(event.target.value)}
+          wrapperClassName=""
         />
         <label htmlFor="partialSign" className={ModalWindowContent.contentLabelStyle}>
           Partially Sign Transaction?

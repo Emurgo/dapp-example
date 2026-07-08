@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import ApiCardWithModal from '../apiCardWithModal'
-import {ModalWindowContent, CommonStyles} from '../../ui-constants'
+import {ModalWindowContent} from '../../ui-constants'
+import InputWithLabel from '../../inputWithLabel'
 import {ethToHexWei} from '../../../utils/ethereumUtils'
 import runApiCall from '../../../utils/runApiCall'
 
@@ -29,34 +30,23 @@ const SendEthTransactionCard = ({accounts, onRawResponse, onResponse, onWaiting}
   return (
     <ApiCardWithModal buttonLabel="eth_sendTransaction" clickFunction={sendTxClick} btnDisabled={!isValid}>
       <div className={ModalWindowContent.contentPadding}>
-        <div className="mb-3">
-          <label htmlFor="ethToAddress" className={ModalWindowContent.contentLabelStyle}>
-            To Address (0x...)
-          </label>
-          <input
-            type="text"
-            id="ethToAddress"
-            className={CommonStyles.inputStyles}
-            placeholder="0xRecipientAddress"
-            value={toAddress}
-            onChange={(e) => setToAddress(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="ethAmount" className={ModalWindowContent.contentLabelStyle}>
-            Amount (ETH)
-          </label>
-          <input
-            type="number"
-            id="ethAmount"
-            className={CommonStyles.inputStyles}
-            placeholder="0.001"
-            step="0.001"
-            min="0"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-        </div>
+        <InputWithLabel
+          inputName="To Address (0x...)"
+          inputValue={toAddress}
+          onChangeFunction={(e) => setToAddress(e.target.value)}
+          placeholder="0xRecipientAddress"
+          wrapperClassName="mb-3"
+        />
+        <InputWithLabel
+          inputName="Amount (ETH)"
+          type="number"
+          min="0"
+          step="0.001"
+          inputValue={amount}
+          onChangeFunction={(e) => setAmount(e.target.value)}
+          placeholder="0.001"
+          wrapperClassName=""
+        />
       </div>
     </ApiCardWithModal>
   )

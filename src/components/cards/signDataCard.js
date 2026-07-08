@@ -2,9 +2,10 @@ import logger from '../../utils/logger'
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
 import {Buffer} from 'buffer'
-import {CommonStyles, ModalWindowContent} from '../ui-constants'
+import {ModalWindowContent} from '../ui-constants'
 import {getBech32AddressFromHex} from '../../utils/cslTools'
 import SelectWithLabel from '../selectWithLabel'
+import InputWithLabel from '../inputWithLabel'
 
 const SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [message, setMessage] = useState('')
@@ -101,38 +102,24 @@ const SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   return (
     <ApiCardWithModal {...apiProps}>
       <div className={ModalWindowContent.contentPadding}>
-        <div>
-          <label htmlFor="signAddress" className={ModalWindowContent.contentLabelStyle}>
-            Address (optional - defaults to reward address)
-          </label>
-          <input
-            type="text"
-            id="signAddress"
-            className={CommonStyles.inputStyles}
-            placeholder=""
-            value={address}
-            onChange={(event) => setAddress(event.target.value)}
-          />
-        </div>
+        <InputWithLabel
+          inputName="Address (optional - defaults to reward address)"
+          inputValue={address}
+          onChangeFunction={(event) => setAddress(event.target.value)}
+          wrapperClassName=""
+        />
         <SelectWithLabel
           selectName="Message Encoding"
           selectArray={encodingOptions}
           onChangeFunction={(event) => setEncodingType(event.target.value)}
           defaultValue={encodingType}
         />
-        <div className="mt-3">
-          <label htmlFor="signMessage" className={ModalWindowContent.contentLabelStyle}>
-            Message to sign
-          </label>
-          <input
-            type="text"
-            id="signMessage"
-            className={CommonStyles.inputStyles}
-            placeholder={encodingType === 'hex' ? 'e.g., 0x48656c6c6f or 48656c6c6f' : 'e.g., Hello'}
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-          />
-        </div>
+        <InputWithLabel
+          inputName="Message to sign"
+          inputValue={message}
+          onChangeFunction={(event) => setMessage(event.target.value)}
+          placeholder={encodingType === 'hex' ? 'e.g., 0x48656c6c6f or 48656c6c6f' : 'e.g., Hello'}
+        />
       </div>
     </ApiCardWithModal>
   )

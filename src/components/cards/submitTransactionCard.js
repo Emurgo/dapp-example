@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
-import {CommonStyles, ModalWindowContent} from '../ui-constants'
+import {ModalWindowContent} from '../ui-constants'
+import InputWithLabel from '../inputWithLabel'
 import runApiCall from '../../utils/runApiCall'
 
 const SubmitTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
@@ -17,16 +18,11 @@ const SubmitTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   return (
     <ApiCardWithModal {...apiProps}>
       <div className={ModalWindowContent.contentPadding}>
-        <label htmlFor="txHex" className={ModalWindowContent.contentLabelStyle}>
-          Signed Tx Hex
-        </label>
-        <input
-          type="text"
-          id="txHex"
-          className={CommonStyles.inputStyles}
-          placeholder=""
-          value={submitTransactionInput}
-          onChange={(event) => setSubmitTransactionInput(event.target.value)}
+        <InputWithLabel
+          inputName="Signed Tx Hex"
+          inputValue={submitTransactionInput}
+          onChangeFunction={(event) => setSubmitTransactionInput(event.target.value)}
+          wrapperClassName=""
         />
       </div>
     </ApiCardWithModal>
