@@ -1,23 +1,9 @@
 import React from 'react'
 import ApiCard from './apiCard'
+import runApiCall from '../../utils/runApiCall'
 
 const GetNetworkIdCard = ({api, onRawResponse, onResponse, onWaiting}) => {
-  const getNetworkIdClick = () => {
-    onWaiting(true)
-    api
-      ?.getNetworkId()
-      .then((response) => {
-        onWaiting(false)
-        onRawResponse(response)
-        onResponse(response)
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        console.log(e)
-      })
-  }
+  const getNetworkIdClick = () => runApiCall(() => api.getNetworkId(), {onRawResponse, onResponse, onWaiting})
 
   const apiProps = {
     apiName: 'getNetworkId',

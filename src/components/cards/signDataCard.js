@@ -1,9 +1,11 @@
+import logger from '../../utils/logger'
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
 import {Buffer} from 'buffer'
-import {CommonStyles, ModalWindowContent} from '../ui-constants'
+import {ModalWindowContent} from '../ui-constants'
 import {getBech32AddressFromHex} from '../../utils/cslTools'
 import SelectWithLabel from '../selectWithLabel'
+import InputWithLabel from '../inputWithLabel'
 
 const SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [message, setMessage] = useState('')
@@ -55,21 +57,21 @@ const SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
     try {
       const address = await getAddress()
       const payloadHex = getPayloadHex(message, encodingType)
-      
+
       // Log the inputs for debugging
-      console.log('SignData inputs:', { address, payloadHex, originalMessage: message, encodingType })
-      
+      logger.log('SignData inputs:', {address, payloadHex, originalMessage: message, encodingType})
+
       const signDataResponse = await api?.signData(address, payloadHex)
-      
+
       // Show raw response with inputs for debugging
       const debugInfo = {
         inputs: {
           address,
           payloadHex,
           originalMessage: message,
-          encodingType
+          encodingType,
         },
-        response: signDataResponse
+        response: signDataResponse,
       }
       const rawResponseString = JSON.stringify(debugInfo, null, 2)
       onRawResponse(rawResponseString)
@@ -81,7 +83,7 @@ const SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       } else {
         onResponse(error)
       }
-      console.error(error)
+      logger.error(error)
     } finally {
       onWaiting(false)
     }
@@ -100,38 +102,24 @@ const SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   return (
     <ApiCardWithModal {...apiProps}>
       <div className={ModalWindowContent.contentPadding}>
-        <div>
-          <label htmlFor="signAddress" className={ModalWindowContent.contentLabelStyle}>
-            Address (optional - defaults to reward address)
-          </label>
-          <input
-            type="text"
-            id="signAddress"
-            className={CommonStyles.inputStyles}
-            placeholder=""
-            value={address}
-            onChange={(event) => setAddress(event.target.value)}
-          />
-        </div>
+        <InputWithLabel
+          inputName="Address (optional - defaults to reward address)"
+          inputValue={address}
+          onChangeFunction={(event) => setAddress(event.target.value)}
+          wrapperClassName=""
+        />
         <SelectWithLabel
           selectName="Message Encoding"
           selectArray={encodingOptions}
           onChangeFunction={(event) => setEncodingType(event.target.value)}
           defaultValue={encodingType}
         />
-        <div className="mt-3">
-          <label htmlFor="signMessage" className={ModalWindowContent.contentLabelStyle}>
-            Message to sign
-          </label>
-          <input
-            type="text"
-            id="signMessage"
-            className={CommonStyles.inputStyles}
-            placeholder={encodingType === 'hex' ? 'e.g., 0x48656c6c6f or 48656c6c6f' : 'e.g., Hello'}
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-          />
-        </div>
+        <InputWithLabel
+          inputName="Message to sign"
+          inputValue={message}
+          onChangeFunction={(event) => setMessage(event.target.value)}
+          placeholder={encodingType === 'hex' ? 'e.g., 0x48656c6c6f or 48656c6c6f' : 'e.g., Hello'}
+        />
       </div>
     </ApiCardWithModal>
   )

@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import GovToolsPanel from '../govToolsPanel'
 import InputWithLabel from '../../inputWithLabel'
 import {getCertOfNewDRepRetirement, getDRepRetirementCert} from '../../../utils/cslTools'
+import buildCert from '../../../utils/buildCert'
 
 const DRepRetirementPanel = (props) => {
   const {onWaiting, onError, getters, setters, handleInputCreds} = props
@@ -10,21 +11,13 @@ const DRepRetirementPanel = (props) => {
   const {dRepIdInputValue, getCertBuilder} = getters
   const [depositRefundAmount, setDepositRefundAmount] = useState('2000000')
 
-  const buildDRepRetirementCert = () => {
-    onWaiting(true)
-    const certBuilder = getCertBuilder()
-    try {
+  const buildDRepRetirementCert = () =>
+    buildCert(getCertBuilder, {onWaiting, onError}, (certBuilder) => {
       const dRepCred = handleInputCreds(dRepIdInputValue)
       const dRepRetirementCert = getDRepRetirementCert(dRepCred, depositRefundAmount)
       certBuilder.add(getCertOfNewDRepRetirement(dRepRetirementCert))
       handleAddingCertInTx(certBuilder)
-      onWaiting(false)
-    } catch (error) {
-      console.error(error)
-      onWaiting(false)
-      onError()
-    }
-  }
+    })
 
   const panelProps = {
     buttonName: 'Build Cert',

@@ -1,8 +1,9 @@
+import logger from './utils/logger'
 import React, {useEffect} from 'react'
 import AccessButton from './components/accessButton'
 import MainTab from './components/tabs/mainTab'
 import TabsComponent from './components/tabs/tabsComponent'
-import useYoroi from './hooks/yoroiProvider'
+import useCardano from './hooks/cardanoProvider'
 import useNetwork, {NETWORK_CARDANO, NETWORK_ETHEREUM} from './hooks/networkProvider'
 import BitcoinAccessButton from './components/bitcoinAccessButton'
 import BitcoinMainTab from './components/tabs/bitcoinMainTab'
@@ -24,7 +25,7 @@ import EthTransactionsTab from './components/tabs/subtabs/ethTransactionsTab'
 import Erc20Tab from './components/tabs/subtabs/erc20Tab'
 
 const App = () => {
-  const {connectionState, selectedWallet, setConnectionState, setConnectionStateFalse} = useYoroi()
+  const {connectionState, selectedWallet, setConnectionState, setConnectionStateFalse} = useCardano()
   const {activeNetwork} = useNetwork()
   const isWalletConnected = connectionState === CONNECTED
   const isNoProvider = connectionState === NO_PROVIDER
@@ -42,7 +43,7 @@ const App = () => {
 
   useEffect(() => {
     const getConnectionState = async () => {
-      console.debug(`[dApp][App] Checking connection works`)
+      logger.debug(`[dApp][App] Checking connection works`)
       try {
         const walletObject = window.cardano[selectedWallet]
         const conState = await walletStateWithTimeout(walletObject, 10000)
@@ -54,14 +55,14 @@ const App = () => {
         }
       } catch (error) {
         setConnectionStateFalse()
-        console.error(error)
+        logger.error(error)
       }
     }
 
     if (isWalletConnected) {
       const connectionTimer = setInterval(getConnectionState, 10000)
       return () => {
-        console.debug(`[dApp][App] Checking connection is stopped`)
+        logger.debug(`[dApp][App] Checking connection is stopped`)
         clearInterval(connectionTimer)
       }
     }

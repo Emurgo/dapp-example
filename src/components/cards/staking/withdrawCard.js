@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import {
   getAddressFromBytes,
   getCertificateBuilder,
@@ -75,7 +76,7 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       setShowSuccessInfo(true)
     } catch (error) {
       setErrorMessage('Network error occurred while fetching account info')
-      console.error(error)
+      logger.error(error)
     } finally {
       setWaitingAccountInfo(false)
     }
@@ -88,7 +89,9 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       const pubStakeKey = await api?.cip95.getRegisteredPubStakeKeys()
       const stakeKeyHash = getPublicKeyFromHex(
         firstOrThrow(pubStakeKey, 'No registered stake key available from wallet'),
-      ).hash().to_hex()
+      )
+        .hash()
+        .to_hex()
       const txBuilderWithWithdrawal = await getTxBuilderWithWithdrawal(stakeKeyHash, networkType, rewardAmount)
       const utxos = await api?.getUtxos()
 
@@ -108,7 +111,7 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       const tx = txBuilderWithWithdrawal.build_tx()
 
       const fixedTx = getFixedTxFromBytes(tx.to_bytes())
-      console.log('[WithdrawCard] Unsingned Tx:', fixedTx)
+      logger.log('[WithdrawCard] Unsingned Tx:', fixedTx)
       const signaturesWitnessesSet = await api.signTx(fixedTx.to_hex())
 
       const witnesses = getTransactionWitnessSetFromBytes(signaturesWitnessesSet)
@@ -116,14 +119,14 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       for (let i = 0; i < vkeysSignatures.len(); i++) {
         fixedTx.add_vkey_witness(vkeysSignatures.get(i))
       }
-      console.log('Withdrawal signed Tx: ', fixedTx.to_hex())
+      logger.log('Withdrawal signed Tx: ', fixedTx.to_hex())
 
       const txId = await api?.submitTx(fixedTx.to_hex())
       onWaiting(false)
       onRawResponse(txId)
       onResponse(txId, false)
     } catch (error) {
-      console.error(error)
+      logger.error(error)
       onRawResponse('')
       onResponse(error)
     } finally {

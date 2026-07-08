@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import React from 'react'
 import ExpandablePanel from '../../expandablePanel'
 import {iconCollapsed16, iconExpanded16} from '../../ui-constants'
@@ -19,7 +20,7 @@ const CertificatesInTxPart = ({getters}) => {
     }
     if (votesInTx) {
       const voteJsonObjects = JSON.parse(votesInTx)
-      console.log('voteJsonObjects', voteJsonObjects)
+      logger.log('voteJsonObjects', voteJsonObjects)
       for (const voteJsonObject of voteJsonObjects) {
         resultArray.push(['Votes', voteJsonObject])
       }

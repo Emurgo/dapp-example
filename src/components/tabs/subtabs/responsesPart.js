@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import React, {useState} from 'react'
 
 const ResponsesPart = ({rawCurrentText, currentText, currentWaiterState}) => {
@@ -7,12 +8,12 @@ const ResponsesPart = ({rawCurrentText, currentText, currentWaiterState}) => {
   const copyToClipboard = () => {
     navigator.clipboard.writeText(currentText).then(
       function () {
-        console.log('Async: Copying the processed response to clipboard was successful!')
+        logger.log('Async: Copying the processed response to clipboard was successful!')
         setMessageDisplayed(true)
         hideMessage()
       },
       function (err) {
-        console.error('Async: Could not copy text: ', err)
+        logger.error('Async: Could not copy text: ', err)
       },
     )
   }
@@ -20,12 +21,12 @@ const ResponsesPart = ({rawCurrentText, currentText, currentWaiterState}) => {
   const copyRawToClipboard = () => {
     navigator.clipboard.writeText(rawCurrentText).then(
       function () {
-        console.log('Async: Copying raw response to clipboard was successful!')
+        logger.log('Async: Copying raw response to clipboard was successful!')
         setMessageDisplayedRaw(true)
         hideMessageRaw()
       },
       function (err) {
-        console.error('Async: Could not copy raw response: ', err)
+        logger.error('Async: Could not copy raw response: ', err)
       },
     )
   }

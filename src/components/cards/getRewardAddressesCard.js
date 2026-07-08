@@ -1,28 +1,17 @@
 import React from 'react'
 import ApiCard from './apiCard'
-import {getBech32AddressFromHex} from '../../utils/cslTools'
+import {hexArrayToBech32Addresses} from '../../utils/cslTools'
+import runApiCall from '../../utils/runApiCall'
 
 const GetRewardAddressesCard = ({api, onRawResponse, onResponse, onWaiting}) => {
-  const getRewardAddressesClick = () => {
-    onWaiting(true)
-    api
-      ?.getRewardAddresses()
-      .then((hexAddresses) => {
-        onWaiting(false)
-        onRawResponse(hexAddresses)
-        const addresses = []
-        for (const hexAddr of hexAddresses) {
-          addresses.push(getBech32AddressFromHex(hexAddr))
-        }
-        onResponse(addresses)
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        console.log(e)
-      })
-  }
+  const getRewardAddressesClick = () =>
+    runApiCall(
+      () => api.getRewardAddresses(),
+      {onRawResponse, onResponse, onWaiting},
+      {
+        parse: hexArrayToBech32Addresses,
+      },
+    )
 
   const apiProps = {
     apiName: 'getRewardAddresses',

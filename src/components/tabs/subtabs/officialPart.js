@@ -18,7 +18,12 @@ const OfficialPart = ({api, setRawCurrentText, setResponse, setWaiterState, sele
   return (
     <div className="grid justify-items-stretch grid-cols-1 md:grid-cols-2 gap-2">
       <div>
-        <IsEnabledCard onRawResponse={setRawCurrentText} onResponse={setResponse} onWaiting={setWaiterState} selectedWallet={selectedWallet} />
+        <IsEnabledCard
+          onRawResponse={setRawCurrentText}
+          onResponse={setResponse}
+          onWaiting={setWaiterState}
+          selectedWallet={selectedWallet}
+        />
       </div>
       <div>
         <GetNetworkIdCard
@@ -77,12 +82,7 @@ const OfficialPart = ({api, setRawCurrentText, setResponse, setWaiterState, sele
         />
       </div>
       <div>
-        <GetUtxosCard
-          api={api}
-          onRawResponse={setRawCurrentText}
-          onResponse={setResponse}
-          onWaiting={setWaiterState}
-        />
+        <GetUtxosCard api={api} onRawResponse={setRawCurrentText} onResponse={setResponse} onWaiting={setWaiterState} />
       </div>
       <div>
         <GetCollateralUtxosCard

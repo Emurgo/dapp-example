@@ -8,6 +8,7 @@ import {
   getDRepUpdateWithAnchorCert,
 } from '../../../utils/cslTools'
 import {getRandomHex} from '../../../utils/helpFunctions'
+import buildCert from '../../../utils/buildCert'
 
 const DRepUpdatePanel = (props) => {
   const {onWaiting, onError, getters, setters, handleInputCreds} = props
@@ -18,10 +19,8 @@ const DRepUpdatePanel = (props) => {
   const [metadataURL, setMetadataURL] = useState('')
   const [metadataHash, setMetadataHash] = useState('')
 
-  const buildDRepUpdateCert = () => {
-    onWaiting(true)
-    const certBuilder = getCertBuilder()
-    try {
+  const buildDRepUpdateCert = () =>
+    buildCert(getCertBuilder, {onWaiting, onError}, (certBuilder) => {
       const dRepCred = handleInputCreds(dRepIdInputValue)
       let dRepUpdateCert = null
       if (metadataURL.length > 0) {
@@ -33,13 +32,7 @@ const DRepUpdatePanel = (props) => {
       }
       certBuilder.add(getCertOfNewDRepUpdate(dRepUpdateCert))
       handleAddingCertInTx(certBuilder)
-      onWaiting(false)
-    } catch (error) {
-      console.error(error)
-      onWaiting(false)
-      onError()
-    }
-  }
+    })
 
   const panelProps = {
     buttonName: 'Build Cert',

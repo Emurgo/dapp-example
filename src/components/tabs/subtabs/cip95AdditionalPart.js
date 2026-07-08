@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import {useState} from 'react'
 import {getCertificateBuilder, getCslVotingBuilder} from '../../../utils/cslTools'
 import TabsComponent from '../tabsComponent'
@@ -20,14 +21,14 @@ const Cip95AdditionalPart = ({api, onWaiting, onError, getters, setters}) => {
     for (let i = 0; i < certs.len(); i++) {
       certsInJson.push(certs.get(i).to_json())
     }
-    console.log('CertInTx', certsInJson)
+    logger.log('CertInTx', certsInJson)
     setCertsInTx(certsInJson)
   }
 
   const handleAddingVotesInTx = (votingBuilderWithVote) => {
     setVotingBuilder(votingBuilderWithVote)
     setVotesInTx(votingBuilderWithVote.build().to_json())
-    console.log('Votes in Tx', votesInTx)
+    logger.log('Votes in Tx', votesInTx)
   }
 
   const getCertBuilder = () => {
@@ -102,7 +103,7 @@ const Cip95AdditionalPart = ({api, onWaiting, onError, getters, setters}) => {
         setters={newSetters}
       />
       <div>
-        <CertificatesInTxPart getters={getters}/>
+        <CertificatesInTxPart getters={getters} />
       </div>
       <div className="block rounded-lg border mt-5 bg-gray-900 border-gray-700">
         <TabsComponent tabsData={data} />

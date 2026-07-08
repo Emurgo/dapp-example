@@ -39,9 +39,7 @@ const InfoPanel = ({getters}) => {
         </div>
         <div>
           <span>Change address: </span>
-          <span className={spanProperties}>
-            {changeAddress.length > 0 ? changeAddress : '-'}
-          </span>
+          <span className={spanProperties}>{changeAddress.length > 0 ? changeAddress : '-'}</span>
         </div>
         <div>
           <span>Reward address: </span>

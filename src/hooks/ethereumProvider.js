@@ -1,35 +1,38 @@
+import logger from '../utils/logger'
 import React, {useState, useEffect, useCallback, useMemo} from 'react'
-import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_PROVIDER} from '../utils/connectionStates'
+import useToast from './toastProvider'
+import useConnectionState from './useConnectionState'
 
 const EthereumContext = React.createContext(null)
 
 export const EthereumProvider = ({children}) => {
-  console.debug('[dApp][EthereumProvider] is called')
+  logger.debug('[dApp][EthereumProvider] is called')
+  const {showToast} = useToast()
+  const {connectionState, setConnected, setNotConnected, setInProgress, setNoProvider} = useConnectionState()
   const [accounts, setAccounts] = useState([])
-  const [connectionState, setConnectionState] = useState(NO_PROVIDER)
   const [chainId, setChainId] = useState(null)
 
   useEffect(() => {
     if (!window.ethereum) {
-      console.warn('[dApp] No Ethereum wallet found')
-      setConnectionState(NO_PROVIDER)
+      logger.warn('[dApp] No Ethereum wallet found')
+      setNoProvider()
       return
     }
-    setConnectionState(NOT_CONNECTED)
+    setNotConnected()
 
     const handleAccountsChanged = (newAccounts) => {
-      console.debug('[dApp][EthereumProvider] accountsChanged', newAccounts)
+      logger.debug('[dApp][EthereumProvider] accountsChanged', newAccounts)
       if (newAccounts.length === 0) {
-        setConnectionState(NOT_CONNECTED)
+        setNotConnected()
         setAccounts([])
       } else {
         setAccounts(newAccounts)
-        setConnectionState(CONNECTED)
+        setConnected()
       }
     }
 
     const handleChainChanged = (newChainId) => {
-      console.debug('[dApp][EthereumProvider] chainChanged', newChainId)
+      logger.debug('[dApp][EthereumProvider] chainChanged', newChainId)
       setChainId(newChainId)
     }
 
@@ -40,29 +43,30 @@ export const EthereumProvider = ({children}) => {
       window.ethereum.removeListener('accountsChanged', handleAccountsChanged)
       window.ethereum.removeListener('chainChanged', handleChainChanged)
     }
-  }, [])
+  }, [setNoProvider, setNotConnected, setConnected])
 
   const connect = useCallback(async () => {
     if (!window.ethereum) return
-    setConnectionState(IN_PROGRESS)
-    console.debug('[dApp][EthereumProvider] connect is called')
+    setInProgress()
+    logger.debug('[dApp][EthereumProvider] connect is called')
     try {
       const accs = await window.ethereum.request({method: 'eth_requestAccounts'})
       const chain = await window.ethereum.request({method: 'eth_chainId'})
       setAccounts(accs)
       setChainId(chain)
-      setConnectionState(CONNECTED)
-      console.log('[dApp][EthereumProvider] CONNECTED, accounts:', accs)
+      setConnected()
+      logger.log('[dApp][EthereumProvider] CONNECTED, accounts:', accs)
     } catch (err) {
-      console.error('[dApp][EthereumProvider] connect error', err)
-      setConnectionState(NOT_CONNECTED)
+      logger.error('[dApp][EthereumProvider] connect error', err)
+      setNotConnected()
+      showToast(`Failed to connect Ethereum wallet: ${err?.message ?? JSON.stringify(err)}`)
     }
-  }, [])
+  }, [showToast, setInProgress, setConnected, setNotConnected])
 
   const disconnect = useCallback(() => {
     setAccounts([])
-    setConnectionState(NOT_CONNECTED)
-  }, [])
+    setNotConnected()
+  }, [setNotConnected])
 
   const getAccounts = useCallback(() => accounts, [accounts])
 
@@ -76,29 +80,35 @@ export const EthereumProvider = ({children}) => {
     return await window.ethereum.request({method: 'eth_sendTransaction', params: [tx]})
   }, [])
 
-  const signMessage = useCallback(async (message) => {
-    if (!window.ethereum || accounts.length === 0) throw new Error('Not connected')
-    return await window.ethereum.request({method: 'personal_sign', params: [message, accounts[0]]})
-  }, [accounts])
+  const signMessage = useCallback(
+    async (message) => {
+      if (!window.ethereum || accounts.length === 0) throw new Error('Not connected')
+      return await window.ethereum.request({method: 'personal_sign', params: [message, accounts[0]]})
+    },
+    [accounts],
+  )
 
-  const values = useMemo(() => ({
-    accounts,
-    connectionState,
-    chainId,
-    connect,
-    disconnect,
-    getAccounts,
-    getBalance,
-    sendTransaction,
-    signMessage,
-  }), [accounts, connectionState, chainId, connect, disconnect, getAccounts, getBalance, sendTransaction, signMessage])
+  const values = useMemo(
+    () => ({
+      accounts,
+      connectionState,
+      chainId,
+      connect,
+      disconnect,
+      getAccounts,
+      getBalance,
+      sendTransaction,
+      signMessage,
+    }),
+    [accounts, connectionState, chainId, connect, disconnect, getAccounts, getBalance, sendTransaction, signMessage],
+  )
 
   return <EthereumContext.Provider value={values}>{children}</EthereumContext.Provider>
 }
 
 const useEthereum = () => {
   const context = React.useContext(EthereumContext)
-  if (context === undefined) throw new Error('useEthereum must be used within EthereumProvider')
+  if (!context) throw new Error('useEthereum must be used within EthereumProvider')
   return context
 }
 

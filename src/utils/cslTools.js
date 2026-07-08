@@ -1,3 +1,4 @@
+import logger from './logger'
 import {protocolParams} from './networkConfig'
 import {hexToBytes, bytesToHex, wasmMultiassetToJSONs} from './utils'
 import {Buffer} from 'buffer'
@@ -54,31 +55,6 @@ export const getTransactionOutput = (wasmOutputAddress, buildTransactionInput) =
 }
 
 // ---- CIP-20 (transaction message metadata, label 674) ----
-
-// Splits a string into an array of chunks each <= 64 bytes when UTF-8 encoded.
-// CSL's metadatum text strings are capped at 64 BYTES (not chars); anything
-// larger makes encode_json_str_to_metadatum throw. We accumulate whole code
-// points (iterating the string yields code points, not UTF-16 units) so we
-// never split a multibyte character mid-sequence.
-export const chunkMessageTo64Bytes = (message) => {
-  const encoder = new TextEncoder()
-  const chunks = []
-  let current = ''
-  let currentBytes = 0
-  for (const ch of message) {
-    const chBytes = encoder.encode(ch).length
-    if (currentBytes + chBytes > 64) {
-      if (current) chunks.push(current)
-      current = ch
-      currentBytes = chBytes
-    } else {
-      current += ch
-      currentBytes += chBytes
-    }
-  }
-  if (current) chunks.push(current)
-  return chunks
-}
 
 // Builds an unsigned CIP-20 transaction:
 //  - one explicit 1 ADA output to `receiverBech32`
@@ -215,8 +191,7 @@ export const buildCip20Tx = ({hexUtxos, receiverBech32, messageLines, pickedHexU
 
 // Descending comparator for lovelace amount strings (UI sort of decoded UTxOs).
 // Uses wasm.BigNum (not native BigInt, which trips the react-app ESLint no-undef).
-export const compareLovelaceDesc = (aStr, bStr) =>
-  wasm.BigNum.from_str(bStr).compare(wasm.BigNum.from_str(aStr))
+export const compareLovelaceDesc = (aStr, bStr) => wasm.BigNum.from_str(bStr).compare(wasm.BigNum.from_str(aStr))
 
 export const getAddressFromBytes = (changeAddress) => wasm.Address.from_bytes(hexToBytes(changeAddress))
 
@@ -226,7 +201,6 @@ export const getTransactionWitnessSetNew = () => wasm.TransactionWitnessSet.new(
 
 export const getTransactionWitnessSetFromBytes = (witnessHex) =>
   wasm.TransactionWitnessSet.from_bytes(hexToBytes(witnessHex))
-
 
 export const getPubKeyHash = (usedAddress) => wasm.BaseAddress.from_address(usedAddress).payment_cred().to_keyhash()
 
@@ -238,6 +212,9 @@ export const getTransactionOutputBuilder = (wasmChangeAddress) =>
 export const getAssetName = (assetNameString) => wasm.AssetName.new(Buffer.from(assetNameString, 'utf8'))
 
 export const getBech32AddressFromHex = (addressHex) => wasm.Address.from_bytes(hexToBytes(addressHex)).to_bech32()
+
+// Decode an array of hex addresses (as returned by the wallet) to bech32.
+export const hexArrayToBech32Addresses = (hexAddresses) => hexAddresses.map(getBech32AddressFromHex)
 
 export const getAddressFromBech32 = (bech32Value) => wasm.Address.from_bech32(bech32Value)
 
@@ -259,6 +236,9 @@ export const getUtxoFromHex = (hexUtxo) => {
   return utxo
 }
 
+// Decode an array of hex UTxOs (as returned by the wallet) to UTxO objects.
+export const hexArrayToUtxos = (hexUtxos) => hexUtxos.map(getUtxoFromHex)
+
 export const getTransactionHashFromHex = (txHex) => wasm.TransactionHash.from_hex(txHex)
 
 export const getCertificateBuilder = () => wasm.CertificatesBuilder.new()
@@ -276,44 +256,60 @@ export const keyHashFromHex = (hexValue) => wasm.Ed25519KeyHash.from_hex(hexValu
 export const keyHashFromBech32 = (bech32Value) => wasm.Ed25519KeyHash.from_bech32(bech32Value)
 
 export const getCslCredentialFromHex = (hexValue) => {
-  console.debug('[cslTools][getCslCredentialFromHex]::hexValue', hexValue)
+  logger.debug('[cslTools][getCslCredentialFromHex]::hexValue', hexValue)
   const keyHash = keyHashFromHex(hexValue)
-  console.debug('[cslTools][getCslCredentialFromHex]::keyHash', keyHash)
+  logger.debug('[cslTools][getCslCredentialFromHex]::keyHash', keyHash)
   const cred = getCredential(keyHash)
-  console.debug('[cslTools][getCslCredentialFromHex]::cred', cred)
+  logger.debug('[cslTools][getCslCredentialFromHex]::cred', cred)
   return cred
 }
 
 export const getCslCredentialFromBech32 = (bech32Value) => {
-  console.debug('[cslTools][getCslCredentialFromBech32]::bech32Value', bech32Value)
+  logger.debug('[cslTools][getCslCredentialFromBech32]::bech32Value', bech32Value)
   const keyHash = keyHashFromBech32(bech32Value)
-  console.debug('[cslTools][getCslCredentialFromBech32]::keyHash', keyHash)
+  logger.debug('[cslTools][getCslCredentialFromBech32]::keyHash', keyHash)
   const cred = getCredential(keyHash)
-  console.debug('[cslTools][getCslCredentialFromBech32]::cred', cred)
+  logger.debug('[cslTools][getCslCredentialFromBech32]::cred', cred)
   return cred
 }
 
+// Parse a credential input as Hex, falling back to Bech32. Throws (rather than
+// returning null) on invalid input so the caller's try/catch handles cleanup
+// instead of feeding null into CSL and crashing with the opaque
+// "expected instance of Fe".
+export const parseCredential = (input) => {
+  try {
+    return getCslCredentialFromHex(input)
+  } catch (err1) {
+    try {
+      return getCslCredentialFromBech32(input)
+    } catch (err2) {
+      throw new Error(`Invalid credential — not valid Hex or Bech32: ${JSON.stringify(err1)}, ${JSON.stringify(err2)}`)
+    }
+  }
+}
+
 export const getCslCredentialFromScriptFromBech32 = (bech32Value) => {
-  console.debug('[cslTools][getCslCredentialFromScriptFromBech32]::bech32Value', bech32Value)
+  logger.debug('[cslTools][getCslCredentialFromScriptFromBech32]::bech32Value', bech32Value)
   const scriptHash = wasm.ScriptHash.from_bech32(bech32Value)
-  console.debug('[cslTools][getCslCredentialFromScriptFromBech32]::scriptHash', scriptHash)
+  logger.debug('[cslTools][getCslCredentialFromScriptFromBech32]::scriptHash', scriptHash)
   const cred = getCredentialFromScriptHash(scriptHash)
-  console.debug('[cslTools][getCslCredentialFromScriptFromBech32]::cred', cred)
+  logger.debug('[cslTools][getCslCredentialFromScriptFromBech32]::cred', cred)
   return cred
 }
 
 export const getCslCredentialFromScriptFromHex = (hexValue) => {
-  console.debug('[cslTools][getCslCredentialFromScriptFromHex]::hexValue', hexValue)
+  logger.debug('[cslTools][getCslCredentialFromScriptFromHex]::hexValue', hexValue)
   const scriptHash = wasm.ScriptHash.from_hex(hexValue)
-  console.debug('[cslTools][getCslCredentialFromScriptFromHex]::scriptHash', scriptHash)
+  logger.debug('[cslTools][getCslCredentialFromScriptFromHex]::scriptHash', scriptHash)
   const cred = getCredentialFromScriptHash(scriptHash)
-  console.debug('[cslTools][getCslCredentialFromScriptFromHex]::cred', cred)
+  logger.debug('[cslTools][getCslCredentialFromScriptFromHex]::cred', cred)
   return cred
 }
 
 /**
- * 
- * @param {wasm.Credential} dRepCred 
+ *
+ * @param {wasm.Credential} dRepCred
  * @returns {boolean}
  */
 export const dRepIsScript = (dRepCred) => dRepCred.kind() === wasm.CredKind.Script

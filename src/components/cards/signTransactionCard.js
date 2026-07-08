@@ -1,3 +1,4 @@
+import logger from '../../utils/logger'
 import React, {useState} from 'react'
 import {bytesToHex, hexToBytes} from '../../utils/utils'
 import {
@@ -11,7 +12,8 @@ import {
   getAddressFromBech32,
 } from '../../utils/cslTools'
 import ApiCardWithModal from './apiCardWithModal'
-import {CommonStyles, ModalWindowContent} from '../ui-constants'
+import {ModalWindowContent} from '../ui-constants'
+import InputWithLabel from '../inputWithLabel'
 
 const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const defaultValue = {amount: '2000000', address: ''}
@@ -46,7 +48,7 @@ const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
     if (!txHex) {
       txHex = await buildTransaction(defaultValue)
     }
-    console.log('[SignTransactionCard] Unsingned Tx:', txHex)
+    logger.log('[SignTransactionCard] Unsingned Tx:', txHex)
     api
       ?.signTx(txHex, partialSign)
       .then((witnessHex) => {
@@ -60,16 +62,13 @@ const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
             signedTx.add_vkey_witness(walletVkeys.get(i))
           }
         }
-        onResponse(
-          JSON.stringify({signedTx: signedTx.to_hex(), witness: witnessHex}, undefined, 2),
-          false,
-        )
+        onResponse(JSON.stringify({signedTx: signedTx.to_hex(), witness: witnessHex}, undefined, 2), false)
       })
       .catch((e) => {
         onWaiting(false)
         onRawResponse('')
         onResponse(e)
-        console.log(e)
+        logger.log(e)
       })
   }
   const apiProps = {
@@ -80,16 +79,11 @@ const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   return (
     <ApiCardWithModal {...apiProps}>
       <div className={ModalWindowContent.contentPadding}>
-        <label htmlFor="txHex" className={ModalWindowContent.contentLabelStyle}>
-          Unsigned Transaction Hex
-        </label>
-        <input
-          type="text"
-          id="txHex"
-          className={CommonStyles.inputStyles}
-          placeholder=""
-          value={signTransactionInput}
-          onChange={(event) => setSignTransactionInput(event.target.value)}
+        <InputWithLabel
+          inputName="Unsigned Transaction Hex"
+          inputValue={signTransactionInput}
+          onChangeFunction={(event) => setSignTransactionInput(event.target.value)}
+          wrapperClassName=""
         />
         <label htmlFor="partialSign" className={ModalWindowContent.contentLabelStyle}>
           Partially Sign Transaction?

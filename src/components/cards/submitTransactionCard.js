@@ -1,26 +1,14 @@
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
-import {CommonStyles, ModalWindowContent} from '../ui-constants'
+import {ModalWindowContent} from '../ui-constants'
+import InputWithLabel from '../inputWithLabel'
+import runApiCall from '../../utils/runApiCall'
 
 const SubmitTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [submitTransactionInput, setSubmitTransactionInput] = useState('')
 
-  const submitTransactionClick = () => {
-    onWaiting(true)
-    api
-      ?.submitTx(submitTransactionInput)
-      .then((txId) => {
-        onWaiting(false)
-        onRawResponse(txId)
-        onResponse(txId, false)
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        console.log(e)
-      })
-  }
+  const submitTransactionClick = () =>
+    runApiCall(() => api.submitTx(submitTransactionInput), {onRawResponse, onResponse, onWaiting}, {stringify: false})
 
   const apiProps = {
     buttonLabel: 'submitTx',
@@ -30,16 +18,11 @@ const SubmitTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   return (
     <ApiCardWithModal {...apiProps}>
       <div className={ModalWindowContent.contentPadding}>
-        <label htmlFor="txHex" className={ModalWindowContent.contentLabelStyle}>
-          Signed Tx Hex
-        </label>
-        <input
-          type="text"
-          id="txHex"
-          className={CommonStyles.inputStyles}
-          placeholder=""
-          value={submitTransactionInput}
-          onChange={(event) => setSubmitTransactionInput(event.target.value)}
+        <InputWithLabel
+          inputName="Signed Tx Hex"
+          inputValue={submitTransactionInput}
+          onChangeFunction={(event) => setSubmitTransactionInput(event.target.value)}
+          wrapperClassName=""
         />
       </div>
     </ApiCardWithModal>

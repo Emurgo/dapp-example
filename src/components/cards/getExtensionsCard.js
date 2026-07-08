@@ -1,22 +1,10 @@
 import React from 'react'
 import ApiCard from './apiCard'
+import runApiCall from '../../utils/runApiCall'
 
 const GetExtensionsCard = ({api, onRawResponse, onResponse, onWaiting}) => {
-  const getExtensionsClick = () => {
-    onWaiting(true)
-    api?.getExtensions()
-      .then((response) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(response)
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        console.log(e)
-      })
-  }
+  const getExtensionsClick = () =>
+    runApiCall(() => api.getExtensions(), {onRawResponse, onResponse, onWaiting}, {rawText: () => ''})
 
   const apiProps = {
     apiName: 'getExtensions',

@@ -1,6 +1,6 @@
 {
   "name": "dapp-example",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "private": true,
   "dependencies": {
     "@emurgo/cardano-serialization-lib-browser": "14.1.2",
@@ -30,12 +30,18 @@
     "@rollup/plugin-terser": "^0.4.4",
     "autoprefixer": "^10.4.8",
     "postcss": "^8.4.16",
+    "prettier": "^3.9.4",
     "tailwindcss": "^3.1.8"
   },
   "scripts": {
     "start": "craco start",
     "build": "CI=false && craco build",
     "test": "craco test",
+    "test:ci": "CI=true craco test",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write \"src/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.js\"",
     "eject": "craco eject"
   },
   "eslintConfig": {

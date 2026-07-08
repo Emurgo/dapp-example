@@ -9,7 +9,8 @@ import {
   getAddressFromBech32,
 } from '../../utils/cslTools'
 import ApiCardWithModal from './apiCardWithModal'
-import {ModalWindowContent, CommonStyles} from '../ui-constants'
+import {ModalWindowContent} from '../ui-constants'
+import InputWithLabel from '../inputWithLabel'
 import CheckboxWithLabel from '../checkboxWithLabel'
 
 const BuildTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
@@ -42,11 +43,7 @@ const BuildTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
         for (let i = 0; i < wasmUtxos.len(); i++) {
           const wasmUtxo = wasmUtxos.get(i)
           const output = wasmUtxo.output()
-          txBuilder.add_regular_input(
-            output.address(),
-            wasmUtxo.input(),
-            output.amount(),
-          )
+          txBuilder.add_regular_input(output.address(), wasmUtxo.input(), output.amount())
         }
 
         // Sending everything to the receiver
@@ -82,21 +79,15 @@ const BuildTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   return (
     <ApiCardWithModal {...apiProps}>
       <div className={ModalWindowContent.contentPadding}>
-        <div>
-          <label htmlFor="amount" className={ModalWindowContent.contentLabelStyle}>
-            Amount
-          </label>
-          <input
-            type="number"
-            min="1000000"
-            id="amount"
-            className={isAmountInputDisabled ? CommonStyles.inputStylesDisabled : CommonStyles.inputStyles}
-            placeholder=""
-            value={buildTransactionInput.amount}
-            onChange={(event) => setBuildTransactionInput({...buildTransactionInput, amount: event.target.value})}
-            disabled={isAmountInputDisabled}
-          />
-        </div>
+        <InputWithLabel
+          inputName="Amount"
+          type="number"
+          min="1000000"
+          inputValue={buildTransactionInput.amount}
+          onChangeFunction={(event) => setBuildTransactionInput({...buildTransactionInput, amount: event.target.value})}
+          disabled={isAmountInputDisabled}
+          wrapperClassName=""
+        />
         <CheckboxWithLabel
           currentState={buildTransactionInput.sendAll}
           onChangeFunc={(event) => {
@@ -109,19 +100,13 @@ const BuildTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
           name="sendAll"
           labelText="Send all (no change)"
         />
-        <div className="mt-3">
-          <label htmlFor="receiverAddress" className={ModalWindowContent.contentLabelStyle}>
-            Receiver address
-          </label>
-          <input
-            type="text"
-            id="receiverAddress"
-            className={CommonStyles.inputStyles}
-            placeholder=""
-            value={buildTransactionInput.address}
-            onChange={(event) => setBuildTransactionInput({...buildTransactionInput, address: event.target.value})}
-          />
-        </div>
+        <InputWithLabel
+          inputName="Receiver address"
+          inputValue={buildTransactionInput.address}
+          onChangeFunction={(event) =>
+            setBuildTransactionInput({...buildTransactionInput, address: event.target.value})
+          }
+        />
       </div>
     </ApiCardWithModal>
   )

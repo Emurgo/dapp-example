@@ -14,10 +14,20 @@ const Eip1193Part = ({accounts, setRawCurrentText, setResponse, setWaiterState})
         <GetChainIdCard onRawResponse={setRawCurrentText} onResponse={setResponse} onWaiting={setWaiterState} />
       </div>
       <div>
-        <GetEthBalanceCard accounts={accounts} onRawResponse={setRawCurrentText} onResponse={setResponse} onWaiting={setWaiterState} />
+        <GetEthBalanceCard
+          accounts={accounts}
+          onRawResponse={setRawCurrentText}
+          onResponse={setResponse}
+          onWaiting={setWaiterState}
+        />
       </div>
       <div>
-        <SignEthMessageCard accounts={accounts} onRawResponse={setRawCurrentText} onResponse={setResponse} onWaiting={setWaiterState} />
+        <SignEthMessageCard
+          accounts={accounts}
+          onRawResponse={setRawCurrentText}
+          onResponse={setResponse}
+          onWaiting={setWaiterState}
+        />
       </div>
     </div>
   )

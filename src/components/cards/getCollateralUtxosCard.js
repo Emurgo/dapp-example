@@ -1,32 +1,22 @@
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
-import {CommonStyles, ModalWindowContent} from '../ui-constants'
-import {getAmountInHex, getUtxoFromHex} from '../../utils/cslTools'
+import {ModalWindowContent} from '../ui-constants'
+import InputWithLabel from '../inputWithLabel'
+import {getAmountInHex, hexArrayToUtxos} from '../../utils/cslTools'
+import runApiCall from '../../utils/runApiCall'
 
 const GetCollateralUtxosCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [getCollateralUtxosInput, setGetCollateralUtxosInput] = useState('2000000')
 
   const getCollateralUtxosClick = () => {
     const amountInHex = getCollateralUtxosInput ? getAmountInHex(getCollateralUtxosInput) : undefined
-    onWaiting(true)
-    api
-      ?.getCollateral(amountInHex)
-      .then((hexUtxos) => {
-        onWaiting(false)
-        onRawResponse(hexUtxos)
-        let utxos = []
-        for (const hexUtxo of hexUtxos) {
-          const utxo = getUtxoFromHex(hexUtxo)
-          utxos.push(utxo)
-        }
-        onResponse(utxos)
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        console.log(e)
-      })
+    return runApiCall(
+      () => api.getCollateral(amountInHex),
+      {onRawResponse, onResponse, onWaiting},
+      {
+        parse: hexArrayToUtxos,
+      },
+    )
   }
 
   const apiProps = {
@@ -37,17 +27,14 @@ const GetCollateralUtxosCard = ({api, onRawResponse, onResponse, onWaiting}) => 
   return (
     <ApiCardWithModal {...apiProps}>
       <div className={ModalWindowContent.contentPadding}>
-        <label htmlFor="amount" className={ModalWindowContent.contentLabelStyle}>
-          Amount
-        </label>
-        <input
+        <InputWithLabel
+          inputName="Amount"
           type="number"
           min="0"
-          id="amount"
-          className={CommonStyles.inputStyles}
           placeholder="2000000"
-          value={getCollateralUtxosInput}
-          onChange={(event) => setGetCollateralUtxosInput(event.target.value)}
+          inputValue={getCollateralUtxosInput}
+          onChangeFunction={(event) => setGetCollateralUtxosInput(event.target.value)}
+          wrapperClassName=""
         />
       </div>
     </ApiCardWithModal>

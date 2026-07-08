@@ -1,6 +1,7 @@
+import logger from '../../../utils/logger'
 import {useState} from 'react'
 import {Buffer} from 'buffer'
-import useYoroi from '../../../hooks/yoroiProvider'
+import useCardano from '../../../hooks/cardanoProvider'
 import {
   getAddressFromBytes,
   getAssetName,
@@ -16,6 +17,7 @@ import {
   toInt,
 } from '../../../utils/cslTools'
 import {CONNECTED} from '../../../utils/connectionStates'
+import {chunkMessageTo64Bytes} from '../../../utils/utils'
 import {firstOrThrow} from '../../../utils/helpFunctions'
 import SelectWithLabel from '../../selectWithLabel'
 import InputWithLabel from '../../inputWithLabel'
@@ -39,7 +41,7 @@ const NFTTab = () => {
     {label: 'Video_WebM', value: 'video/webm'},
     {label: 'Video_WMV', value: 'video/x-ms-wmv'},
   ]
-  const {api, connectionState} = useYoroi()
+  const {api, connectionState} = useCardano()
   const [currentNFTName, setCurrentNFTName] = useState('')
   const [currentImageUrl, setCurrentImageUrl] = useState('')
   const [currentDescription, setCurrentDescription] = useState('')
@@ -77,7 +79,7 @@ const NFTTab = () => {
 
   const handleNFTsAmount = () => {
     setIsMoreThenOneNFT(!isMoreThenOneNFT)
-    console.debug(`[NFTTab] mint MoreThenOneNFT is set: ${!isMoreThenOneNFT}`)
+    logger.debug(`[NFTTab] mint MoreThenOneNFT is set: ${!isMoreThenOneNFT}`)
     if (isMoreThenOneNFT === false) {
       setCurrentNFTsAmount(1)
     }
@@ -85,28 +87,22 @@ const NFTTab = () => {
 
   const handleNftVersionOnChange = () => {
     setIsV2nft(!isV2nft)
-    console.debug(`[NFTTab] V2 is set: ${!isV2nft}`)
+    logger.debug(`[NFTTab] V2 is set: ${!isV2nft}`)
     setCurrentMintingInfo(emptyTokenInfo)
     setMintingTxInfo([])
-    console.debug('[NFTTab] cleared the metadata and the prepared minting batch info')
+    logger.debug('[NFTTab] cleared the metadata and the prepared minting batch info')
   }
 
   const handleImageTypeChange = (event) => {
     setImageType(event.target.value)
   }
 
+  // CIP-25 stores a field as a plain string when it fits in one 64-byte chunk,
+  // or an array of <=64-byte chunks when longer. Chunking is byte-based (shared
+  // util) so multibyte characters are never split mid-sequence.
   const sliceBy64Char = (inputString) => {
-    console.debug(`[NFTTab] inputString: ${JSON.stringify(inputString)}`)
-    if (inputString.length <= 64) {
-      return inputString
-    }
-    const step = 64
-    const resultArray = []
-    for (let startIndex = 0; startIndex < inputString.length; startIndex = startIndex + step) {
-      const stringSlice = inputString.slice(startIndex, startIndex + step)
-      resultArray.push(stringSlice)
-    }
-    return resultArray
+    const chunks = chunkMessageTo64Bytes(inputString)
+    return chunks.length <= 1 ? inputString : chunks
   }
 
   const clearInfo = () => {
@@ -116,7 +112,7 @@ const NFTTab = () => {
   }
 
   const _genMeta = (nftName, nftImageUrl, nftDescription) => {
-    console.debug(
+    logger.debug(
       `[NFTTab][_genMeta]\nnftName: ${nftName}\nnftImageUrl: ${nftImageUrl}\nnftDescription: ${nftDescription}`,
     )
     const name = nftName.replace(/ /g, '_')
@@ -129,7 +125,7 @@ const NFTTab = () => {
     newInfo.metadata.image = imageUrl
     newInfo.metadata.files[0].src = imageUrl
     newInfo.metadata.description = description
-    console.debug(`[NFTTab][_genMeta] newInfo: ${JSON.stringify(newInfo, null, 2)}`)
+    logger.debug(`[NFTTab][_genMeta] newInfo: ${JSON.stringify(newInfo, null, 2)}`)
 
     return newInfo
   }
@@ -145,7 +141,7 @@ const NFTTab = () => {
   }
 
   const generateSeveralMetadata = () => {
-    console.debug(`[NFTTab][generateSeveralMetadata] ${currentNFTsAmount} NFTs metadata will be generated`)
+    logger.debug(`[NFTTab][generateSeveralMetadata] ${currentNFTsAmount} NFTs metadata will be generated`)
     const allMetadataInfo = []
     for (let index = 1; index <= currentNFTsAmount; index++) {
       const newName = currentNFTName + `_${index}`
@@ -162,7 +158,7 @@ const NFTTab = () => {
       const txBuilder = getTxBuilder()
 
       const changeAddress = await api?.getChangeAddress()
-      console.debug(`[NFTTab][mint] changeAddress -> ${changeAddress}`)
+      logger.debug(`[NFTTab][mint] changeAddress -> ${changeAddress}`)
       const wasmChangeAddress = getAddressFromBytes(changeAddress)
       const usedAddresses = await api?.getUsedAddresses()
       const usedAddress = getAddressFromBytes(firstOrThrow(usedAddresses, 'No used address available from wallet'))
@@ -175,7 +171,7 @@ const NFTTab = () => {
       for (const assetInfo of mintingTxInfo) {
         metadata[scriptHashHex][assetInfo.NFTName] = assetInfo.metadata
         metadata['version'] = isV2nft ? '2.0' : '1.0'
-        console.debug(`[NFTTab][mint] metadata -> ${JSON.stringify(metadata)}`)
+        logger.debug(`[NFTTab][mint] metadata -> ${JSON.stringify(metadata)}`)
         txBuilder.add_json_metadatum(strToBigNum('721'), JSON.stringify(metadata))
         txBuilder.add_mint_asset_and_output_min_required_coin(
           wasmNativeScript,
@@ -185,21 +181,21 @@ const NFTTab = () => {
         )
       }
 
-      console.debug(`[NFTTab][mint] getting UTxOs`)
+      logger.debug(`[NFTTab][mint] getting UTxOs`)
       const hexInputUtxos = await api?.getUtxos()
 
-      console.debug(`[NFTTab][mint] preparing wasmUTxOs`)
+      logger.debug(`[NFTTab][mint] preparing wasmUTxOs`)
       const wasmUtxos = getCslUtxos(hexInputUtxos)
 
-      console.debug(`[NFTTab][mint] adding inputs`)
+      logger.debug(`[NFTTab][mint] adding inputs`)
       txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset())
       txBuilder.add_required_signer(pubkeyHash)
       txBuilder.add_change_if_needed(wasmChangeAddress)
 
       const wasmUnsignedTransaction = txBuilder.build_tx()
       const fixedTx = getFixedTxFromBytes(wasmUnsignedTransaction.to_bytes())
-      console.log('[NFTTab][mint] Unsigned Tx:', fixedTx.to_hex())
-      console.debug(`[NFTTab][mint] signing the tx`)
+      logger.log('[NFTTab][mint] Unsigned Tx:', fixedTx.to_hex())
+      logger.debug(`[NFTTab][mint] signing the tx`)
       const witnessHex = await api?.signTx(fixedTx.to_hex())
       const wasmWitnessSet = getTransactionWitnessSetFromBytes(witnessHex)
       const vkeys = wasmWitnessSet.vkeys()
@@ -207,12 +203,12 @@ const NFTTab = () => {
         fixedTx.add_vkey_witness(vkeys.get(i))
       }
       const signedTxHex = fixedTx.to_hex()
-      console.log('[NFTTab][mint] Signed Tx:', signedTxHex)
+      logger.log('[NFTTab][mint] Signed Tx:', signedTxHex)
       const txId = await api?.submitTx(signedTxHex)
-      console.log(`[NFTTab][mint] Transaction successfully submitted: ${txId}`)
+      logger.log(`[NFTTab][mint] Transaction successfully submitted: ${txId}`)
     } catch (error) {
       handleError()
-      console.error(error)
+      logger.error(error)
     }
   }
 
@@ -229,8 +225,8 @@ const NFTTab = () => {
                   Note: Currently the functionality of this is extremely limited, it is really only here to mint really
                   basic NFTs for testing.
                   <p />
-                  The minting policy is hardcoded to basically just use the pubkeyhash of your first used address, so all
-                  the NFTs you mint here will have the same policy id.
+                  The minting policy is hardcoded to basically just use the pubkeyhash of your first used address, so
+                  all the NFTs you mint here will have the same policy id.
                   <p />
                   They're not even really NFTs, cuz you can mint multiple of them. This is a work in progress and will
                   have more functionalities in the future.

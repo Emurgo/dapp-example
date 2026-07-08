@@ -1,23 +1,16 @@
 import React from 'react'
 import ApiCard from '../apiCard'
+import runApiCall from '../../../utils/runApiCall'
 
 const GetAccountsCard = ({onRawResponse, onResponse, onWaiting}) => {
-  const getAccountsClick = () => {
-    onWaiting(true)
-    window.ethereum
-      .request({method: 'eth_accounts'})
-      .then((accounts) => {
-        onWaiting(false)
-        onRawResponse(JSON.stringify(accounts))
-        onResponse(accounts)
-      })
-      .catch((e) => {
-        onWaiting(false)
-        onRawResponse('')
-        onResponse(e)
-        console.error(e)
-      })
-  }
+  const getAccountsClick = () =>
+    runApiCall(
+      () => window.ethereum.request({method: 'eth_accounts'}),
+      {onRawResponse, onResponse, onWaiting},
+      {
+        rawText: (accounts) => JSON.stringify(accounts),
+      },
+    )
 
   return <ApiCard apiName="eth_accounts" clickFunction={getAccountsClick} />
 }

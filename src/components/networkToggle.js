@@ -12,9 +12,7 @@ const NetworkToggle = () => {
         <button
           onClick={() => setActiveNetwork(NETWORK_CARDANO)}
           className={`text-xs sm:text-sm font-semibold px-3 py-1 rounded-md transition-colors duration-200 ${
-            activeNetwork === NETWORK_CARDANO
-              ? 'bg-blue-600 text-white'
-              : 'text-gray-400 hover:text-blue-400'
+            activeNetwork === NETWORK_CARDANO ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-blue-400'
           }`}
         >
           Cardano
@@ -22,9 +20,7 @@ const NetworkToggle = () => {
         <button
           onClick={() => setActiveNetwork(NETWORK_ETHEREUM)}
           className={`text-xs sm:text-sm font-semibold px-3 py-1 rounded-md transition-colors duration-200 ${
-            activeNetwork === NETWORK_ETHEREUM
-              ? 'bg-purple-600 text-white'
-              : 'text-gray-400 hover:text-purple-400'
+            activeNetwork === NETWORK_ETHEREUM ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-purple-400'
           }`}
         >
           Ethereum

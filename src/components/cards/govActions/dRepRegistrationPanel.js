@@ -3,6 +3,7 @@ import GovToolsPanel from '../govToolsPanel'
 import InputWithLabel from '../../inputWithLabel'
 import {getAnchor, getCertOfNewDRepReg, getDRepRegCert, getDRepRegWithAnchorCert} from '../../../utils/cslTools'
 import {bytesToHex} from '../../../utils/utils'
+import buildCert from '../../../utils/buildCert'
 
 const DRepRegistrationPanel = (props) => {
   const {onWaiting, onError, getters, setters, handleInputCreds} = props
@@ -14,10 +15,8 @@ const DRepRegistrationPanel = (props) => {
   const [metadataURL, setMetadataURL] = useState('')
   const [metadataHash, setMetadataHash] = useState('')
 
-  const buildDRepRegistrationCert = () => {
-    onWaiting(true)
-    const certBuilder = getCertBuilder()
-    try {
+  const buildDRepRegistrationCert = () =>
+    buildCert(getCertBuilder, {onWaiting, onError}, (certBuilder) => {
       const dRepCred = handleInputCreds(dRepIdInputValue)
       let dRepRegCert = null
       if (metadataURL.length > 0) {
@@ -32,13 +31,7 @@ const DRepRegistrationPanel = (props) => {
       }
       certBuilder.add(getCertOfNewDRepReg(dRepRegCert))
       handleAddingCertInTx(certBuilder)
-      onWaiting(false)
-    } catch (error) {
-      console.error(error)
-      onWaiting(false)
-      onError()
-    }
-  }
+    })
 
   const panelProps = {
     buttonName: 'Build Cert',

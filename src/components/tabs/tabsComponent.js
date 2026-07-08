@@ -1,8 +1,9 @@
 import React, {useState} from 'react'
-import {Tabs, TabsHeader, TabsBody, Tab, TabPanel} from '@material-tailwind/react'
+import {Tabs, TabsHeader, Tab} from '@material-tailwind/react'
 
 const TabsComponent = ({tabsData}) => {
   const [activeTab, setActiveTab] = useState(tabsData[0].value)
+  const activeTabData = tabsData.find((tab) => tab.value === activeTab)
 
   return (
     <Tabs value={activeTab}>
@@ -12,7 +13,9 @@ const TabsComponent = ({tabsData}) => {
             key={value}
             value={value}
             className={
-              activeTab === value ? 'bg-orange-700 text-white rounded-t-lg whitespace-nowrap' : 'text-gray-300 border-x border-gray-700 whitespace-nowrap'
+              activeTab === value
+                ? 'bg-orange-700 text-white rounded-t-lg whitespace-nowrap'
+                : 'text-gray-300 border-x border-gray-700 whitespace-nowrap'
             }
             onClick={() => setActiveTab(value)}
           >
@@ -20,13 +23,11 @@ const TabsComponent = ({tabsData}) => {
           </Tab>
         ))}
       </TabsHeader>
-      <TabsBody>
-        {tabsData.map(({value, children}) => (
-          <TabPanel key={value} value={value}>
-            {activeTab === value ? children : <div></div>}
-          </TabPanel>
-        ))}
-      </TabsBody>
+      {/* Render only the active tab's content. Material Tailwind's <TabsBody>/
+          <TabPanel> keep inactive panels mounted and absolutely positioned; with
+          no positioned ancestor they collapse to the top-left of the viewport and
+          overlay the page (e.g. the network toggle), swallowing its clicks. */}
+      <div className="text-gray-300">{activeTabData?.children}</div>
     </Tabs>
   )
 }
