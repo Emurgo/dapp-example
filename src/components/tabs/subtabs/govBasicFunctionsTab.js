@@ -7,6 +7,7 @@ import {
   getCslCredentialFromHex,
   getCslCredentialFromScriptFromBech32,
   getCslCredentialFromScriptFromHex,
+  parseCredential,
 } from '../../../utils/cslTools'
 import DRepRegistrationPanel from '../../cards/govActions/dRepRegistrationPanel'
 import DRepUpdatePanel from '../../cards/govActions/dRepUpdatePanel'
@@ -16,22 +17,7 @@ import RegisterStakeKeyPanel from '../../cards/govActions/regStakeKeyPanel'
 import UnregisterStakeKeyPanel from '../../cards/govActions/unregStakeKeyPanel'
 
 const GovBasicFunctionsTab = ({api, onWaiting, onError, getters, setters}) => {
-  const handleInputCreds = (input) => {
-    try {
-      return getCslCredentialFromHex(input)
-    } catch (err1) {
-      try {
-        return getCslCredentialFromBech32(input)
-      } catch (err2) {
-        // Throw instead of returning null so the caller's try/catch handles cleanup
-        // (onWaiting/onError), rather than feeding null into CSL and crashing
-        // with the opaque `expected instance of Fe`.
-        throw new Error(
-          `Invalid credential — not valid Hex or Bech32: ${JSON.stringify(err1)}, ${JSON.stringify(err2)}`,
-        )
-      }
-    }
-  }
+  const handleInputCreds = parseCredential
 
   /**
    *

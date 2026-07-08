@@ -300,6 +300,24 @@ export const getCslCredentialFromBech32 = (bech32Value) => {
   return cred
 }
 
+// Parse a credential input as Hex, falling back to Bech32. Throws (rather than
+// returning null) on invalid input so the caller's try/catch handles cleanup
+// instead of feeding null into CSL and crashing with the opaque
+// "expected instance of Fe".
+export const parseCredential = (input) => {
+  try {
+    return getCslCredentialFromHex(input)
+  } catch (err1) {
+    try {
+      return getCslCredentialFromBech32(input)
+    } catch (err2) {
+      throw new Error(
+        `Invalid credential — not valid Hex or Bech32: ${JSON.stringify(err1)}, ${JSON.stringify(err2)}`,
+      )
+    }
+  }
+}
+
 export const getCslCredentialFromScriptFromBech32 = (bech32Value) => {
   logger.debug('[cslTools][getCslCredentialFromScriptFromBech32]::bech32Value', bech32Value)
   const scriptHash = wasm.ScriptHash.from_bech32(bech32Value)

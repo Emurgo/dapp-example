@@ -1,28 +1,15 @@
-const MainTab = (props) => {
-  const {isWalletConnected, isNoProvider} = props
+import {CONNECTED, NO_PROVIDER, NOT_CONNECTED} from '../../utils/connectionStates'
+import ChainStatusMessage from './chainStatusMessage'
 
-  const walletConnectionMessage = () => {
-    if (!isWalletConnected) {
-      if (isNoProvider) {
-        return (
-          <div className="text-m font-bold tracking-tight text-white">
-            <label>Cardano wallet is not found</label>
-          </div>
-        )
-      } else {
-        return (
-          <div className="text-m font-bold tracking-tight text-white">
-            <label>Wallet is not connected</label>
-          </div>
-        )
-      }
-    }
-  }
+const MainTab = ({isWalletConnected, isNoProvider}) => {
+  const connectionState = isWalletConnected ? CONNECTED : isNoProvider ? NO_PROVIDER : NOT_CONNECTED
 
   return (
-    <>
-      <div className="bg-gray-900 grid justify-items-center pt-5">{walletConnectionMessage()}</div>
-    </>
+    <ChainStatusMessage
+      connectionState={connectionState}
+      notFoundText="Cardano wallet is not found"
+      notConnectedText="Wallet is not connected"
+    />
   )
 }
 

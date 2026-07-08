@@ -1,13 +1,8 @@
-import React from 'react'
+import {NO_PROVIDER} from '../../utils/connectionStates'
+import ChainStatusMessage from './chainStatusMessage'
 
-const BitcoinMainTab = () => {
-  return (
-    <div className="bg-gray-900 grid justify-items-center pt-5">
-      <div className="text-m font-bold tracking-tight text-white">
-        <label>Bitcoin support coming soon</label>
-      </div>
-    </div>
-  )
-}
+const BitcoinMainTab = () => (
+  <ChainStatusMessage connectionState={NO_PROVIDER} notFoundText="Bitcoin support coming soon" />
+)
 
 export default BitcoinMainTab
