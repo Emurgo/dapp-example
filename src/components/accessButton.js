@@ -1,10 +1,10 @@
 import React from 'react'
-import useYoroi from '../hooks/yoroiProvider'
+import useCardano from '../hooks/cardanoProvider'
 import {IN_PROGRESS} from '../utils/connectionStates'
 import WalletsModal from './walletsModal'
 
 const AccessButton = () => {
-  const {api, connectionState, availableWallets, selectedWallet} = useYoroi()
+  const {api, connectionState, availableWallets, selectedWallet} = useCardano()
   console.log(`[dApp][AccessButton] available wallets: ${availableWallets.length}`)
 
   const getWalletIcon = () => {

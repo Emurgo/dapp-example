@@ -1,10 +1,10 @@
 import React, {useState} from 'react'
 import Popup from 'reactjs-popup'
-import useYoroi from '../hooks/yoroiProvider'
+import useCardano from '../hooks/cardanoProvider'
 import {NO_PROVIDER} from '../utils/connectionStates'
 
 const WalletsModal = () => {
-  const {connect, availableWallets, setSelectedWallet, connectionState} = useYoroi()
+  const {connect, availableWallets, setSelectedWallet, connectionState} = useCardano()
   const [selectedUserWallet, setSelectedUserWallet] = useState('')
   console.log(`[dApp][WalletsModal] is called`)
 

@@ -1,11 +1,11 @@
 import {useState} from 'react'
-import useYoroi from '../../../hooks/yoroiProvider'
+import useCardano from '../../../hooks/cardanoProvider'
 import {CONNECTED} from '../../../utils/connectionStates'
 import ResponsesPart from './responsesPart'
 import WithdrawCard from '../../cards/staking/withdrawCard'
 
 const Staking = () => {
-  const {api, connectionState} = useYoroi()
+  const {api, connectionState} = useCardano()
   const [currentText, setCurrentText] = useState('')
   const [rawCurrentText, setRawCurrentText] = useState('')
   const [waiterState, setWaiterState] = useState(false)

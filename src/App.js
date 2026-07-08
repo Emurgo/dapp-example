@@ -2,7 +2,7 @@ import React, {useEffect} from 'react'
 import AccessButton from './components/accessButton'
 import MainTab from './components/tabs/mainTab'
 import TabsComponent from './components/tabs/tabsComponent'
-import useYoroi from './hooks/yoroiProvider'
+import useCardano from './hooks/cardanoProvider'
 import useNetwork, {NETWORK_CARDANO, NETWORK_ETHEREUM} from './hooks/networkProvider'
 import BitcoinAccessButton from './components/bitcoinAccessButton'
 import BitcoinMainTab from './components/tabs/bitcoinMainTab'
@@ -24,7 +24,7 @@ import EthTransactionsTab from './components/tabs/subtabs/ethTransactionsTab'
 import Erc20Tab from './components/tabs/subtabs/erc20Tab'
 
 const App = () => {
-  const {connectionState, selectedWallet, setConnectionState, setConnectionStateFalse} = useYoroi()
+  const {connectionState, selectedWallet, setConnectionState, setConnectionStateFalse} = useCardano()
   const {activeNetwork} = useNetwork()
   const isWalletConnected = connectionState === CONNECTED
   const isNoProvider = connectionState === NO_PROVIDER

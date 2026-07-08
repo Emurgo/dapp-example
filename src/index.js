@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import App from './App'
-import {YoroiProvider} from './hooks/yoroiProvider'
+import {CardanoProvider} from './hooks/cardanoProvider'
 import {NetworkProvider} from './hooks/networkProvider'
 import {EthereumProvider} from './hooks/ethereumProvider'
 import {BitcoinProvider} from './hooks/bitcoinProvider'
@@ -12,7 +12,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
     <NetworkProvider>
-      <YoroiProvider>
+      <CardanoProvider>
         <EthereumProvider>
           <BitcoinProvider>
           <BrowserRouter>
@@ -22,7 +22,7 @@ root.render(
           </BrowserRouter>
           </BitcoinProvider>
         </EthereumProvider>
-      </YoroiProvider>
+      </CardanoProvider>
     </NetworkProvider>
   </React.StrictMode>,
 )

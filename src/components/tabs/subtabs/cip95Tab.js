@@ -1,11 +1,11 @@
 import React, {useState} from 'react'
-import useYoroi from '../../../hooks/yoroiProvider'
+import useCardano from '../../../hooks/cardanoProvider'
 import ResponsesPart from './responsesPart'
 import {CONNECTED} from '../../../utils/connectionStates'
 import Cip95OfficialPart from './cip95OfficialPart'
 
 const Cip95Tab = () => {
-  const {api, connectionState} = useYoroi()
+  const {api, connectionState} = useCardano()
   const [currentText, setCurrentText] = useState('')
   const [rawCurrentText, setRawCurrentText] = useState('')
   const [waiterState, setWaiterState] = useState(false)

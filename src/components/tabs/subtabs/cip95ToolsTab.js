@@ -1,12 +1,12 @@
 import {useState} from 'react'
-import useYoroi from '../../../hooks/yoroiProvider'
+import useCardano from '../../../hooks/cardanoProvider'
 import {CONNECTED} from '../../../utils/connectionStates'
 import Cip95AdditionalPart from './cip95AdditionalPart'
 import GetAllInfoCard from '../../cards/getAllInfoCard'
 import InfoPanel from './infoPanel'
 
 const Cip95TabTools = () => {
-  const {api, connectionState} = useYoroi()
+  const {api, connectionState} = useCardano()
   // Waiter label
   const [waiterState, setWaiterState] = useState(false)
   // Error label

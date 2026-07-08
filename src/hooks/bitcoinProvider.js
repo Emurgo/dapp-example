@@ -50,7 +50,7 @@ export const BitcoinProvider = ({children}) => {
 
 const useBitcoin = () => {
   const context = React.useContext(BitcoinContext)
-  if (context === undefined) throw new Error('useBitcoin must be used within BitcoinProvider')
+  if (!context) throw new Error('useBitcoin must be used within BitcoinProvider')
   return context
 }
 

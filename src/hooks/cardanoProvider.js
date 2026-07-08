@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_PROVIDER} from '../utils/connectionStates'
 
-const YoroiContext = React.createContext(null)
+const CardanoContext = React.createContext(null)
 const reservedKeys = [
   'enable',
   'isEnabled',
@@ -22,8 +22,8 @@ const reservedKeys = [
   '_events',
 ]
 
-export const YoroiProvider = ({children}) => {
-  console.debug('[dApp][YoroiProvider] is called')
+export const CardanoProvider = ({children}) => {
+  console.debug('[dApp][CardanoProvider] is called')
   const [api, setApi] = useState(null)
   const [connectionState, setConnectionState] = useState(NO_PROVIDER)
   const [availableWallets, setAvailableWallets] = useState([])
@@ -105,12 +105,12 @@ export const YoroiProvider = ({children}) => {
 
   /**
    * @param {string} walletName - A wallet name as it is presented in the Cardano object
-   * @param {bool} requestId - Request connection with or without required authentication
-   * @param {bool} silent - Request connection with or without showing the connection pop-up
-   * @param {bool} throwError - Throw an error which possibly can be while connecting to the wallet
+   * @param {boolean} requestIdentification - Request connection with or without required authentication
+   * @param {boolean} silent - Request connection with or without showing the connection pop-up
+   * @param {boolean} throwError - Throw an error which possibly can be while connecting to the wallet
    * @returns {Promise<any>}
    */
-  const connect = async (walletName, requestId, silent, throwError = false) => {
+  const connect = async (walletName, requestIdentification, silent, throwError = false) => {
     setConnectionState(IN_PROGRESS)
     setApi(null)
     console.debug(`[dApp][connect] is called`)
@@ -122,11 +122,11 @@ export const YoroiProvider = ({children}) => {
     }
 
     console.log(`[dApp][connect] connecting the wallet "${walletName}"`)
-    console.debug(`[dApp][connect] {requestIdentification: ${requestId}, onlySilent: ${silent}}`)
+    console.debug(`[dApp][connect] {requestIdentification: ${requestIdentification}, onlySilent: ${silent}}`)
 
     try {
       const connectedApi = await window.cardano[walletName].enable({
-        requestIdentification: requestId,
+        requestIdentification,
         onlySilent: silent,
       })
       console.debug(`[dApp][connect] wallet API object is received`)
@@ -190,17 +190,17 @@ export const YoroiProvider = ({children}) => {
     setSelectedWallet,
   }
 
-  return <YoroiContext.Provider value={values}>{children}</YoroiContext.Provider>
+  return <CardanoContext.Provider value={values}>{children}</CardanoContext.Provider>
 }
 
-const useYoroi = () => {
-  const context = React.useContext(YoroiContext)
+const useCardano = () => {
+  const context = React.useContext(CardanoContext)
 
-  if (context === undefined) {
-    throw new Error('Install Yoroi')
+  if (!context) {
+    throw new Error('useCardano must be used within CardanoProvider')
   }
 
   return context
 }
 
-export default useYoroi
+export default useCardano

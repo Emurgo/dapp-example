@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import useYoroi from '../../../hooks/yoroiProvider'
+import useCardano from '../../../hooks/cardanoProvider'
 import ResponsesPart from './responsesPart'
 import CheckboxWithLabel from '../../checkboxWithLabel'
 import ExpandablePanel from '../../expandablePanel'
@@ -14,7 +14,7 @@ const defaultCredModes = () =>
   Object.fromEntries([...CREDENTIAL_FEATURES].map((f) => [f, 'key']))
 
 const TestTxsTab = () => {
-  const {api, connectionState} = useYoroi()
+  const {api, connectionState} = useCardano()
   const [enabledFeatures, setEnabledFeatures] = useState(new Set())
   const [credModes, setCredModes] = useState(defaultCredModes)
   const [walletRewardAddrHex, setWalletRewardAddrHex] = useState(null)

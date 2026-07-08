@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useMemo} from 'react'
 import Popup from 'reactjs-popup'
-import useYoroi from '../../../hooks/yoroiProvider'
+import useCardano from '../../../hooks/cardanoProvider'
 import {CONNECTED} from '../../../utils/connectionStates'
 import {hexToBytes} from '../../../utils/utils'
 import {
@@ -55,7 +55,7 @@ const RawCborPopup = ({label, value}) => (
 )
 
 const Cip20Tab = () => {
-  const {api, connectionState} = useYoroi()
+  const {api, connectionState} = useCardano()
 
   const [hexUtxos, setHexUtxos] = useState([])
   const [decodedUtxos, setDecodedUtxos] = useState([])

@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import {Buffer} from 'buffer'
-import useYoroi from '../../../hooks/yoroiProvider'
+import useCardano from '../../../hooks/cardanoProvider'
 import {
   getAddressFromBytes,
   getAssetName,
@@ -39,7 +39,7 @@ const NFTTab = () => {
     {label: 'Video_WebM', value: 'video/webm'},
     {label: 'Video_WMV', value: 'video/x-ms-wmv'},
   ]
-  const {api, connectionState} = useYoroi()
+  const {api, connectionState} = useCardano()
   const [currentNFTName, setCurrentNFTName] = useState('')
   const [currentImageUrl, setCurrentImageUrl] = useState('')
   const [currentDescription, setCurrentDescription] = useState('')

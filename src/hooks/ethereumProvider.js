@@ -98,7 +98,7 @@ export const EthereumProvider = ({children}) => {
 
 const useEthereum = () => {
   const context = React.useContext(EthereumContext)
-  if (context === undefined) throw new Error('useEthereum must be used within EthereumProvider')
+  if (!context) throw new Error('useEthereum must be used within EthereumProvider')
   return context
 }
 

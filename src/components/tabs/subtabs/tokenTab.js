@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import useYoroi from '../../../hooks/yoroiProvider'
+import useCardano from '../../../hooks/cardanoProvider'
 import {
   getAddressFromBytes,
   getAssetName,
@@ -18,7 +18,7 @@ import {firstOrThrow} from '../../../utils/helpFunctions'
 import InputWithLabel from '../../inputWithLabel'
 
 const TokenTab = () => {
-  const {api, connectionState} = useYoroi()
+  const {api, connectionState} = useCardano()
   const [currentTokenName, setCurrentTokenName] = useState('')
   const [currentTokenTicker, setCurrentTokenTicker] = useState('')
   const [currentTokenDescription, setCurrentTokenDescription] = useState('')
