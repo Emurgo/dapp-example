@@ -36,6 +36,7 @@
     "start": "craco start",
     "build": "CI=false && craco build",
     "test": "craco test",
+    "test:ci": "CI=true craco test",
     "eject": "craco eject"
   },
   "eslintConfig": {
