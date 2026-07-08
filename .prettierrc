@@ -7,8 +7,5 @@
   "semi": false,
   "singleQuote": true,
   "bracketSpacing": false,
-  "arrowParens": "always",
-  "importOrder": ["^@(.*)$", "^[./]" ],
-  "importOrderSeparation": true,
-  "importOrderSortSpecifiers": true
+  "arrowParens": "always"
 }

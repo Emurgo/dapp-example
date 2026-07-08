@@ -1,3 +1,7 @@
+// These tests call the app logger's own debug(), not RTL's screen.debug(), so the
+// testing-library debugging-utils rule is a false positive here.
+/* eslint-disable testing-library/no-debugging-utils */
+
 // NODE_ENV is 'test' here, so the build default is "logging off" — which lets us
 // assert the gating and the runtime toggle cleanly.
 describe('logger', () => {
