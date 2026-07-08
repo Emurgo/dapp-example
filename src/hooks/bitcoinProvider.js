@@ -1,12 +1,13 @@
 import logger from '../utils/logger'
-import React, {useState} from 'react'
-import {NO_PROVIDER} from '../utils/connectionStates'
+import React from 'react'
+import useConnectionState from './useConnectionState'
 
 const BitcoinContext = React.createContext(null)
 
 export const BitcoinProvider = ({children}) => {
   logger.debug('[dApp][BitcoinProvider] is called')
-  const [connectionState] = useState(NO_PROVIDER)
+  // Stub provider — stays NO_PROVIDER until Bitcoin support is implemented.
+  const {connectionState} = useConnectionState()
 
   const connect = async () => {
     logger.warn('[dApp][BitcoinProvider] connect: not implemented')

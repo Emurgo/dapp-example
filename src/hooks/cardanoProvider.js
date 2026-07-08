@@ -1,7 +1,7 @@
 import logger from '../utils/logger'
 import React, {useState, useEffect, useCallback, useMemo} from 'react'
-import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_PROVIDER} from '../utils/connectionStates'
 import useToast from './toastProvider'
+import useConnectionState from './useConnectionState'
 
 const CardanoContext = React.createContext(null)
 const reservedKeys = [
@@ -27,15 +27,16 @@ const reservedKeys = [
 export const CardanoProvider = ({children}) => {
   logger.debug('[dApp][CardanoProvider] is called')
   const {showToast} = useToast()
+  const {connectionState, setConnectionState, setConnected, setNotConnected, setInProgress, setNoProvider} =
+    useConnectionState()
   const [api, setApi] = useState(null)
-  const [connectionState, setConnectionState] = useState(NO_PROVIDER)
   const [availableWallets, setAvailableWallets] = useState([])
   const [selectedWallet, setSelectedWallet] = useState('')
 
   const setConnectionStateFalse = useCallback(() => {
-    setConnectionState(NOT_CONNECTED)
+    setNotConnected()
     setApi(null)
-  }, [])
+  }, [setNotConnected])
 
   const getAvailableWallets = () => {
     // We need to filter like this because of the Nami wallet.
@@ -58,13 +59,13 @@ export const CardanoProvider = ({children}) => {
    */
   const connect = useCallback(
     async (walletName, requestIdentification, silent, throwError = false) => {
-      setConnectionState(IN_PROGRESS)
+      setInProgress()
       setApi(null)
       logger.debug(`[dApp][connect] is called`)
 
       if (!window.cardano) {
         logger.error('There are no cardano wallets are installed')
-        setConnectionState(NOT_CONNECTED)
+        setNotConnected()
         return
       }
 
@@ -79,12 +80,12 @@ export const CardanoProvider = ({children}) => {
         logger.debug(`[dApp][connect] wallet API object is received`)
         setApi(connectedApi)
         setSelectedWallet(walletName)
-        setConnectionState(CONNECTED)
+        setConnected()
         return connectedApi
       } catch (error) {
         logger.error(`[dApp][connect] The error received while connecting the wallet`)
         setSelectedWallet('')
-        setConnectionState(NOT_CONNECTED)
+        setNotConnected()
         // Surface user-initiated connection failures; stay quiet on the silent
         // background reconnect so page load doesn't pop a toast.
         if (!silent) {
@@ -99,13 +100,13 @@ export const CardanoProvider = ({children}) => {
         }
       }
     },
-    [showToast],
+    [showToast, setInProgress, setNotConnected, setConnected],
   )
 
   useEffect(() => {
     if (!window.cardano) {
       logger.warn('[dApp] There are no cardano wallets are installed')
-      setConnectionState(NO_PROVIDER)
+      setNoProvider()
       return
     }
 
@@ -118,17 +119,17 @@ export const CardanoProvider = ({children}) => {
       logger.debug(`[dApp][tryConnectSilent] is called`)
       try {
         logger.debug(`[dApp][tryConnectSilent] trying {false, true}`)
-        setConnectionState(IN_PROGRESS)
+        setInProgress()
         connectResult = await connect(walletName, false, true, false)
         if (connectResult != null) {
           logger.log('[dApp][tryConnectSilent] RE-CONNECTED!')
           setSelectedWallet(walletName)
-          setConnectionState(CONNECTED)
+          setConnected()
           return
         }
       } catch (error) {
         setSelectedWallet('')
-        setConnectionState(NOT_CONNECTED)
+        setNotConnected()
         logger.error(error)
       }
     }
@@ -147,23 +148,23 @@ export const CardanoProvider = ({children}) => {
           if (response) {
             tryConnectSilent(existingWallet).then()
           } else {
-            setConnectionState(NOT_CONNECTED)
+            setNotConnected()
           }
         })
         .catch((err) => {
-          setConnectionState(NOT_CONNECTED)
+          setNotConnected()
           logger.error(err)
         })
     } else {
-      setConnectionState(NOT_CONNECTED)
+      setNotConnected()
     }
-  }, [connect])
+  }, [connect, setInProgress, setConnected, setNotConnected, setNoProvider])
 
   const disconnect = useCallback(() => {
     setApi(null)
     setSelectedWallet('')
-    setConnectionState(NOT_CONNECTED)
-  }, [])
+    setNotConnected()
+  }, [setNotConnected])
 
   const getAccounts = useCallback(async () => {
     if (!api) return []
@@ -220,6 +221,7 @@ export const CardanoProvider = ({children}) => {
       connectionState,
       availableWallets,
       selectedWallet,
+      setConnectionState,
       setConnectionStateFalse,
     ],
   )

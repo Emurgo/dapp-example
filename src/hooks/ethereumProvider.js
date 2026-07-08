@@ -1,33 +1,33 @@
 import logger from '../utils/logger'
 import React, {useState, useEffect, useCallback, useMemo} from 'react'
-import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_PROVIDER} from '../utils/connectionStates'
 import useToast from './toastProvider'
+import useConnectionState from './useConnectionState'
 
 const EthereumContext = React.createContext(null)
 
 export const EthereumProvider = ({children}) => {
   logger.debug('[dApp][EthereumProvider] is called')
   const {showToast} = useToast()
+  const {connectionState, setConnected, setNotConnected, setInProgress, setNoProvider} = useConnectionState()
   const [accounts, setAccounts] = useState([])
-  const [connectionState, setConnectionState] = useState(NO_PROVIDER)
   const [chainId, setChainId] = useState(null)
 
   useEffect(() => {
     if (!window.ethereum) {
       logger.warn('[dApp] No Ethereum wallet found')
-      setConnectionState(NO_PROVIDER)
+      setNoProvider()
       return
     }
-    setConnectionState(NOT_CONNECTED)
+    setNotConnected()
 
     const handleAccountsChanged = (newAccounts) => {
       logger.debug('[dApp][EthereumProvider] accountsChanged', newAccounts)
       if (newAccounts.length === 0) {
-        setConnectionState(NOT_CONNECTED)
+        setNotConnected()
         setAccounts([])
       } else {
         setAccounts(newAccounts)
-        setConnectionState(CONNECTED)
+        setConnected()
       }
     }
 
@@ -43,30 +43,30 @@ export const EthereumProvider = ({children}) => {
       window.ethereum.removeListener('accountsChanged', handleAccountsChanged)
       window.ethereum.removeListener('chainChanged', handleChainChanged)
     }
-  }, [])
+  }, [setNoProvider, setNotConnected, setConnected])
 
   const connect = useCallback(async () => {
     if (!window.ethereum) return
-    setConnectionState(IN_PROGRESS)
+    setInProgress()
     logger.debug('[dApp][EthereumProvider] connect is called')
     try {
       const accs = await window.ethereum.request({method: 'eth_requestAccounts'})
       const chain = await window.ethereum.request({method: 'eth_chainId'})
       setAccounts(accs)
       setChainId(chain)
-      setConnectionState(CONNECTED)
+      setConnected()
       logger.log('[dApp][EthereumProvider] CONNECTED, accounts:', accs)
     } catch (err) {
       logger.error('[dApp][EthereumProvider] connect error', err)
-      setConnectionState(NOT_CONNECTED)
+      setNotConnected()
       showToast(`Failed to connect Ethereum wallet: ${err?.message ?? JSON.stringify(err)}`)
     }
-  }, [showToast])
+  }, [showToast, setInProgress, setConnected, setNotConnected])
 
   const disconnect = useCallback(() => {
     setAccounts([])
-    setConnectionState(NOT_CONNECTED)
-  }, [])
+    setNotConnected()
+  }, [setNotConnected])
 
   const getAccounts = useCallback(() => accounts, [accounts])
 
