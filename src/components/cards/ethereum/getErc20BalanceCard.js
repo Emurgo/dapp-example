@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 /* global BigInt */
 import React, {useState} from 'react'
 import ApiCardWithModal from '../apiCardWithModal'
@@ -33,7 +34,7 @@ const GetErc20BalanceCard = ({accounts, onRawResponse, onResponse, onWaiting}) =
     } catch (e) {
       onRawResponse('')
       onResponse(e)
-      console.error(e)
+      logger.error(e)
     } finally {
       onWaiting(false)
     }

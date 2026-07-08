@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import {useState} from 'react'
 import InputWithLabel from '../../inputWithLabel'
 import GovToolsPanel from '../govToolsPanel'
@@ -56,7 +57,7 @@ const VotePanel = (props) => {
       handleAddingVotesInTx(votingBuilder)
       onWaiting(false)
     } catch (error) {
-      console.error(error)
+      logger.error(error)
       onWaiting(false)
       onError()
     }

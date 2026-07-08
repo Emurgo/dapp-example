@@ -1,3 +1,4 @@
+import logger from '../../utils/logger'
 import {
   getAddressFromBech32,
   getCslUtxos,
@@ -17,7 +18,7 @@ const Cip95BuildSignSubmitCard = (props) => {
   const errorHappen = (errorMessage) => {
     onWaiting(false)
     onError()
-    console.error(errorMessage)
+    logger.error(errorMessage)
   }
 
   const buildSignSubmit = async () => {
@@ -55,7 +56,7 @@ const Cip95BuildSignSubmitCard = (props) => {
       const wasmUnsignedTransaction = txBuilder.build_tx()
       // sign Tx
       const fixedTx = getFixedTxFromBytes(wasmUnsignedTransaction.to_bytes())
-      console.log('[Cip95BuildSignSubmitCard] Unsigned Tx:', fixedTx.to_hex())
+      logger.log('[Cip95BuildSignSubmitCard] Unsigned Tx:', fixedTx.to_hex())
       const witnessHex = await api?.signTx(fixedTx.to_hex())
       const wasmWitnessSet = getTransactionWitnessSetFromBytes(witnessHex)
       const vkeys = wasmWitnessSet.vkeys()
@@ -63,9 +64,9 @@ const Cip95BuildSignSubmitCard = (props) => {
         fixedTx.add_vkey_witness(vkeys.get(i))
       }
       const signedTxHex = fixedTx.to_hex()
-      console.log('Signed Tx:', signedTxHex)
+      logger.log('Signed Tx:', signedTxHex)
       const txId = await api?.submitTx(signedTxHex)
-      console.log('The transaction is sent:', txId)
+      logger.log('The transaction is sent:', txId)
     } catch (e) {
       errorHappen(e)
     } finally {

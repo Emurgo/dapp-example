@@ -1,3 +1,4 @@
+import logger from '../../utils/logger'
 import React, {useState} from 'react'
 import {getBech32AddressFromHex} from '../../utils/cslTools'
 import ApiCardWithModal from './apiCardWithModal'
@@ -23,7 +24,7 @@ const GetUsedAddresses = ({api, onRawResponse, onResponse, onWaiting}) => {
         onWaiting(false)
         onRawResponse('')
         onResponse(e)
-        console.log(e)
+        logger.log(e)
       })
   }
 

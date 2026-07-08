@@ -1,3 +1,4 @@
+import logger from '../utils/logger'
 import React, {useState, useEffect, useCallback, useMemo} from 'react'
 import {NOT_CONNECTED, IN_PROGRESS, CONNECTED, NO_PROVIDER} from '../utils/connectionStates'
 
@@ -23,7 +24,7 @@ const reservedKeys = [
 ]
 
 export const CardanoProvider = ({children}) => {
-  console.debug('[dApp][CardanoProvider] is called')
+  logger.debug('[dApp][CardanoProvider] is called')
   const [api, setApi] = useState(null)
   const [connectionState, setConnectionState] = useState(NO_PROVIDER)
   const [availableWallets, setAvailableWallets] = useState([])
@@ -56,42 +57,42 @@ export const CardanoProvider = ({children}) => {
   const connect = useCallback(async (walletName, requestIdentification, silent, throwError = false) => {
     setConnectionState(IN_PROGRESS)
     setApi(null)
-    console.debug(`[dApp][connect] is called`)
+    logger.debug(`[dApp][connect] is called`)
 
     if (!window.cardano) {
-      console.error('There are no cardano wallets are installed')
+      logger.error('There are no cardano wallets are installed')
       setConnectionState(NOT_CONNECTED)
       return
     }
 
-    console.log(`[dApp][connect] connecting the wallet "${walletName}"`)
-    console.debug(`[dApp][connect] {requestIdentification: ${requestIdentification}, onlySilent: ${silent}}`)
+    logger.log(`[dApp][connect] connecting the wallet "${walletName}"`)
+    logger.debug(`[dApp][connect] {requestIdentification: ${requestIdentification}, onlySilent: ${silent}}`)
 
     try {
       const connectedApi = await window.cardano[walletName].enable({
         requestIdentification,
         onlySilent: silent,
       })
-      console.debug(`[dApp][connect] wallet API object is received`)
+      logger.debug(`[dApp][connect] wallet API object is received`)
       setApi(connectedApi)
       setSelectedWallet(walletName)
       setConnectionState(CONNECTED)
       return connectedApi
     } catch (error) {
-      console.error(`[dApp][connect] The error received while connecting the wallet`)
+      logger.error(`[dApp][connect] The error received while connecting the wallet`)
       setSelectedWallet('')
       setConnectionState(NOT_CONNECTED)
       if (throwError) {
         throw new Error(JSON.stringify(error))
       } else {
-        console.error(`[dApp][connect] ${JSON.stringify(error)}`)
+        logger.error(`[dApp][connect] ${JSON.stringify(error)}`)
       }
     }
   }, [])
 
   useEffect(() => {
     if (!window.cardano) {
-      console.warn('[dApp] There are no cardano wallets are installed')
+      logger.warn('[dApp] There are no cardano wallets are installed')
       setConnectionState(NO_PROVIDER)
       return
     }
@@ -102,13 +103,13 @@ export const CardanoProvider = ({children}) => {
    */
     const tryConnectSilent = async (walletName) => {
       let connectResult = null
-      console.debug(`[dApp][tryConnectSilent] is called`)
+      logger.debug(`[dApp][tryConnectSilent] is called`)
       try {
-        console.debug(`[dApp][tryConnectSilent] trying {false, true}`)
+        logger.debug(`[dApp][tryConnectSilent] trying {false, true}`)
         setConnectionState(IN_PROGRESS)
         connectResult = await connect(walletName, false, true, false)
         if (connectResult != null) {
-          console.log('[dApp][tryConnectSilent] RE-CONNECTED!')
+          logger.log('[dApp][tryConnectSilent] RE-CONNECTED!')
           setSelectedWallet(walletName)
           setConnectionState(CONNECTED)
           return
@@ -116,12 +117,12 @@ export const CardanoProvider = ({children}) => {
       } catch (error) {
         setSelectedWallet('')
         setConnectionState(NOT_CONNECTED)
-        console.error(error)
+        logger.error(error)
       }
     }
 
     const availableWallets = getAvailableWallets()
-    console.log('[dApp] allInfoWallets: ', availableWallets)
+    logger.log('[dApp] allInfoWallets: ', availableWallets)
     setAvailableWallets(availableWallets)
 
     if (availableWallets.length === 1) {
@@ -130,7 +131,7 @@ export const CardanoProvider = ({children}) => {
       walletObject
         .isEnabled()
         .then((response) => {
-          console.debug(`[dApp] Connection is enabled: ${response}`)
+          logger.debug(`[dApp] Connection is enabled: ${response}`)
           if (response) {
             tryConnectSilent(existingWallet).then()
           } else {
@@ -139,7 +140,7 @@ export const CardanoProvider = ({children}) => {
         })
         .catch((err) => {
           setConnectionState(NOT_CONNECTED)
-          console.error(err)
+          logger.error(err)
         })
     } else {
       setConnectionState(NOT_CONNECTED);

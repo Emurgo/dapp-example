@@ -1,3 +1,4 @@
+import logger from '../../utils/logger'
 import React from 'react'
 import {wasmMultiassetToJSONs} from '../../utils/utils'
 import ApiCard from './apiCard'
@@ -20,7 +21,7 @@ const GetBalanceCard = ({api, onRawResponse, onResponse, onWaiting}) => {
         onWaiting(false)
         onRawResponse('')
         onResponse(e)
-        console.log(e)
+        logger.log(e)
       })
   }
 

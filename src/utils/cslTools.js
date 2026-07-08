@@ -1,3 +1,4 @@
+import logger from './logger'
 import {protocolParams} from './networkConfig'
 import {hexToBytes, bytesToHex, wasmMultiassetToJSONs} from './utils'
 import {Buffer} from 'buffer'
@@ -276,38 +277,38 @@ export const keyHashFromHex = (hexValue) => wasm.Ed25519KeyHash.from_hex(hexValu
 export const keyHashFromBech32 = (bech32Value) => wasm.Ed25519KeyHash.from_bech32(bech32Value)
 
 export const getCslCredentialFromHex = (hexValue) => {
-  console.debug('[cslTools][getCslCredentialFromHex]::hexValue', hexValue)
+  logger.debug('[cslTools][getCslCredentialFromHex]::hexValue', hexValue)
   const keyHash = keyHashFromHex(hexValue)
-  console.debug('[cslTools][getCslCredentialFromHex]::keyHash', keyHash)
+  logger.debug('[cslTools][getCslCredentialFromHex]::keyHash', keyHash)
   const cred = getCredential(keyHash)
-  console.debug('[cslTools][getCslCredentialFromHex]::cred', cred)
+  logger.debug('[cslTools][getCslCredentialFromHex]::cred', cred)
   return cred
 }
 
 export const getCslCredentialFromBech32 = (bech32Value) => {
-  console.debug('[cslTools][getCslCredentialFromBech32]::bech32Value', bech32Value)
+  logger.debug('[cslTools][getCslCredentialFromBech32]::bech32Value', bech32Value)
   const keyHash = keyHashFromBech32(bech32Value)
-  console.debug('[cslTools][getCslCredentialFromBech32]::keyHash', keyHash)
+  logger.debug('[cslTools][getCslCredentialFromBech32]::keyHash', keyHash)
   const cred = getCredential(keyHash)
-  console.debug('[cslTools][getCslCredentialFromBech32]::cred', cred)
+  logger.debug('[cslTools][getCslCredentialFromBech32]::cred', cred)
   return cred
 }
 
 export const getCslCredentialFromScriptFromBech32 = (bech32Value) => {
-  console.debug('[cslTools][getCslCredentialFromScriptFromBech32]::bech32Value', bech32Value)
+  logger.debug('[cslTools][getCslCredentialFromScriptFromBech32]::bech32Value', bech32Value)
   const scriptHash = wasm.ScriptHash.from_bech32(bech32Value)
-  console.debug('[cslTools][getCslCredentialFromScriptFromBech32]::scriptHash', scriptHash)
+  logger.debug('[cslTools][getCslCredentialFromScriptFromBech32]::scriptHash', scriptHash)
   const cred = getCredentialFromScriptHash(scriptHash)
-  console.debug('[cslTools][getCslCredentialFromScriptFromBech32]::cred', cred)
+  logger.debug('[cslTools][getCslCredentialFromScriptFromBech32]::cred', cred)
   return cred
 }
 
 export const getCslCredentialFromScriptFromHex = (hexValue) => {
-  console.debug('[cslTools][getCslCredentialFromScriptFromHex]::hexValue', hexValue)
+  logger.debug('[cslTools][getCslCredentialFromScriptFromHex]::hexValue', hexValue)
   const scriptHash = wasm.ScriptHash.from_hex(hexValue)
-  console.debug('[cslTools][getCslCredentialFromScriptFromHex]::scriptHash', scriptHash)
+  logger.debug('[cslTools][getCslCredentialFromScriptFromHex]::scriptHash', scriptHash)
   const cred = getCredentialFromScriptHash(scriptHash)
-  console.debug('[cslTools][getCslCredentialFromScriptFromHex]::cred', cred)
+  logger.debug('[cslTools][getCslCredentialFromScriptFromHex]::cred', cred)
   return cred
 }
 

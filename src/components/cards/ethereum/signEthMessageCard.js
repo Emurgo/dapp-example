@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import React, {useState} from 'react'
 import ApiCardWithModal from '../apiCardWithModal'
 import {ModalWindowContent, CommonStyles} from '../../ui-constants'
@@ -21,7 +22,7 @@ const SignEthMessageCard = ({accounts, onRawResponse, onResponse, onWaiting}) =>
     } catch (e) {
       onRawResponse('')
       onResponse(e)
-      console.error(e)
+      logger.error(e)
     } finally {
       onWaiting(false)
     }

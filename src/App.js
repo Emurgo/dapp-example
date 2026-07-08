@@ -1,3 +1,4 @@
+import logger from './utils/logger'
 import React, {useEffect} from 'react'
 import AccessButton from './components/accessButton'
 import MainTab from './components/tabs/mainTab'
@@ -42,7 +43,7 @@ const App = () => {
 
   useEffect(() => {
     const getConnectionState = async () => {
-      console.debug(`[dApp][App] Checking connection works`)
+      logger.debug(`[dApp][App] Checking connection works`)
       try {
         const walletObject = window.cardano[selectedWallet]
         const conState = await walletStateWithTimeout(walletObject, 10000)
@@ -54,14 +55,14 @@ const App = () => {
         }
       } catch (error) {
         setConnectionStateFalse()
-        console.error(error)
+        logger.error(error)
       }
     }
 
     if (isWalletConnected) {
       const connectionTimer = setInterval(getConnectionState, 10000)
       return () => {
-        console.debug(`[dApp][App] Checking connection is stopped`)
+        logger.debug(`[dApp][App] Checking connection is stopped`)
         clearInterval(connectionTimer)
       }
     }

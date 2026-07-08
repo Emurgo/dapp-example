@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import React, {useState} from 'react'
 import GovToolsPanel from '../govToolsPanel'
 import InputWithLabel from '../../inputWithLabel'
@@ -35,7 +36,7 @@ const DRepUpdatePanel = (props) => {
       handleAddingCertInTx(certBuilder)
       onWaiting(false)
     } catch (error) {
-      console.error(error)
+      logger.error(error)
       onWaiting(false)
       onError()
     }

@@ -1,3 +1,4 @@
+import logger from '../../utils/logger'
 import React, {useState} from 'react'
 import {bytesToHex, hexToBytes} from '../../utils/utils'
 import {
@@ -46,7 +47,7 @@ const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
     if (!txHex) {
       txHex = await buildTransaction(defaultValue)
     }
-    console.log('[SignTransactionCard] Unsingned Tx:', txHex)
+    logger.log('[SignTransactionCard] Unsingned Tx:', txHex)
     api
       ?.signTx(txHex, partialSign)
       .then((witnessHex) => {
@@ -69,7 +70,7 @@ const SignTransactionCard = ({api, onRawResponse, onResponse, onWaiting}) => {
         onWaiting(false)
         onRawResponse('')
         onResponse(e)
-        console.log(e)
+        logger.log(e)
       })
   }
   const apiProps = {

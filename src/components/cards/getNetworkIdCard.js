@@ -1,3 +1,4 @@
+import logger from '../../utils/logger'
 import React from 'react'
 import ApiCard from './apiCard'
 
@@ -15,7 +16,7 @@ const GetNetworkIdCard = ({api, onRawResponse, onResponse, onWaiting}) => {
         onWaiting(false)
         onRawResponse('')
         onResponse(e)
-        console.log(e)
+        logger.log(e)
       })
   }
 

@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import React, {useState} from 'react'
 import GovToolsPanel from '../govToolsPanel'
 import CheckboxWithLabel from '../../checkboxWithLabel'
@@ -16,7 +17,7 @@ const UnregisterStakeKeyPanel = (props) => {
 
   const handleUseConwayCert = () => {
     setUseConway(!useConway)
-    console.debug(`[dApp][UnregisterStakeKeyPanel] use Conway Stake Registration Certificate is set: ${!useConway}`)
+    logger.debug(`[dApp][UnregisterStakeKeyPanel] use Conway Stake Registration Certificate is set: ${!useConway}`)
   }
 
   const buildUnregStakeKey = () => {
@@ -34,7 +35,7 @@ const UnregisterStakeKeyPanel = (props) => {
       handleAddingCertInTx(certBuilder)
       onWaiting(false)
     } catch (error) {
-      console.error(error)
+      logger.error(error)
       onWaiting(false)
       onError()
     }

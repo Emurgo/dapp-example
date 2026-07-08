@@ -1,3 +1,4 @@
+import logger from '../utils/logger'
 import React, {useState} from 'react'
 import Popup from 'reactjs-popup'
 import useCardano from '../hooks/cardanoProvider'
@@ -6,13 +7,13 @@ import {NO_PROVIDER} from '../utils/connectionStates'
 const WalletsModal = () => {
   const {connect, availableWallets, setSelectedWallet, connectionState} = useCardano()
   const [selectedUserWallet, setSelectedUserWallet] = useState('')
-  console.log(`[dApp][WalletsModal] is called`)
+  logger.log(`[dApp][WalletsModal] is called`)
 
   const handleSelectionAndClose = (closeFunc) => {
-    console.log(`[dApp][WalletsModal] selected wallet is ${selectedUserWallet}`)
+    logger.log(`[dApp][WalletsModal] selected wallet is ${selectedUserWallet}`)
     setSelectedWallet(selectedUserWallet)
     closeFunc()
-    console.log(`[dApp][WalletsModal] is closed`)
+    logger.log(`[dApp][WalletsModal] is closed`)
     connect(selectedUserWallet, false, false)
   }
 

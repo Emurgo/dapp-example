@@ -1,10 +1,11 @@
+import logger from '../../utils/logger'
 import React from 'react'
 import {ModalWindowContent} from '../ui-constants'
 
 const GovToolsPanel = (props) => {
   const {buttonName, certLabel, clickFunction, children} = props
   const handleAction = () => {
-    console.log(`[dApp][GovToolsPanel][${certLabel}] Building is called`)
+    logger.log(`[dApp][GovToolsPanel][${certLabel}] Building is called`)
     // action here
     clickFunction()
   }

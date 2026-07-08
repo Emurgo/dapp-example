@@ -1,3 +1,4 @@
+import logger from '../../utils/logger'
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
 import {ModalWindowContent, CommonStyles} from '../ui-constants'
@@ -24,7 +25,7 @@ const GetUtxosCard = ({api, onRawResponse, onResponse, onWaiting}) => {
         onWaiting(false)
         onRawResponse('')
         onResponse(e)
-        console.log(e)
+        logger.log(e)
       })
   }
 

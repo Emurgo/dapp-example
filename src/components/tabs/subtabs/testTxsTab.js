@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import React, {useState, useEffect} from 'react'
 import useCardano from '../../../hooks/cardanoProvider'
 import ResponsesPart from './responsesPart'
@@ -32,15 +33,15 @@ const TestTxsTab = () => {
       .then((addrs) => {
         if (addrs && addrs.length > 0) setWalletRewardAddrHex(addrs[0])
       })
-      .catch(console.error)
+      .catch(logger.error)
     api
       .getChangeAddress()
       .then((addr) => setWalletChangeAddrHex(addr))
-      .catch(console.error)
+      .catch(logger.error)
     api
       .getNetworkId()
       .then((id) => setNetworkId(id))
-      .catch(console.error)
+      .catch(logger.error)
   }, [api])
 
   const toggleFeature = (key) => {
@@ -105,7 +106,7 @@ const TestTxsTab = () => {
     } catch (e) {
       setRawCurrentText('')
       setCurrentText(`Sign error: ${e.message ?? JSON.stringify(e)}`)
-      console.error(e)
+      logger.error(e)
     }
     setWaiterState(false)
   }

@@ -1,3 +1,4 @@
+import logger from '../../utils/logger'
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
 import {Buffer} from 'buffer'
@@ -57,7 +58,7 @@ const SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       const payloadHex = getPayloadHex(message, encodingType)
       
       // Log the inputs for debugging
-      console.log('SignData inputs:', { address, payloadHex, originalMessage: message, encodingType })
+      logger.log('SignData inputs:', { address, payloadHex, originalMessage: message, encodingType })
       
       const signDataResponse = await api?.signData(address, payloadHex)
       
@@ -81,7 +82,7 @@ const SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       } else {
         onResponse(error)
       }
-      console.error(error)
+      logger.error(error)
     } finally {
       onWaiting(false)
     }

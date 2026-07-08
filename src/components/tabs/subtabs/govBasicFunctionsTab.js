@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import TabsComponent from '../tabsComponent'
 import VoteDelegationPanel from '../../cards/govActions/voteDelegationPanel'
 import {
@@ -92,7 +93,7 @@ const GovBasicFunctionsTab = ({api, onWaiting, onError, getters, setters}) => {
    */
   const handleDrepId = (bechEncodedID) => {
     if (!isValidDRepID(bechEncodedID) && !isPotentiallyValidHex(bechEncodedID)) {
-      console.error(`The value "${bechEncodedID}" is not valid dRepID`)
+      logger.error(`The value "${bechEncodedID}" is not valid dRepID`)
       onError()
       return
     }

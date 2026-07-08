@@ -1,3 +1,4 @@
+import logger from '../../utils/logger'
 import React from 'react'
 import ApiCard from './apiCard'
 import { getAddressFromCred, getCredential, getSecretKey } from '../../utils/cslTools'
@@ -24,7 +25,7 @@ const CreateRandomKeyPart = ({onRawResponse, onResponse, onWaiting}) => {
     } catch(e) {
       onRawResponse('');
       onResponse(e);
-      console.error(e);
+      logger.error(e);
     } finally {
       onWaiting(false);
     }

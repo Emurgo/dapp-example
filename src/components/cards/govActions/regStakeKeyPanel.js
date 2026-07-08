@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import React, {useState} from 'react'
 import CheckboxWithLabel from '../../checkboxWithLabel'
 import InputWithLabel from '../../inputWithLabel'
@@ -17,7 +18,7 @@ const RegisterStakeKeyPanel = (props) => {
 
   const handleUseConwayCert = () => {
     setUseConway(!useConway)
-    console.debug(`[dApp][RegisterStakeKeyPanel] use Conway Stake Registration Certificate is set: ${!useConway}`)
+    logger.debug(`[dApp][RegisterStakeKeyPanel] use Conway Stake Registration Certificate is set: ${!useConway}`)
   }
 
   const buildRegStakeKey = () => {
@@ -36,7 +37,7 @@ const RegisterStakeKeyPanel = (props) => {
       handleAddingCertInTx(certBuilder)
       onWaiting(false)
     } catch (error) {
-      console.error(error)
+      logger.error(error)
       onWaiting(false)
       onError()
     }

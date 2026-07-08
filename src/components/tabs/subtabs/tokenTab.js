@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import {useState} from 'react'
 import useCardano from '../../../hooks/cardanoProvider'
 import {
@@ -84,13 +85,13 @@ const TokenTab = () => {
     const clearTokenName = currentTokenName.trim()
     if (clearTokenName.length === 0) {
       handleEmptyTokenName()
-      console.error("The token name shouldn't be empty")
+      logger.error("The token name shouldn't be empty")
       return
     }
 
     if (currentQuantity === '0') {
       handleEmptyTokenQuantity()
-      console.error("The token quantity isn't suitable")
+      logger.error("The token quantity isn't suitable")
       return
     }
     let quantityInt = 0
@@ -98,14 +99,14 @@ const TokenTab = () => {
       quantityInt = toInt(currentQuantity)
     } catch (error) {
       handleEmptyTokenQuantity()
-      console.error(error)
+      logger.error(error)
       return
     }
 
     const txBuilder = getTxBuilder()
 
     const changeAddress = await api?.getChangeAddress()
-    console.debug(`[dApp][Tokens_Tab][mint] changeAddress -> ${changeAddress}`)
+    logger.debug(`[dApp][Tokens_Tab][mint] changeAddress -> ${changeAddress}`)
 
     const wasmChangeAddress = getAddressFromBytes(changeAddress)
     try {
@@ -122,21 +123,21 @@ const TokenTab = () => {
         getTransactionOutputBuilder(wasmChangeAddress),
       )
 
-      console.debug(`[TokenTab][mint] getting UTxOs`)
+      logger.debug(`[TokenTab][mint] getting UTxOs`)
       const hexInputUtxos = await api?.getUtxos()
 
-      console.debug(`[TokenTab][mint] preparing wasmUTxOs`)
+      logger.debug(`[TokenTab][mint] preparing wasmUTxOs`)
       const wasmUtxos = getCslUtxos(hexInputUtxos)
 
-      console.debug(`[TokenTab][mint] adding inputs`)
+      logger.debug(`[TokenTab][mint] adding inputs`)
       txBuilder.add_inputs_from(wasmUtxos, getLargestFirstMultiAsset())
       txBuilder.add_required_signer(pubkeyHash)
       txBuilder.add_change_if_needed(wasmChangeAddress)
       
       const wasmUnsignedTransaction = txBuilder.build_tx()
       const fixedTx = getFixedTxFromBytes(wasmUnsignedTransaction.to_bytes())
-      console.log('[TokenTab] Unsigned Tx:', fixedTx.to_hex())
-      console.debug(`[TokenTab][mint] signing the tx`)
+      logger.log('[TokenTab] Unsigned Tx:', fixedTx.to_hex())
+      logger.debug(`[TokenTab][mint] signing the tx`)
       const witnessHex = await api?.signTx(fixedTx.to_hex())
       const wasmWitnessSet = getTransactionWitnessSetFromBytes(witnessHex)
       const vkeys = wasmWitnessSet.vkeys()
@@ -144,12 +145,12 @@ const TokenTab = () => {
         fixedTx.add_vkey_witness(vkeys.get(i))
       }
       const signedTxHex = fixedTx.to_hex()
-      console.log('[TokenTab][mint] Signed Tx:', signedTxHex)
+      logger.log('[TokenTab][mint] Signed Tx:', signedTxHex)
       const txId = await api?.submitTx(signedTxHex)
-      console.log(`[TokenTab][mint] Transaction successfully submitted: ${txId}`)
+      logger.log(`[TokenTab][mint] Transaction successfully submitted: ${txId}`)
     } catch (error) {
       handleError(error)
-      console.error(error)
+      logger.error(error)
     }
   }
 

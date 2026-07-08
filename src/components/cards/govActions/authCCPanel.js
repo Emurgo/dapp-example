@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import React, {useState} from 'react'
 import InputWithLabel from '../../inputWithLabel'
 import {
@@ -41,7 +42,7 @@ const AuthCCPanel = (props) => {
       handleAddingCertInTx(certBuilder)
       onWaiting(false)
     } catch (error) {
-      console.error(error)
+      logger.error(error)
       onWaiting(false)
       onError()
     }

@@ -1,3 +1,4 @@
+import logger from '../../utils/logger'
 import React from 'react'
 import ApiCard from './apiCard'
 import {getBech32AddressFromHex} from '../../utils/cslTools'
@@ -16,7 +17,7 @@ const GetChangeAddressCard = ({api, onRawResponse, onResponse, onWaiting}) => {
         onWaiting(false)
         onRawResponse('')
         onResponse(e)
-        console.log(e)
+        logger.log(e)
       })
   }
 

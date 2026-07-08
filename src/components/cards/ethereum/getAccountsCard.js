@@ -1,3 +1,4 @@
+import logger from '../../../utils/logger'
 import React from 'react'
 import ApiCard from '../apiCard'
 
@@ -15,7 +16,7 @@ const GetAccountsCard = ({onRawResponse, onResponse, onWaiting}) => {
         onWaiting(false)
         onRawResponse('')
         onResponse(e)
-        console.error(e)
+        logger.error(e)
       })
   }
 

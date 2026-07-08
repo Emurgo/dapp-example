@@ -1,3 +1,4 @@
+import logger from '../utils/logger'
 import React from 'react'
 import useCardano from '../hooks/cardanoProvider'
 import {IN_PROGRESS} from '../utils/connectionStates'
@@ -5,7 +6,7 @@ import WalletsModal from './walletsModal'
 
 const AccessButton = () => {
   const {api, connectionState, availableWallets, selectedWallet} = useCardano()
-  console.log(`[dApp][AccessButton] available wallets: ${availableWallets.length}`)
+  logger.log(`[dApp][AccessButton] available wallets: ${availableWallets.length}`)
 
   const getWalletIcon = () => {
     return window.cardano[selectedWallet].icon

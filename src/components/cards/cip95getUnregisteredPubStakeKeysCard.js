@@ -1,3 +1,4 @@
+import logger from '../../utils/logger'
 import React from 'react'
 import ApiCard from './apiCard'
 import { getPublicKeyFromHex } from '../../utils/cslTools'
@@ -8,7 +9,7 @@ const Cip95GetUnregisteredPubStakeKeysCard = ({api, onRawResponse, onResponse, o
     api?.cip95
       .getUnregisteredPubStakeKeys()
       .then((unregPubStakeKeys) => {
-        console.log('unregPubStakeKeys: ', unregPubStakeKeys)
+        logger.log('unregPubStakeKeys: ', unregPubStakeKeys)
         onWaiting(false)
         onRawResponse(unregPubStakeKeys)
         if (unregPubStakeKeys.length < 1) {
@@ -23,7 +24,7 @@ const Cip95GetUnregisteredPubStakeKeysCard = ({api, onRawResponse, onResponse, o
         onWaiting(false)
         onRawResponse('')
         onResponse(e)
-        console.log(e)
+        logger.log(e)
       })
   }
 

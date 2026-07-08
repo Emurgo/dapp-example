@@ -1,3 +1,4 @@
+import logger from '../../utils/logger'
 import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
 import {Buffer} from 'buffer'
@@ -35,7 +36,7 @@ const Cip95SignDataCard = ({api, onRawResponse, onResponse, onWaiting}) => {
       } else {
         onResponse(error)
       }
-      console.error(error)
+      logger.error(error)
     } finally {
       onWaiting(false)
     }

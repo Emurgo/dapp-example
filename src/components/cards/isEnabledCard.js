@@ -1,3 +1,4 @@
+import logger from '../../utils/logger'
 import ApiCard from './apiCard'
 
 const IsEnabledCard = ({onRawResponse, onResponse, onWaiting, selectedWallet}) => {
@@ -14,7 +15,7 @@ const IsEnabledCard = ({onRawResponse, onResponse, onWaiting, selectedWallet}) =
         onWaiting(false)
         onRawResponse('')
         onResponse(e)
-        console.error(e)
+        logger.error(e)
       })
   }
 
