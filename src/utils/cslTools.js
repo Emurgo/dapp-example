@@ -56,31 +56,6 @@ export const getTransactionOutput = (wasmOutputAddress, buildTransactionInput) =
 
 // ---- CIP-20 (transaction message metadata, label 674) ----
 
-// Splits a string into an array of chunks each <= 64 bytes when UTF-8 encoded.
-// CSL's metadatum text strings are capped at 64 BYTES (not chars); anything
-// larger makes encode_json_str_to_metadatum throw. We accumulate whole code
-// points (iterating the string yields code points, not UTF-16 units) so we
-// never split a multibyte character mid-sequence.
-export const chunkMessageTo64Bytes = (message) => {
-  const encoder = new TextEncoder()
-  const chunks = []
-  let current = ''
-  let currentBytes = 0
-  for (const ch of message) {
-    const chBytes = encoder.encode(ch).length
-    if (currentBytes + chBytes > 64) {
-      if (current) chunks.push(current)
-      current = ch
-      currentBytes = chBytes
-    } else {
-      current += ch
-      currentBytes += chBytes
-    }
-  }
-  if (current) chunks.push(current)
-  return chunks
-}
-
 // Builds an unsigned CIP-20 transaction:
 //  - one explicit 1 ADA output to `receiverBech32`
 //  - a label-674 { "msg": [...] } metadata entry from `messageLines`

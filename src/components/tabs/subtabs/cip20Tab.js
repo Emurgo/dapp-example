@@ -2,13 +2,12 @@ import React, {useState, useEffect, useMemo} from 'react'
 import Popup from 'reactjs-popup'
 import useCardano from '../../../hooks/cardanoProvider'
 import {CONNECTED} from '../../../utils/connectionStates'
-import {hexToBytes} from '../../../utils/utils'
+import {hexToBytes, chunkMessageTo64Bytes} from '../../../utils/utils'
 import {
   getUtxoFromHex,
   getAddressFromBech32,
   getFixedTxFromBytes,
   getTransactionWitnessSetFromBytes,
-  chunkMessageTo64Bytes,
   buildCip20Tx,
   compareLovelaceDesc,
 } from '../../../utils/cslTools'

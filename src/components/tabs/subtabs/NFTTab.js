@@ -17,6 +17,7 @@ import {
   toInt,
 } from '../../../utils/cslTools'
 import {CONNECTED} from '../../../utils/connectionStates'
+import {chunkMessageTo64Bytes} from '../../../utils/utils'
 import {firstOrThrow} from '../../../utils/helpFunctions'
 import SelectWithLabel from '../../selectWithLabel'
 import InputWithLabel from '../../inputWithLabel'
@@ -96,18 +97,12 @@ const NFTTab = () => {
     setImageType(event.target.value)
   }
 
+  // CIP-25 stores a field as a plain string when it fits in one 64-byte chunk,
+  // or an array of <=64-byte chunks when longer. Chunking is byte-based (shared
+  // util) so multibyte characters are never split mid-sequence.
   const sliceBy64Char = (inputString) => {
-    logger.debug(`[NFTTab] inputString: ${JSON.stringify(inputString)}`)
-    if (inputString.length <= 64) {
-      return inputString
-    }
-    const step = 64
-    const resultArray = []
-    for (let startIndex = 0; startIndex < inputString.length; startIndex = startIndex + step) {
-      const stringSlice = inputString.slice(startIndex, startIndex + step)
-      resultArray.push(stringSlice)
-    }
-    return resultArray
+    const chunks = chunkMessageTo64Bytes(inputString)
+    return chunks.length <= 1 ? inputString : chunks
   }
 
   const clearInfo = () => {
