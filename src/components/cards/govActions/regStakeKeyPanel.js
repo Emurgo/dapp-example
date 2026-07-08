@@ -5,6 +5,7 @@ import InputWithLabel from '../../inputWithLabel'
 import GovToolsPanel from '../govToolsPanel'
 import {protocolParams} from '../../../utils/networkConfig'
 import {getCertOfNewStakeReg, getStakeKeyRegCert, getStakeKeyRegCertWithCoin} from '../../../utils/cslTools'
+import buildCert from '../../../utils/buildCert'
 
 const RegisterStakeKeyPanel = (props) => {
   const {onWaiting, onError, getters, setters, handleInputCreds} = props
@@ -21,27 +22,16 @@ const RegisterStakeKeyPanel = (props) => {
     logger.debug(`[dApp][RegisterStakeKeyPanel] use Conway Stake Registration Certificate is set: ${!useConway}`)
   }
 
-  const buildRegStakeKey = () => {
-    onWaiting(true)
-    const certBuilder = getCertBuilder()
-    try {
+  const buildRegStakeKey = () =>
+    buildCert(getCertBuilder, {onWaiting, onError}, (certBuilder) => {
       // building StakeKeyRegCert
       const stakeCred = handleInputCreds(stakeKeyHash)
-      let stakeKeyRegCert
-      if (useConway) {
-        stakeKeyRegCert = getStakeKeyRegCertWithCoin(stakeCred, stakeDepositAmount)
-      } else {
-        stakeKeyRegCert = getStakeKeyRegCert(stakeCred)
-      }
+      const stakeKeyRegCert = useConway
+        ? getStakeKeyRegCertWithCoin(stakeCred, stakeDepositAmount)
+        : getStakeKeyRegCert(stakeCred)
       certBuilder.add(getCertOfNewStakeReg(stakeKeyRegCert))
       handleAddingCertInTx(certBuilder)
-      onWaiting(false)
-    } catch (error) {
-      logger.error(error)
-      onWaiting(false)
-      onError()
-    }
-  }
+    })
 
   const panelProps = {
     buttonName: 'Build Cert',

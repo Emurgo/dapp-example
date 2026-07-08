@@ -1,4 +1,3 @@
-import logger from '../../../utils/logger'
 import {useState} from 'react'
 import InputWithLabel from '../../inputWithLabel'
 import {
@@ -11,6 +10,7 @@ import {
   keyHashFromHex,
 } from '../../../utils/cslTools'
 import GovToolsPanel from '../govToolsPanel'
+import buildCert from '../../../utils/buildCert'
 
 const VoteDelegationPanel = (props) => {
   const {onWaiting, onError, getters, setters, handleInputCreds, handleDrepId} = props
@@ -21,12 +21,8 @@ const VoteDelegationPanel = (props) => {
 
   const suitableStake = regPubStakeKey.length > 0 ? regPubStakeKey : unregPubStakeKey
 
-  const buildVoteDelegationCert = () => {
-    onWaiting(true)
-
-    // build vote cert
-    const certBuilder = getCertBuilder()
-    try {
+  const buildVoteDelegationCert = () =>
+    buildCert(getCertBuilder, {onWaiting, onError}, (certBuilder) => {
       let targetDRep
       if (dRepIdInputValue.toUpperCase() === 'ABSTAIN') {
         targetDRep = getDRepAbstain()
@@ -54,7 +50,7 @@ const VoteDelegationPanel = (props) => {
       }
       const stakeCred = handleInputCreds(pubStake)
       if (stakeCred == null) {
-        return null
+        return
       }
       // Create cert object
       if (targetDRep) {
@@ -64,13 +60,7 @@ const VoteDelegationPanel = (props) => {
         // adding the cert to the certStorage
         handleAddingCertInTx(certBuilder)
       }
-      onWaiting(false)
-    } catch (error) {
-      logger.error(error)
-      onWaiting(false)
-      onError()
-    }
-  }
+    })
 
   const panelProps = {
     buttonName: 'Build Cert',

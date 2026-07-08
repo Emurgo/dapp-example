@@ -1,4 +1,3 @@
-import logger from '../../../utils/logger'
 import React, {useState} from 'react'
 import InputWithLabel from '../../inputWithLabel'
 import {
@@ -6,6 +5,7 @@ import {
   getCertOfNewCommitteeHotAuth,
 } from '../../../utils/cslTools'
 import GovToolsPanel from '../govToolsPanel'
+import buildCert from '../../../utils/buildCert'
 
 const AuthCCPanel = (props) => {
   const {onWaiting, onError, getters, setters, handleInputCreds} = props
@@ -15,23 +15,18 @@ const AuthCCPanel = (props) => {
   const [ccColdInputValue, setCCColdCredInputValue] = useState('')
   const [ccHotInputValue, setCCHotCredInputValue] = useState('')
 
-  const buildCCAuthCert = () => {
-    onWaiting(true)
-
-    // build CC auth cert
-    const certBuilder = getCertBuilder()
-    try {
-
+  const buildCCAuthCert = () =>
+    buildCert(getCertBuilder, {onWaiting, onError}, (certBuilder) => {
       // cold credential
       const coldCred = handleInputCreds(ccColdInputValue)
       if (coldCred == null) {
-        return null
+        return
       }
-      
+
       // hot credential
       const hotCred = handleInputCreds(ccHotInputValue)
       if (hotCred == null) {
-        return null
+        return
       }
 
       // Create cert object
@@ -40,13 +35,7 @@ const AuthCCPanel = (props) => {
       certBuilder.add(getCertOfNewCommitteeHotAuth(committeeHotAuthCert))
       // adding the cert to the certStorage
       handleAddingCertInTx(certBuilder)
-      onWaiting(false)
-    } catch (error) {
-      logger.error(error)
-      onWaiting(false)
-      onError()
-    }
-  }
+    })
 
   const panelProps = {
     buttonName: 'Build Cert',

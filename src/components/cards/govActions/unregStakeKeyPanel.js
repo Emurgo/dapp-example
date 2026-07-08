@@ -5,6 +5,7 @@ import CheckboxWithLabel from '../../checkboxWithLabel'
 import InputWithLabel from '../../inputWithLabel'
 import {protocolParams} from '../../../utils/networkConfig'
 import {getCertOfNewStakeDereg, getStakeKeyDeregCert, getStakeKeyDeregCertWithCoin} from '../../../utils/cslTools'
+import buildCert from '../../../utils/buildCert'
 
 const UnregisterStakeKeyPanel = (props) => {
   const {onWaiting, onError, getters, setters, handleInputCreds} = props
@@ -20,26 +21,15 @@ const UnregisterStakeKeyPanel = (props) => {
     logger.debug(`[dApp][UnregisterStakeKeyPanel] use Conway Stake Registration Certificate is set: ${!useConway}`)
   }
 
-  const buildUnregStakeKey = () => {
-    onWaiting(true)
-    const certBuilder = getCertBuilder()
-    try {
+  const buildUnregStakeKey = () =>
+    buildCert(getCertBuilder, {onWaiting, onError}, (certBuilder) => {
       const stakeCred = handleInputCreds(stakeKeyHash)
-      let stakeKeyDeregCert
-      if (useConway) {
-        stakeKeyDeregCert = getStakeKeyDeregCertWithCoin(stakeCred, stakeDepositRefundAmount)
-      } else {
-        stakeKeyDeregCert = getStakeKeyDeregCert(stakeCred)
-      }
+      const stakeKeyDeregCert = useConway
+        ? getStakeKeyDeregCertWithCoin(stakeCred, stakeDepositRefundAmount)
+        : getStakeKeyDeregCert(stakeCred)
       certBuilder.add(getCertOfNewStakeDereg(stakeKeyDeregCert))
       handleAddingCertInTx(certBuilder)
-      onWaiting(false)
-    } catch (error) {
-      logger.error(error)
-      onWaiting(false)
-      onError()
-    }
-  }
+    })
 
   const panelProps = {
     buttonName: 'Build Cert',

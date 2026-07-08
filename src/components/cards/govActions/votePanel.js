@@ -1,4 +1,3 @@
-import logger from '../../../utils/logger'
 import {useState} from 'react'
 import InputWithLabel from '../../inputWithLabel'
 import GovToolsPanel from '../govToolsPanel'
@@ -11,6 +10,7 @@ import {
 } from '../../../utils/cslTools'
 import SelectWithLabel from '../../selectWithLabel'
 import {getRandomHex} from '../../../utils/helpFunctions'
+import buildCert from '../../../utils/buildCert'
 
 const VotePanel = (props) => {
   const {onWaiting, onError, getters, setters, handleDrepId} = props
@@ -33,10 +33,8 @@ const VotePanel = (props) => {
     setVotingChoice(event.target.value)
   }
 
-  const buildVote = () => {
-    onWaiting(true)
-    const votingBuilder = getVotingBuilder()
-    try {
+  const buildVote = () =>
+    buildCert(getVotingBuilder, {onWaiting, onError}, (votingBuilder) => {
       // Getting voter
       const dRepCreds = handleDrepId(dRepIdInputValue)
       const voter = getVoter(dRepCreds)
@@ -55,13 +53,7 @@ const VotePanel = (props) => {
       // Add vote to vote builder
       votingBuilder.add(voter, govActionId, votingProcedure)
       handleAddingVotesInTx(votingBuilder)
-      onWaiting(false)
-    } catch (error) {
-      logger.error(error)
-      onWaiting(false)
-      onError()
-    }
-  }
+    })
 
   const panelProps = {
     buttonName: 'Build Vote',
