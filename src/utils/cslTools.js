@@ -240,6 +240,9 @@ export const getAssetName = (assetNameString) => wasm.AssetName.new(Buffer.from(
 
 export const getBech32AddressFromHex = (addressHex) => wasm.Address.from_bytes(hexToBytes(addressHex)).to_bech32()
 
+// Decode an array of hex addresses (as returned by the wallet) to bech32.
+export const hexArrayToBech32Addresses = (hexAddresses) => hexAddresses.map(getBech32AddressFromHex)
+
 export const getAddressFromBech32 = (bech32Value) => wasm.Address.from_bech32(bech32Value)
 
 export const getCslValue = (hexValue) => wasm.Value.from_hex(hexValue)
@@ -259,6 +262,9 @@ export const getUtxoFromHex = (hexUtxo) => {
   utxo.hex = hexUtxo
   return utxo
 }
+
+// Decode an array of hex UTxOs (as returned by the wallet) to UTxO objects.
+export const hexArrayToUtxos = (hexUtxos) => hexUtxos.map(getUtxoFromHex)
 
 export const getTransactionHashFromHex = (txHex) => wasm.TransactionHash.from_hex(txHex)
 

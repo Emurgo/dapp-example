@@ -1,4 +1,10 @@
-import {getCslValue, getUtxoFromHex, getBech32AddressFromHex, getPublicKeyFromHex} from './cslTools'
+import {
+  getCslValue,
+  getBech32AddressFromHex,
+  getPublicKeyFromHex,
+  hexArrayToBech32Addresses,
+  hexArrayToUtxos,
+} from './cslTools'
 
 // Returns the first element of a wallet-returned array, or throws a clear error
 // if the wallet returned nothing. Prevents `undefined` from flowing into CSL
@@ -19,13 +25,8 @@ export const getBalance = async (api) => {
 }
 
 export const getUTxOs = async (api, amountLovelaces, requestParam = {page: 0, limit: 20}) => {
-  const utxos = []
   const hexUtxos = await api.getUtxos(amountLovelaces, requestParam)
-  for (const hexUtxo of hexUtxos) {
-    const utxo = getUtxoFromHex(hexUtxo)
-    utxos.push(utxo)
-  }
-  return utxos
+  return hexArrayToUtxos(hexUtxos)
 }
 
 export const getChangeAddress = async (api) => {
@@ -35,11 +36,7 @@ export const getChangeAddress = async (api) => {
 
 export const getRewardAddress = async (api) => {
   const hexAddresses = await api.getRewardAddresses()
-  const addresses = []
-  for (const hexAddr of hexAddresses) {
-    addresses.push(getBech32AddressFromHex(hexAddr))
-  }
-  return addresses[0]
+  return hexArrayToBech32Addresses(hexAddresses)[0]
 }
 
 export const getPubDRepKey = async (api) => {
@@ -79,20 +76,12 @@ export const getUnregPubStakeKey = async (api) => {
 export const getUsedAddress = async (api) => {
   const requestParam = {page: 0, limit: 1}
   const hexAddresses = await api.getUsedAddresses(requestParam)
-  const addresses = []
-  for (const hexAddr of hexAddresses) {
-    addresses.push(getBech32AddressFromHex(hexAddr))
-  }
-  return addresses[0]
+  return hexArrayToBech32Addresses(hexAddresses)[0]
 }
 
 export const getUnusedAddress = async (api) => {
   const hexAddresses = await api.getUnusedAddresses()
-  const addresses = []
-  for (const hexAddr of hexAddresses) {
-    addresses.push(getBech32AddressFromHex(hexAddr))
-  }
-  return addresses[0]
+  return hexArrayToBech32Addresses(hexAddresses)[0]
 }
 
 const randomBytes = (count) => {

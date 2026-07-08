@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
 import {ModalWindowContent} from '../ui-constants'
 import InputWithLabel from '../inputWithLabel'
-import {getAmountInHex, getUtxoFromHex} from '../../utils/cslTools'
+import {getAmountInHex, hexArrayToUtxos} from '../../utils/cslTools'
 import runApiCall from '../../utils/runApiCall'
 
 const GetCollateralUtxosCard = ({api, onRawResponse, onResponse, onWaiting}) => {
@@ -11,7 +11,7 @@ const GetCollateralUtxosCard = ({api, onRawResponse, onResponse, onWaiting}) => 
   const getCollateralUtxosClick = () => {
     const amountInHex = getCollateralUtxosInput ? getAmountInHex(getCollateralUtxosInput) : undefined
     return runApiCall(() => api.getCollateral(amountInHex), {onRawResponse, onResponse, onWaiting}, {
-      parse: (hexUtxos) => hexUtxos.map(getUtxoFromHex),
+      parse: hexArrayToUtxos,
     })
   }
 

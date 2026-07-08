@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {getBech32AddressFromHex} from '../../utils/cslTools'
+import {hexArrayToBech32Addresses} from '../../utils/cslTools'
 import ApiCardWithModal from './apiCardWithModal'
 import InputWithLabel from '../inputWithLabel'
 import runApiCall from '../../utils/runApiCall'
@@ -9,7 +9,7 @@ const GetUsedAddresses = ({api, onRawResponse, onResponse, onWaiting}) => {
 
   const getUsedAddressesClick = () =>
     runApiCall(() => api.getUsedAddresses(usedAddressInput), {onRawResponse, onResponse, onWaiting}, {
-      parse: (hexAddresses) => hexAddresses.map(getBech32AddressFromHex),
+      parse: hexArrayToBech32Addresses,
     })
 
   const apiProps = {

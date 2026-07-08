@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import ApiCardWithModal from './apiCardWithModal'
 import {ModalWindowContent} from '../ui-constants'
 import InputWithLabel from '../inputWithLabel'
-import {getUtxoFromHex} from '../../utils/cslTools'
+import {hexArrayToUtxos} from '../../utils/cslTools'
 import runApiCall from '../../utils/runApiCall'
 
 const GetUtxosCard = ({api, onRawResponse, onResponse, onWaiting}) => {
@@ -12,7 +12,7 @@ const GetUtxosCard = ({api, onRawResponse, onResponse, onWaiting}) => {
     runApiCall(
       () => api.getUtxos(getUtxosInput.amount, {page: getUtxosInput.page, limit: getUtxosInput.limit}),
       {onRawResponse, onResponse, onWaiting},
-      {parse: (hexUtxos) => hexUtxos.map(getUtxoFromHex)},
+      {parse: hexArrayToUtxos},
     )
 
   const apiProps = {
