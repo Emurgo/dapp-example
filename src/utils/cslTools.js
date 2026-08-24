@@ -9,6 +9,13 @@ export const toInt = (numberInStr) => wasm.Int.from_str(numberInStr)
 
 export const strToBigNum = (numberIsStr) => wasm.BigNum.from_str(numberIsStr)
 
+// Protocol params express the UTxO cost per WORD; every CSL API we use wants it
+// per BYTE. Derived once so the tx builder and min-ada calculations can never
+// drift apart.
+export const coinsPerUtxoByte = Math.floor(parseFloat(protocolParams.coinsPerUtxoWord) / 8).toString(10)
+
+export const getDataCost = () => wasm.DataCost.new_coins_per_byte(strToBigNum(coinsPerUtxoByte))
+
 export const getSecretKey = () => wasm.Bip32PrivateKey.generate_ed25519_bip32()
 
 export const getTxBuilder = () => {
@@ -22,7 +29,7 @@ export const getTxBuilder = () => {
       )
       .pool_deposit(strToBigNum(protocolParams.poolDeposit))
       .key_deposit(strToBigNum(protocolParams.keyDeposit))
-      .coins_per_utxo_byte(strToBigNum(Math.floor(parseFloat(protocolParams.coinsPerUtxoWord) / 8).toString(10)))
+      .coins_per_utxo_byte(strToBigNum(coinsPerUtxoByte))
       .max_value_size(protocolParams.maxValueSize)
       .max_tx_size(protocolParams.maxTxSize)
       .ex_unit_prices(
@@ -211,6 +218,82 @@ export const getTransactionOutputBuilder = (wasmChangeAddress) =>
 
 export const getAssetName = (assetNameString) => wasm.AssetName.new(Buffer.from(assetNameString, 'utf8'))
 
+// CIP-67 asset names are raw bytes (a 4-byte label prefix + the utf8 name), so
+// they are built from hex rather than from a utf8 string.
+export const getAssetNameFromHex = (assetNameHex) => wasm.AssetName.new(hexToBytes(assetNameHex))
+
+// ---- Minting (MintBuilder) ----
+// Used instead of TransactionBuilder.add_mint_asset_and_output_min_required_coin
+// when several assets must land in ONE shared output: that helper creates a
+// separate output (and therefore a separate min-ada deposit) per asset.
+
+export const getMintBuilder = () => wasm.MintBuilder.new()
+
+export const getNativeScriptMintWitness = (wasmNativeScript) =>
+  wasm.MintWitness.new_native_script(wasm.NativeScriptSource.new(wasmNativeScript))
+
+// Builds a MultiAsset holding `assets` ([{assetName, quantity}]) under one policy.
+export const getMultiAssetForPolicy = (wasmScriptHash, assets) => {
+  const multiasset = wasm.MultiAsset.new()
+  const wasmAssets = wasm.Assets.new()
+  for (const {assetName, quantity} of assets) {
+    wasmAssets.insert(assetName, strToBigNum(quantity))
+  }
+  multiasset.insert(wasmScriptHash, wasmAssets)
+  return multiasset
+}
+
+// Output carrying `multiasset` with the exact min-ada for its size. `plutusData`
+// (optional) is attached as an INLINE datum — required for the CIP-68 reference
+// token, whose metadata lives in the datum instead of in tx metadata.
+export const buildAssetOutputWithMinCoin = (wasmAddress, multiasset, plutusData) => {
+  const outputBuilder = wasm.TransactionOutputBuilder.new().with_address(wasmAddress)
+  const withData = plutusData ? outputBuilder.with_plutus_data(plutusData) : outputBuilder
+  return withData.next().with_asset_and_min_required_coin_by_utxo_cost(multiasset, getDataCost()).build()
+}
+
+// ---- CIP-68 datum ----
+
+const getPlutusBytes = (value) => wasm.PlutusData.new_bytes(Buffer.from(value, 'utf8'))
+
+const getPlutusInt = (value) => wasm.PlutusData.new_integer(wasm.BigInt.from_str(value.toString(10)))
+
+// CIP-68 reference-token datum: constr 0 [ {metadata}, version ].
+// `fields` is a plain object of utf8 keys to string (bytes) or number (int) values.
+export const getCip68Datum = (fields, version = 1) => {
+  const metadataMap = wasm.PlutusMap.new()
+  for (const [key, value] of Object.entries(fields)) {
+    const mapValues = wasm.PlutusMapValues.new()
+    mapValues.add(typeof value === 'number' ? getPlutusInt(value) : getPlutusBytes(value))
+    metadataMap.insert(getPlutusBytes(key), mapValues)
+  }
+  const datumFields = wasm.PlutusList.new()
+  datumFields.add(wasm.PlutusData.new_map(metadataMap))
+  datumFields.add(getPlutusInt(version))
+  return wasm.PlutusData.new_constr_plutus_data(wasm.ConstrPlutusData.new(strToBigNum('0'), datumFields))
+}
+
+// ---- Tx chaining ----
+// A wallet's getUtxos() still reports the pre-submission set until a tx is
+// confirmed, so a follow-up tx built from it would double-spend. These helpers
+// let the caller advance the UTxO set locally between chained transactions.
+
+export const getInputKeysFromBody = (txBody) => {
+  const keys = new Set()
+  const inputs = txBody.inputs()
+  for (let i = 0; i < inputs.len(); i++) {
+    const input = inputs.get(i)
+    keys.add(`${input.transaction_id().to_hex()}#${input.index()}`)
+  }
+  return keys
+}
+
+export const getUnspentOutputHex = (txHashHex, outputIndex, wasmOutput) =>
+  wasm.TransactionUnspentOutput.new(
+    wasm.TransactionInput.new(getTransactionHashFromHex(txHashHex), outputIndex),
+    wasmOutput,
+  ).to_hex()
+
 export const getBech32AddressFromHex = (addressHex) => wasm.Address.from_bytes(hexToBytes(addressHex)).to_bech32()
 
 // Decode an array of hex addresses (as returned by the wallet) to bech32.
@@ -254,7 +337,6 @@ export const getPublicKeyFromHex = (publicKeyHex) => wasm.PublicKey.from_hex(pub
 export const keyHashFromHex = (hexValue) => wasm.Ed25519KeyHash.from_hex(hexValue)
 
 export const keyHashFromBech32 = (bech32Value) => wasm.Ed25519KeyHash.from_bech32(bech32Value)
-
 export const getCslCredentialFromHex = (hexValue) => {
   logger.debug('[cslTools][getCslCredentialFromHex]::hexValue', hexValue)
   const keyHash = keyHashFromHex(hexValue)
@@ -386,7 +468,6 @@ export const getStakeKeyDeregCert = (stakeCred) => wasm.StakeDeregistration.new(
 
 export const getCertOfNewStakeDereg = (stakeKeyDeregCert) =>
   wasm.Certificate.new_stake_deregistration(stakeKeyDeregCert)
-
 // Committee Hot Authorization Certificate
 export const getCommitteeHotAuth = (coldCred, hotCred) => wasm.CommitteeHotAuth.new(coldCred, hotCred)
 
