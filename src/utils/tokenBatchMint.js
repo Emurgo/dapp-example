@@ -29,7 +29,8 @@ import {CIP67_FUNGIBLE_TOKEN_PREFIX, CIP67_REFERENCE_NFT_PREFIX} from './tokenBa
 // transaction instead of once per token.
 
 // CIP-25 stores a field as a plain string when it fits in one 64-byte chunk, or
-// as an array of <=64-byte chunks when longer.
+// as an array of <=64-byte chunks when longer. Applied to ticker and description
+// (asset `name` is already capped at 32 bytes).
 const sliceBy64Bytes = (value) => {
   const chunks = chunkMessageTo64Bytes(value)
   return chunks.length <= 1 ? value : chunks
@@ -88,7 +89,7 @@ export const buildBatchChunkTx = ({chunk, hexUtxos, changeAddressHex, usedAddres
       pooledAssets.push({assetName: wasmAssetName, quantity: token.quantity})
       metadata[policyId][token.assetName] = {
         name: token.assetName,
-        ticker: token.ticker,
+        ticker: sliceBy64Bytes(token.ticker),
         description: sliceBy64Bytes(token.description),
       }
     }
@@ -120,12 +121,13 @@ export const buildBatchChunkTx = ({chunk, hexUtxos, changeAddressHex, usedAddres
 
 /**
  * Advances the local UTxO set after a chunk is submitted: drops the inputs the
- * transaction spent and adds back its change output as a synthetic UTxO. The
+ * transaction spent and adds back its change outputs as synthetic UTxOs. The
  * wallet cannot do this for us — getUtxos() keeps reporting the pre-submission
  * set until the transaction is confirmed, so the next chunk would double-spend.
  *
- * The pooled mint output is deliberately NOT added back: it holds the freshly
- * minted assets, and there is no reason for a later chunk to spend them.
+ * The pooled mint output (and any CIP-68 reference outputs) are deliberately
+ * NOT added back: they hold the freshly minted assets, and later chunks have
+ * no reason to spend them.
  */
 export const chainUtxosAfterTx = ({fixedTx, hexUtxos, explicitOutputCount}) => {
   const body = fixedTx.body()
@@ -136,12 +138,17 @@ export const chainUtxosAfterTx = ({fixedTx, hexUtxos, explicitOutputCount}) => {
   })
 
   const outputs = body.outputs()
-  if (outputs.len() > explicitOutputCount) {
-    // add_change_if_needed appends the change output last.
-    const changeIndex = outputs.len() - 1
-    remaining.push(getUnspentOutputHex(fixedTx.transaction_hash().to_hex(), changeIndex, outputs.get(changeIndex)))
-  } else {
+  if (outputs.len() <= explicitOutputCount) {
     logger.debug('[tokenBatchMint][chainUtxosAfterTx] no change output produced — nothing to chain forward')
+    return remaining
+  }
+
+  // add_change_if_needed appends change after the explicit mint/reference
+  // outputs. Leftover multi-assets can force several change UTxOs when one
+  // would exceed maxValueSize — chain every one of them, not only the last.
+  const txHashHex = fixedTx.transaction_hash().to_hex()
+  for (let changeIndex = explicitOutputCount; changeIndex < outputs.len(); changeIndex++) {
+    remaining.push(getUnspentOutputHex(txHashHex, changeIndex, outputs.get(changeIndex)))
   }
 
   return remaining
