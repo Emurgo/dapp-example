@@ -48,7 +48,9 @@ describe('DelegateCard', () => {
 
     expect(screen.getByText('Delegate to Pool')).toBeInTheDocument()
     expect(screen.getByLabelText('Pool ID')).toBeInTheDocument()
+    expect(screen.getByLabelText('Blockfrost Project ID')).toBeInTheDocument()
     expect(screen.getByRole('button', {name: 'Send'})).toBeDisabled()
+    expect(screen.getByRole('button', {name: 'Get Account info'})).toBeDisabled()
 
     fireEvent.change(screen.getByLabelText('Pool ID'), {
       target: {value: 'deadbeef01234567890abcdef01234567890abcdef01234567890abc'},
@@ -59,21 +61,21 @@ describe('DelegateCard', () => {
   it('shows current pool info after Get Account info succeeds', async () => {
     fetchAccountInfo.mockResolvedValue({
       ok: true,
-      json: async () => ({
-        aabbcc: {stakeRegistered: true, delegation: 'pool1abc'},
-      }),
+      stakeRegistered: true,
+      delegation: 'pool1abc',
     })
 
     render(<DelegateCard api={api} onRawResponse={() => {}} onResponse={() => {}} onWaiting={() => {}} />)
     await waitFor(() => expect(api.getNetworkId).toHaveBeenCalled())
 
+    fireEvent.change(screen.getByLabelText('Blockfrost Project ID'), {target: {value: 'mainnetProjectId'}})
     fireEvent.click(screen.getByRole('button', {name: 'Get Account info'}))
 
     await waitFor(() => {
       expect(screen.getByText(/Stake key registered: yes/)).toBeInTheDocument()
     })
     expect(screen.getByText(/Current pool: pool1abc/)).toBeInTheDocument()
-    expect(fetchAccountInfo).toHaveBeenCalledWith('mainnet', 'aabbcc')
+    expect(fetchAccountInfo).toHaveBeenCalledWith('mainnet', 'aabbcc', 'mainnetProjectId')
   })
 
   it('shows an error when account info cannot be loaded', async () => {
@@ -82,6 +84,7 @@ describe('DelegateCard', () => {
     render(<DelegateCard api={api} onRawResponse={() => {}} onResponse={() => {}} onWaiting={() => {}} />)
     await waitFor(() => expect(api.getNetworkId).toHaveBeenCalled())
 
+    fireEvent.change(screen.getByLabelText('Blockfrost Project ID'), {target: {value: 'mainnetProjectId'}})
     fireEvent.click(screen.getByRole('button', {name: 'Get Account info'}))
 
     await waitFor(() => {

@@ -17,10 +17,11 @@ import {useEffect, useState} from 'react'
 import {fetchAccountInfo, getTxBuilderWithWithdrawal} from './logic/withdraw'
 import {firstOrThrow} from '../../../utils/helpFunctions'
 import CheckboxWithLabel from '../../checkboxWithLabel'
+import InputWithLabel from '../../inputWithLabel'
 
 const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [networkType, setNetworkType] = useState('preprod')
-  const [showNetworkSelection, setShowNetworkSelection] = useState(false)
+  const [projectId, setProjectId] = useState('')
   const [waitingAccountInfo, setWaitingAccountInfo] = useState(false)
   const [isDelegated, setIsDelegated] = useState(false)
   const [rewardAmount, setRewardAmount] = useState('0')
@@ -29,19 +30,13 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [showSuccessInfo, setShowSuccessInfo] = useState(false)
   const [undelegate, setUndelegate] = useState(false)
 
-  const handleNetworkSelection = async () => {
-    const walletNetworkId = await api?.getNetworkId()
-    if (walletNetworkId === 1) {
-      setNetworkType('mainnet')
-      setShowNetworkSelection(false)
-    } else if (walletNetworkId === 0) {
-      setShowNetworkSelection(true)
-    }
-  }
-
   useEffect(() => {
-    handleNetworkSelection()
-  })
+    const selectNetwork = async () => {
+      const walletNetworkId = await api?.getNetworkId()
+      setNetworkType(walletNetworkId === 1 ? 'mainnet' : 'preprod')
+    }
+    selectNetwork()
+  }, [api])
 
   const getAccountInfo = async () => {
     setWaitingAccountInfo(true)
@@ -50,14 +45,12 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
 
     try {
       const rewardAddressHex = firstOrThrow(await api?.getRewardAddresses(), 'No reward address available from wallet')
-      const delegationInfoResponse = await fetchAccountInfo(networkType, rewardAddressHex)
+      const delegationInfo = await fetchAccountInfo(networkType, rewardAddressHex, projectId)
 
-      if (!delegationInfoResponse.ok) {
+      if (!delegationInfo.ok) {
         setErrorMessage('Something went wrong while getting delegation info')
         return
       }
-
-      const delegationInfo = (await delegationInfoResponse.json())[rewardAddressHex]
 
       if (!delegationInfo.stakeRegistered) {
         setErrorMessage('Staking key is not registered!')
@@ -142,40 +135,6 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   return (
     <ApiCardWithModal {...apiProps}>
       <div className={ModalWindowContent.contentPadding}>
-        {showNetworkSelection && !waitingAccountInfo && (
-          <div className="mb-4">
-            <div className="text-white mb-2">Select Network:</div>
-            <div className="flex items-center space-x-4 justify-evenly">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="form-radio text-blue-600"
-                  name="network"
-                  value="preprod"
-                  checked={networkType === 'preprod'}
-                  onChange={(e) => {
-                    setNetworkType(e.target.value)
-                  }}
-                />
-                <span className="ml-2 text-white">Preprod</span>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="form-radio text-blue-600"
-                  name="network"
-                  value="preview"
-                  checked={networkType === 'preview'}
-                  onChange={(e) => {
-                    setNetworkType(e.target.value)
-                  }}
-                />
-                <span className="ml-2 text-white">Preview</span>
-              </label>
-            </div>
-          </div>
-        )}
-
         {waitingAccountInfo ? (
           <div className="flex justify-center items-center py-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
@@ -199,12 +158,19 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
               </div>
             )}
 
+            <InputWithLabel
+              inputName="Blockfrost Project ID"
+              helpText="project_id from blockfrost.io for this network"
+              inputValue={projectId}
+              onChangeFunction={(event) => setProjectId(event.target.value)}
+            />
+
             <div className="flex">
               <div className="flex-auto mt-3 mx-2">
                 <button
                   className="w-full py-1 rounded-md text-xl text-white font-semibold bg-green-700 hover:bg-green-800 active:bg-green-500"
                   onClick={getAccountInfo}
-                  disabled={waitingAccountInfo}
+                  disabled={waitingAccountInfo || projectId.trim().length === 0}
                 >
                   Get Account info
                 </button>

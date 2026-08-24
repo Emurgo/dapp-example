@@ -10,7 +10,7 @@ import {buildDelegationTx, getStakeKeyHashFromPubKey, resolveDelegationStakeKey}
 
 const DelegateCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [networkType, setNetworkType] = useState('preprod')
-  const [showNetworkSelection, setShowNetworkSelection] = useState(false)
+  const [projectId, setProjectId] = useState('')
   const [waitingAccountInfo, setWaitingAccountInfo] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [showSuccessInfo, setShowSuccessInfo] = useState(false)
@@ -21,12 +21,7 @@ const DelegateCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   useEffect(() => {
     const selectNetwork = async () => {
       const walletNetworkId = await api?.getNetworkId()
-      if (walletNetworkId === 1) {
-        setNetworkType('mainnet')
-        setShowNetworkSelection(false)
-      } else if (walletNetworkId === 0) {
-        setShowNetworkSelection(true)
-      }
+      setNetworkType(walletNetworkId === 1 ? 'mainnet' : 'preprod')
     }
     selectNetwork()
   }, [api])
@@ -38,14 +33,13 @@ const DelegateCard = ({api, onRawResponse, onResponse, onWaiting}) => {
 
     try {
       const rewardAddressHex = firstOrThrow(await api?.getRewardAddresses(), 'No reward address available from wallet')
-      const delegationInfoResponse = await fetchAccountInfo(networkType, rewardAddressHex)
+      const delegationInfo = await fetchAccountInfo(networkType, rewardAddressHex, projectId)
 
-      if (!delegationInfoResponse.ok) {
+      if (!delegationInfo.ok) {
         setErrorMessage('Something went wrong while getting delegation info')
         return
       }
 
-      const delegationInfo = (await delegationInfoResponse.json())[rewardAddressHex]
       setStakeRegistered(Boolean(delegationInfo.stakeRegistered))
       setStakePool(delegationInfo.delegation || '')
       setShowSuccessInfo(true)
@@ -105,40 +99,6 @@ const DelegateCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   return (
     <ApiCardWithModal {...apiProps}>
       <div className={ModalWindowContent.contentPadding}>
-        {showNetworkSelection && !waitingAccountInfo && (
-          <div className="mb-4">
-            <div className="text-white mb-2">Select Network:</div>
-            <div className="flex items-center space-x-4 justify-evenly">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="form-radio text-blue-600"
-                  name="delegateNetwork"
-                  value="preprod"
-                  checked={networkType === 'preprod'}
-                  onChange={(e) => {
-                    setNetworkType(e.target.value)
-                  }}
-                />
-                <span className="ml-2 text-white">Preprod</span>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="form-radio text-blue-600"
-                  name="delegateNetwork"
-                  value="preview"
-                  checked={networkType === 'preview'}
-                  onChange={(e) => {
-                    setNetworkType(e.target.value)
-                  }}
-                />
-                <span className="ml-2 text-white">Preview</span>
-              </label>
-            </div>
-          </div>
-        )}
-
         {waitingAccountInfo ? (
           <div className="flex justify-center items-center py-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
@@ -155,6 +115,13 @@ const DelegateCard = ({api, onRawResponse, onResponse, onWaiting}) => {
             )}
 
             <InputWithLabel
+              inputName="Blockfrost Project ID"
+              helpText="project_id from blockfrost.io for this network"
+              inputValue={projectId}
+              onChangeFunction={(event) => setProjectId(event.target.value)}
+            />
+
+            <InputWithLabel
               inputName="Pool ID"
               helpText="bech32 pool1… ID or 56-character hex pool key hash"
               inputValue={poolId}
@@ -166,7 +133,7 @@ const DelegateCard = ({api, onRawResponse, onResponse, onWaiting}) => {
                 <button
                   className="w-full py-1 rounded-md text-xl text-white font-semibold bg-green-700 hover:bg-green-800 active:bg-green-500"
                   onClick={getAccountInfo}
-                  disabled={waitingAccountInfo}
+                  disabled={waitingAccountInfo || projectId.trim().length === 0}
                 >
                   Get Account info
                 </button>
