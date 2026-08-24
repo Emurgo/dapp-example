@@ -4,6 +4,7 @@ import {hexToBytes, bytesToHex, wasmMultiassetToJSONs} from './utils'
 import {Buffer} from 'buffer'
 import * as wasm from '@emurgo/cardano-serialization-lib-browser'
 import {bech32} from 'bech32'
+import {classifyPoolId} from './poolId'
 
 export const toInt = (numberInStr) => wasm.Int.from_str(numberInStr)
 
@@ -337,6 +338,12 @@ export const getPublicKeyFromHex = (publicKeyHex) => wasm.PublicKey.from_hex(pub
 export const keyHashFromHex = (hexValue) => wasm.Ed25519KeyHash.from_hex(hexValue)
 
 export const keyHashFromBech32 = (bech32Value) => wasm.Ed25519KeyHash.from_bech32(bech32Value)
+
+export const getPoolKeyHash = (poolId) => {
+  const classified = classifyPoolId(poolId)
+  return classified.format === 'hex' ? keyHashFromHex(classified.value) : keyHashFromBech32(classified.value)
+}
+
 export const getCslCredentialFromHex = (hexValue) => {
   logger.debug('[cslTools][getCslCredentialFromHex]::hexValue', hexValue)
   const keyHash = keyHashFromHex(hexValue)
@@ -468,6 +475,12 @@ export const getStakeKeyDeregCert = (stakeCred) => wasm.StakeDeregistration.new(
 
 export const getCertOfNewStakeDereg = (stakeKeyDeregCert) =>
   wasm.Certificate.new_stake_deregistration(stakeKeyDeregCert)
+
+// Stake Delegation Certificate
+export const getStakeDelegCert = (stakeCred, poolKeyHash) => wasm.StakeDelegation.new(stakeCred, poolKeyHash)
+
+export const getCertOfNewStakeDelegation = (stakeDelegCert) => wasm.Certificate.new_stake_delegation(stakeDelegCert)
+
 // Committee Hot Authorization Certificate
 export const getCommitteeHotAuth = (coldCred, hotCred) => wasm.CommitteeHotAuth.new(coldCred, hotCred)
 
