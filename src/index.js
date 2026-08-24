@@ -9,6 +9,8 @@ import {BitcoinProvider} from './hooks/bitcoinProvider'
 import {ToastProvider} from './hooks/toastProvider'
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 
+const routerBasename = process.env.PUBLIC_URL || undefined
+
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
@@ -17,7 +19,7 @@ root.render(
         <CardanoProvider>
           <EthereumProvider>
             <BitcoinProvider>
-              <BrowserRouter>
+              <BrowserRouter basename={routerBasename}>
                 <Routes>
                   <Route path="/*" element={<App />} />
                 </Routes>
