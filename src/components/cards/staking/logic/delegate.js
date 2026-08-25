@@ -7,16 +7,10 @@ import {
   getCslUtxos,
   getLargestFirstMultiAsset,
   getPoolKeyHash,
-  getPublicKeyFromHex,
   getStakeDelegCert,
   getStakeKeyRegCert,
   getTxBuilder,
 } from '../../../../utils/cslTools'
-import {resolveDelegationStakeKey} from './stakeKey'
-
-export {resolveDelegationStakeKey}
-
-export const getStakeKeyHashFromPubKey = (pubKeyHex) => getPublicKeyFromHex(pubKeyHex).hash().to_hex()
 
 export const buildDelegationTx = ({hexUtxos, changeAddressHex, stakeKeyHash, poolId, registerStakeKey}) => {
   const txBuilder = getTxBuilder()

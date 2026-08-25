@@ -7,8 +7,8 @@ import {
   getCslUtxos,
   getLargestFirstMultiAsset,
   getFixedTxFromBytes,
-  getPublicKeyFromHex,
   getStakeKeyDeregCert,
+  getStakeKeyHashFromRewardAddressHex,
   getTransactionWitnessSetFromBytes,
 } from '../../../utils/cslTools'
 import ApiCardWithModal from '../apiCardWithModal'
@@ -79,12 +79,8 @@ const WithdrawCard = ({api, onRawResponse, onResponse, onWaiting}) => {
     try {
       onWaiting(true)
       // build withdraw
-      const pubStakeKey = await api?.cip95.getRegisteredPubStakeKeys()
-      const stakeKeyHash = getPublicKeyFromHex(
-        firstOrThrow(pubStakeKey, 'No registered stake key available from wallet'),
-      )
-        .hash()
-        .to_hex()
+      const rewardAddressHex = firstOrThrow(await api?.getRewardAddresses(), 'No reward address available from wallet')
+      const stakeKeyHash = getStakeKeyHashFromRewardAddressHex(rewardAddressHex)
       const txBuilderWithWithdrawal = await getTxBuilderWithWithdrawal(stakeKeyHash, networkType, rewardAmount)
       const utxos = await api?.getUtxos()
 

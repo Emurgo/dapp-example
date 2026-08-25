@@ -212,6 +212,20 @@ export const getTransactionWitnessSetFromBytes = (witnessHex) =>
 
 export const getPubKeyHash = (usedAddress) => wasm.BaseAddress.from_address(usedAddress).payment_cred().to_keyhash()
 
+// CIP-30 getRewardAddresses() returns a stake (reward) address. Certificates and
+// withdrawals need the stake key hash from that address — not CIP-95 pub keys.
+export const getStakeKeyHashFromRewardAddressHex = (rewardAddressHex) => {
+  const rewardAddr = wasm.RewardAddress.from_address(getAddressFromBytes(rewardAddressHex))
+  if (!rewardAddr) {
+    throw new Error('Wallet did not return a reward address')
+  }
+  const keyHash = rewardAddr.payment_cred().to_keyhash()
+  if (!keyHash) {
+    throw new Error('Reward address does not contain a stake key hash')
+  }
+  return keyHash.to_hex()
+}
+
 export const getNativeScript = (pubKeyHash) => wasm.NativeScript.new_script_pubkey(wasm.ScriptPubkey.new(pubKeyHash))
 
 export const getTransactionOutputBuilder = (wasmChangeAddress) =>
