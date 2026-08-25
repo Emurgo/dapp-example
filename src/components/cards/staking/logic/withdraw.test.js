@@ -43,15 +43,12 @@ describe('fetchAccountInfo', () => {
       remainingAmount: '42',
     })
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      `https://cardano-mainnet.blockfrost.io/api/v0/accounts/${stakeBech32}`,
-      {
-        headers: {
-          accept: 'application/json',
-          project_id: projectId,
-        },
+    expect(global.fetch).toHaveBeenCalledWith(`https://cardano-mainnet.blockfrost.io/api/v0/accounts/${stakeBech32}`, {
+      headers: {
+        accept: 'application/json',
+        project_id: projectId,
       },
-    )
+    })
   })
 
   it('uses the preprod host for non-mainnet networks', async () => {
@@ -62,9 +59,7 @@ describe('fetchAccountInfo', () => {
     })
 
     await fetchAccountInfo('preprod', 'aabbcc', projectId)
-    expect(global.fetch.mock.calls[0][0]).toBe(
-      `https://cardano-preprod.blockfrost.io/api/v0/accounts/${stakeBech32}`,
-    )
+    expect(global.fetch.mock.calls[0][0]).toBe(`https://cardano-preprod.blockfrost.io/api/v0/accounts/${stakeBech32}`)
   })
 
   it('treats 404 as an unregistered stake key', async () => {

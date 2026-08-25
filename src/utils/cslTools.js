@@ -489,13 +489,17 @@ export const getCertOfNewCommitteeHotAuth = (committeeHotAuthCert) =>
 
 export const getCslRewardAddressFromHex = (networkType, rewardAddressHex) => {
   const networkId =
-    networkType === 'mainnet' ? wasm.NetworkInfo.mainnet().network_id() : wasm.NetworkInfo.testnet_preprod().network_id()
+    networkType === 'mainnet'
+      ? wasm.NetworkInfo.mainnet().network_id()
+      : wasm.NetworkInfo.testnet_preprod().network_id()
   return wasm.RewardAddress.new(networkId, wasm.Credential.from_hex(rewardAddressHex))
 }
 
 export const getCslRewardAddress = (networkType, stakeKeyHashCredential) => {
   const networkId =
-    networkType === 'mainnet' ? wasm.NetworkInfo.mainnet().network_id() : wasm.NetworkInfo.testnet_preprod().network_id()
+    networkType === 'mainnet'
+      ? wasm.NetworkInfo.mainnet().network_id()
+      : wasm.NetworkInfo.testnet_preprod().network_id()
   return wasm.RewardAddress.new(networkId, stakeKeyHashCredential)
 }
 
