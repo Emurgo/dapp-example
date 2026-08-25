@@ -2,6 +2,7 @@ import logger from '../utils/logger'
 import React, {useState, useEffect, useCallback, useMemo} from 'react'
 import useToast from './toastProvider'
 import useConnectionState from './useConnectionState'
+import {buildEnableOptions, isCip95Api} from '../utils/cip95'
 
 const CardanoContext = React.createContext(null)
 const reservedKeys = [
@@ -32,10 +33,12 @@ export const CardanoProvider = ({children}) => {
   const [api, setApi] = useState(null)
   const [availableWallets, setAvailableWallets] = useState([])
   const [selectedWallet, setSelectedWallet] = useState('')
+  const [cip95Available, setCip95Available] = useState(false)
 
   const setConnectionStateFalse = useCallback(() => {
     setNotConnected()
     setApi(null)
+    setCip95Available(false)
   }, [setNotConnected])
 
   const getAvailableWallets = () => {
@@ -61,6 +64,7 @@ export const CardanoProvider = ({children}) => {
     async (walletName, requestIdentification, silent, throwError = false) => {
       setInProgress()
       setApi(null)
+      setCip95Available(false)
       logger.debug(`[dApp][connect] is called`)
 
       if (!window.cardano) {
@@ -73,18 +77,18 @@ export const CardanoProvider = ({children}) => {
       logger.debug(`[dApp][connect] {requestIdentification: ${requestIdentification}, onlySilent: ${silent}}`)
 
       try {
-        const connectedApi = await window.cardano[walletName].enable({
-          requestIdentification,
-          onlySilent: silent,
-        })
+        const wallet = window.cardano[walletName]
+        const connectedApi = await wallet.enable(buildEnableOptions({requestIdentification, silent, wallet}))
         logger.debug(`[dApp][connect] wallet API object is received`)
         setApi(connectedApi)
+        setCip95Available(isCip95Api(connectedApi))
         setSelectedWallet(walletName)
         setConnected()
         return connectedApi
       } catch (error) {
         logger.error(`[dApp][connect] The error received while connecting the wallet`)
         setSelectedWallet('')
+        setCip95Available(false)
         setNotConnected()
         // Surface user-initiated connection failures; stay quiet on the silent
         // background reconnect so page load doesn't pop a toast.
@@ -163,6 +167,7 @@ export const CardanoProvider = ({children}) => {
   const disconnect = useCallback(() => {
     setApi(null)
     setSelectedWallet('')
+    setCip95Available(false)
     setNotConnected()
   }, [setNotConnected])
 
@@ -206,6 +211,7 @@ export const CardanoProvider = ({children}) => {
       availableWallets,
       setAvailableWallets,
       selectedWallet,
+      cip95Available,
       setConnectionState,
       setConnectionStateFalse,
       setSelectedWallet,
@@ -221,6 +227,7 @@ export const CardanoProvider = ({children}) => {
       connectionState,
       availableWallets,
       selectedWallet,
+      cip95Available,
       setConnectionState,
       setConnectionStateFalse,
     ],

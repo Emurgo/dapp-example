@@ -1,12 +1,16 @@
 import {useEffect, useState} from 'react'
 import logger from '../../../utils/logger'
-import {getFixedTxFromBytes, getTransactionWitnessSetFromBytes} from '../../../utils/cslTools'
+import {
+  getFixedTxFromBytes,
+  getStakeKeyHashFromRewardAddressHex,
+  getTransactionWitnessSetFromBytes,
+} from '../../../utils/cslTools'
 import ApiCardWithModal from '../apiCardWithModal'
 import {ModalWindowContent} from '../../ui-constants'
 import InputWithLabel from '../../inputWithLabel'
 import {firstOrThrow} from '../../../utils/helpFunctions'
 import {fetchAccountInfo} from './logic/withdraw'
-import {buildDelegationTx, getStakeKeyHashFromPubKey, resolveDelegationStakeKey} from './logic/delegate'
+import {buildDelegationTx} from './logic/delegate'
 
 const DelegateCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const [networkType, setNetworkType] = useState('preprod')
@@ -54,10 +58,8 @@ const DelegateCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const delegateClick = async () => {
     try {
       onWaiting(true)
-      const registeredPubKeys = (await api?.cip95.getRegisteredPubStakeKeys()) || []
-      const unregisteredPubKeys = (await api?.cip95.getUnregisteredPubStakeKeys()) || []
-      const {pubKeyHex, needsRegistration} = resolveDelegationStakeKey({registeredPubKeys, unregisteredPubKeys})
-      const stakeKeyHash = getStakeKeyHashFromPubKey(pubKeyHex)
+      const rewardAddressHex = firstOrThrow(await api?.getRewardAddresses(), 'No reward address available from wallet')
+      const stakeKeyHash = getStakeKeyHashFromRewardAddressHex(rewardAddressHex)
       const hexUtxos = await api?.getUtxos()
       const changeAddressHex = await api?.getChangeAddress()
       const tx = buildDelegationTx({
@@ -65,7 +67,7 @@ const DelegateCard = ({api, onRawResponse, onResponse, onWaiting}) => {
         changeAddressHex,
         stakeKeyHash,
         poolId,
-        registerStakeKey: needsRegistration,
+        registerStakeKey: !stakeRegistered,
       })
 
       const fixedTx = getFixedTxFromBytes(tx.to_bytes())
@@ -93,7 +95,7 @@ const DelegateCard = ({api, onRawResponse, onResponse, onWaiting}) => {
   const apiProps = {
     buttonLabel: 'Delegate to Pool',
     clickFunction: delegateClick,
-    btnDisabled: poolId.trim().length === 0,
+    btnDisabled: poolId.trim().length === 0 || !showSuccessInfo,
   }
 
   return (

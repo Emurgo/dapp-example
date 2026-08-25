@@ -8,6 +8,7 @@ import useNetwork, {NETWORK_CARDANO, NETWORK_ETHEREUM} from './hooks/networkProv
 import BitcoinAccessButton from './components/bitcoinAccessButton'
 import BitcoinMainTab from './components/tabs/bitcoinMainTab'
 import {CONNECTED, NO_PROVIDER} from './utils/connectionStates'
+import {isCip95Tab} from './utils/cip95'
 import NetworkToggle from './components/networkToggle'
 import EthereumAccessButton from './components/ethereumAccessButton'
 import EthereumMainTab from './components/tabs/ethereumMainTab'
@@ -25,7 +26,7 @@ import EthTransactionsTab from './components/tabs/subtabs/ethTransactionsTab'
 import Erc20Tab from './components/tabs/subtabs/erc20Tab'
 
 const App = () => {
-  const {connectionState, selectedWallet, setConnectionState, setConnectionStateFalse} = useCardano()
+  const {connectionState, selectedWallet, setConnectionState, setConnectionStateFalse, cip95Available} = useCardano()
   const {activeNetwork} = useNetwork()
   const isWalletConnected = connectionState === CONNECTED
   const isNoProvider = connectionState === NO_PROVIDER
@@ -119,7 +120,7 @@ const App = () => {
       value: 'testTxs',
       children: <TestTxsTab />,
     },
-  ]
+  ].filter((tab) => cip95Available || !isCip95Tab(tab.value))
 
   const ethereumTabsData = [
     {
