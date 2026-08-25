@@ -488,31 +488,19 @@ export const getCertOfNewCommitteeHotAuth = (committeeHotAuthCert) =>
   wasm.Certificate.new_committee_hot_auth(committeeHotAuthCert)
 
 export const getCslRewardAddressFromHex = (networkType, rewardAddressHex) => {
-  switch (networkType) {
-    case 'mainnet':
-      return wasm.RewardAddress.new(wasm.NetworkInfo.mainnet().network_id(), wasm.Credential.from_hex(rewardAddressHex))
-    case 'preview':
-      return wasm.RewardAddress.new(
-        wasm.NetworkInfo.testnet_preview().network_id(),
-        wasm.Credential.from_hex(rewardAddressHex),
-      )
-    default:
-      return wasm.RewardAddress.new(
-        wasm.NetworkInfo.testnet_preprod().network_id(),
-        wasm.Credential.from_hex(rewardAddressHex),
-      )
-  }
+  const networkId =
+    networkType === 'mainnet'
+      ? wasm.NetworkInfo.mainnet().network_id()
+      : wasm.NetworkInfo.testnet_preprod().network_id()
+  return wasm.RewardAddress.new(networkId, wasm.Credential.from_hex(rewardAddressHex))
 }
 
 export const getCslRewardAddress = (networkType, stakeKeyHashCredential) => {
-  switch (networkType) {
-    case 'mainnet':
-      return wasm.RewardAddress.new(wasm.NetworkInfo.mainnet().network_id(), stakeKeyHashCredential)
-    case 'preview':
-      return wasm.RewardAddress.new(wasm.NetworkInfo.testnet_preview().network_id(), stakeKeyHashCredential)
-    default:
-      return wasm.RewardAddress.new(wasm.NetworkInfo.testnet_preprod().network_id(), stakeKeyHashCredential)
-  }
+  const networkId =
+    networkType === 'mainnet'
+      ? wasm.NetworkInfo.mainnet().network_id()
+      : wasm.NetworkInfo.testnet_preprod().network_id()
+  return wasm.RewardAddress.new(networkId, stakeKeyHashCredential)
 }
 
 export const getWithdrawalsBuilder = () => wasm.WithdrawalsBuilder.new()

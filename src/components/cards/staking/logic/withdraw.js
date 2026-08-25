@@ -1,4 +1,5 @@
 import {
+  getBech32AddressFromHex,
   getCslCredentialFromHex,
   getCslRewardAddress,
   getTxBuilder,
@@ -6,25 +7,49 @@ import {
   strToBigNum,
 } from '../../../../utils/cslTools'
 
-export const fetchAccountInfo = async (networkType, rewardAddressHex) => {
-  let backendUrl = ''
-  if (networkType === 'mainnet') {
-    backendUrl = 'api.yoroiwallet.com'
-  } else if (networkType === 'preview') {
-    backendUrl = 'preview-backend.emurgornd.com'
-  } else {
-    backendUrl = 'preprod-backend.yoroiwallet.com'
+const BLOCKFROST_BASE_URL = {
+  mainnet: 'https://cardano-mainnet.blockfrost.io/api/v0',
+  preprod: 'https://cardano-preprod.blockfrost.io/api/v0',
+}
+
+const unregisteredAccount = () => ({
+  ok: true,
+  stakeRegistered: false,
+  delegation: '',
+  remainingAmount: '0',
+})
+
+export const fetchAccountInfo = async (networkType, rewardAddressHex, projectId) => {
+  if (!projectId?.trim()) {
+    return {ok: false}
   }
 
-  const endpointUrl = `https://${backendUrl}/api/account/state`
-  return await fetch(endpointUrl, {
+  const baseUrl = BLOCKFROST_BASE_URL[networkType] || BLOCKFROST_BASE_URL.preprod
+  const stakeAddress = getBech32AddressFromHex(rewardAddressHex)
+  const endpointUrl = `${baseUrl}/accounts/${stakeAddress}`
+
+  const response = await fetch(endpointUrl, {
     headers: {
-      accept: 'application/json, text/plain, */*',
-      'content-type': 'application/json',
+      accept: 'application/json',
+      project_id: projectId.trim(),
     },
-    body: `{"addresses":["${rewardAddressHex}"]}`,
-    method: 'POST',
   })
+
+  if (response.status === 404) {
+    return unregisteredAccount()
+  }
+
+  if (!response.ok) {
+    return {ok: false}
+  }
+
+  const data = await response.json()
+  return {
+    ok: true,
+    stakeRegistered: Boolean(data.registered ?? data.active),
+    delegation: data.pool_id || '',
+    remainingAmount: data.withdrawable_amount || '0',
+  }
 }
 
 export const getTxBuilderWithWithdrawal = async (stakeKeyHash, networkType, rewardAmount) => {
