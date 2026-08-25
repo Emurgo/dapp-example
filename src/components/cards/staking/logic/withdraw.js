@@ -46,7 +46,7 @@ export const fetchAccountInfo = async (networkType, rewardAddressHex, projectId)
   const data = await response.json()
   return {
     ok: true,
-    stakeRegistered: Boolean(data.active),
+    stakeRegistered: Boolean(data.registered ?? data.active),
     delegation: data.pool_id || '',
     remainingAmount: data.withdrawable_amount || '0',
   }

@@ -30,6 +30,7 @@ describe('fetchAccountInfo', () => {
       ok: true,
       status: 200,
       json: async () => ({
+        registered: true,
         active: true,
         pool_id: 'pool1abc',
         withdrawable_amount: '42',
@@ -55,11 +56,31 @@ describe('fetchAccountInfo', () => {
     global.fetch.mockResolvedValue({
       ok: true,
       status: 200,
-      json: async () => ({active: false, pool_id: null, withdrawable_amount: '0'}),
+      json: async () => ({registered: false, active: false, pool_id: null, withdrawable_amount: '0'}),
     })
 
     await fetchAccountInfo('preprod', 'aabbcc', projectId)
     expect(global.fetch.mock.calls[0][0]).toBe(`https://cardano-preprod.blockfrost.io/api/v0/accounts/${stakeBech32}`)
+  })
+
+  it('treats a registered but not delegated account as registered', async () => {
+    global.fetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        registered: true,
+        active: false,
+        pool_id: null,
+        withdrawable_amount: '0',
+      }),
+    })
+
+    await expect(fetchAccountInfo('mainnet', 'aabbcc', projectId)).resolves.toEqual({
+      ok: true,
+      stakeRegistered: true,
+      delegation: '',
+      remainingAmount: '0',
+    })
   })
 
   it('treats 404 as an unregistered stake key', async () => {
