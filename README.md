@@ -3,7 +3,7 @@
 A simple, multi-chain example dApp that shows how to interact with wallet
 connectors — built for clarity, learning, testing, and extension.
 
-Live demo: https://dapp-example.yoroiwallet.com/
+Live demo: https://emurgo.github.io/dapp-example/
 
 > It may not look fancy, but it works and is meant as a reference for other
 > projects on how to talk to wallet dApp-connectors.
