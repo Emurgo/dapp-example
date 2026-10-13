@@ -12,6 +12,7 @@ import {isCip95Tab} from './utils/cip95'
 import NetworkToggle from './components/networkToggle'
 import EthereumAccessButton from './components/ethereumAccessButton'
 import EthereumMainTab from './components/tabs/ethereumMainTab'
+import Cip8Tab from './components/tabs/subtabs/cip8Tab'
 import Cip30Tab from './components/tabs/subtabs/cip30Tab'
 import Cip20Tab from './components/tabs/subtabs/cip20Tab'
 import Cip95Tab from './components/tabs/subtabs/cip95Tab'
@@ -75,6 +76,11 @@ const App = () => {
   }
 
   const cardanoTabsData = [
+    {
+      label: 'CIP-8',
+      value: 'cip8',
+      children: <Cip8Tab />,
+    },
     {
       label: 'CIP-30',
       value: 'cip30',
